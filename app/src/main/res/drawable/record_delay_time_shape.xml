@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/class_room_69000000" />
+    <corners android:topLeftRadius="@dimen/classroom_10dp"
+        android:topRightRadius="@dimen/classroom_10dp"
+        android:bottomRightRadius="@dimen/classroom_10dp"
+        android:bottomLeftRadius="@dimen/classroom_10dp"/>
+</shape>

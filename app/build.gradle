@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 29
+    buildToolsVersion "29.0.1"
+
+    defaultConfig {
+        applicationId "com.yiqi.smurf"
+        minSdkVersion 19
+        targetSdkVersion 29
+        versionCode 1
+        versionName "1.0"
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['libs']
+            }
+        }
+
+        defaultConfig {
+            applicationId "com.smurf.app"
+            minSdkVersion 15
+            targetSdkVersion 29
+            versionCode 9
+            versionName "2.6.4"
+            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+            manifestPlaceholders = [
+                    // 设置manifest.xml中的变量
+                    JPUSH_APPKEY : "dbc4c9398b1b89659b882ff3",
+                    //应用渠道
+                    JPUSH_CHANNEL: "default_developer",
+            ]
+        }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+
+
+}

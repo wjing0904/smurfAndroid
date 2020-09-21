@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="class_room_ffffff">#ffffff</color>
+    <color name="class_room_222222">#222222</color>
+    <color name="class_room_666666">#666666</color>
+    <color name="class_room_E6E6E6">#E6E6E6</color>
+    <color name="class_room_999999">#999999</color>
+    <color name="class_room_32C75A">#32C75A</color>
+    <color name="class_room_69000000">#69000000</color>
+    <color name="class_room_F9F9F9">#F9F9F9</color>
+    <color name="classroom_66000000">#66000000</color>
+    <color name="classroom_B0FFFFFF">#B0FFFFFF</color>
+    <color name="classroom_FF9C31">#FF9C31</color>
+    <color name="classroom_4D000000">#4D000000</color>
+    <color name="classroom_21291A">#21291A</color>
+    <color name="classroom_99000000">#99000000</color>
+    <color name="class_room_84C937">#84C937</color>
+    <color name="class_room_F66C4A">#F66C4A</color>
+    <color name="class_room_58E377">#58E377</color>
+    <color name="class_room_7BCB56">#7BCB56</color>
+    <color name="class_room_FFF6DC">#FFF6DC</color>
+    <color name="class_room_F5F5F5">#F5F5F5</color>
+
+</resources>
