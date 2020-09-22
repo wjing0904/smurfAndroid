@@ -46,10 +46,10 @@
         <!-- Required -->
         <meta-data
             android:name="JPUSH_APPKEY"
-            android:value="${JPUSH_APPKEY}" /> <!-- </>值来自开发者平台取得的AppKey -->
+            android:value="dbc4c9398b1b89659b882ff3" /> <!-- </>值来自开发者平台取得的AppKey -->
         <meta-data
             android:name="JPUSH_CHANNEL"
-            android:value="${JPUSH_CHANNEL}" />
+            android:value="developer-default" />
     </application>
 
 

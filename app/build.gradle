@@ -10,16 +10,13 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        sourceSets {
-            main {
-                jniLibs.srcDirs = ['libs']
-            }
-        }
+
         ndk {
             //兼容的 cpu 类型
             abiFilters 'armeabi'
         }
         manifestPlaceholders = [
+                JPUSH_PKGNAME : applicationId,
                 // 设置manifest.xml中的变量
                 JPUSH_APPKEY : "dbc4c9398b1b89659b882ff3",
                 //应用渠道
@@ -96,6 +93,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
 
     implementation 'com.github.bumptech.glide:glide:4.9.0'
+
+    implementation 'cn.jiguang.sdk:jverification:2.6.4'  // 此处以2.6.4 版本为例。
+    implementation 'cn.jiguang.sdk:jcore:2.3.8'  // 此处以JCore 2.3.4 版本为例。
 
 
 }
