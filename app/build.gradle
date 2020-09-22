@@ -32,12 +32,67 @@ android {
 
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            storeFile file('../app/key/smurf.old')
+            storePassword 'smurf123'
+            keyAlias = 'key0'
+            keyPassword 'smurf123'
+        }
+        debug {
+            storeFile file('../app/key/smurf.old')
+            storePassword 'smurf123'
+            keyAlias = 'key0'
+            keyPassword 'smurf123'
         }
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            shrinkResources false // 为 true 在打包时会删除没有用到的资源 （https://www.jianshu.com/p/77cbe147aea8）
+            debuggable false // 表示是否支持断点调试，release 默认为false，debug 默认为true
+            zipAlignEnabled true // 表示是否对APK包执行ZIP对齐优化，减小zip体积，增加运行效率，release 和 debug 默认都为 true
+        }
+
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            shrinkResources false
+            debuggable true
+            zipAlignEnabled true // 表示是否对APK包执行ZIP对齐优化，减小zip体积，增加运行效率，release 和 debug 默认都为 true
+        }
+    }
+    //修改输出文件名称
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                // 输出apk名称为appname-1.0-release-xxxx-xx-xx.apk
+                if (variant.buildType.name.equals('release')) {
+                    output.outputFileName = "smurf-${defaultConfig.versionName}-release-${releaseTime()}.apk"
+                } else {
+                    output.outputFileName = "smurf-${defaultConfig.versionName}-debug-${releaseTime()}.apk"
+                }
+            }
+        }
+    }
+    dexOptions() {
+        javaMaxHeapSize "2g"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+
+//获取时间戳
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd-HH:mm:ss")
 }
 
 dependencies {
