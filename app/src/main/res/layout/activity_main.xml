@@ -20,7 +20,7 @@
         android:layout_marginTop="@dimen/classroom_5dp"
         android:layout_gravity="right"
         android:background="@drawable/record_delay_time_shape"
-        android:text="3"
+        android:text="3s"
         android:gravity="center"
         android:textSize="@dimen/classroom_14sp"
         android:textColor="@color/class_room_F9F9F9"

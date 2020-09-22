@@ -2,10 +2,10 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.1"
+    buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.yiqi.smurf"
+        applicationId "com.smurf.app"
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
@@ -22,7 +22,6 @@ android {
             targetSdkVersion 29
             versionCode 9
             versionName "2.6.4"
-            testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
             manifestPlaceholders = [
                     // 设置manifest.xml中的变量
                     JPUSH_APPKEY : "dbc4c9398b1b89659b882ff3",
