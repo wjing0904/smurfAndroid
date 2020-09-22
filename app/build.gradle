@@ -21,7 +21,7 @@ android {
             minSdkVersion 15
             targetSdkVersion 29
             versionCode 9
-            versionName "2.6.4"
+            versionName "1.0.0"
             manifestPlaceholders = [
                     // 设置manifest.xml中的变量
                     JPUSH_APPKEY : "dbc4c9398b1b89659b882ff3",
