@@ -6,13 +6,19 @@ import android.util.Log;
 import com.tencent.smtt.sdk.QbSdk;
 
 import cn.jiguang.verifysdk.api.JVerificationInterface;
+import cn.jiguang.verifysdk.api.RequestCallback;
 
 public class SmurfApplication  extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
         JVerificationInterface.setDebugMode(true);
-        JVerificationInterface.init(this);
+        JVerificationInterface.init(this, new RequestCallback<String>() {
+            @Override
+            public void onResult(int code, String result) {
+                Log.d("MyApp", "[init] code = " + code + " result = " + result);
+            }
+        });
 
         QbSdk.PreInitCallback cb = new QbSdk.PreInitCallback() {
 

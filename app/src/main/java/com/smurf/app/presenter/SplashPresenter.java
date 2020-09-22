@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 
 import com.smurf.app.view.ILoginViewInterface;
 
-public class LoginPresenter {
+public class SplashPresenter {
     private static final int MSG_DELAY_TIME_WHAT = 0;
     private ILoginViewInterface loginViewInterface;
     private int time = 3;
@@ -33,7 +33,7 @@ public class LoginPresenter {
         }
     };
 
-    public LoginPresenter(ILoginViewInterface iLoginViewInterface){
+    public SplashPresenter(ILoginViewInterface iLoginViewInterface){
         this.loginViewInterface = iLoginViewInterface;
     }
 
@@ -45,4 +45,5 @@ public class LoginPresenter {
     public void resertTime(){
         time = 3;
     }
+
 }
