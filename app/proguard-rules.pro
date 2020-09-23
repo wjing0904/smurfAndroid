@@ -44,3 +44,55 @@
 
          -dontwarn com.sdk.**
          -keep class com.sdk.** { *; }
+
+
+
+         -ignorewarnings
+
+         -dontoptimize
+         -dontwarn android.app.**
+         -dontwarn android.support.**
+         -dontwarn sun.misc.**
+         -keepattributes Signature
+         -keepattributes *Annotation*
+         -dontwarn android.support.**
+         -dontwarn com.adhub.ads.**
+         -dontwarn com.hubcloud.adhubsdk.**
+
+         -keep class sun.misc.**{*;}
+         -keep class android.support.** { *; }
+         -keep class android.app.**{*;}
+         -keep class **.R$* {*;}
+
+         -keep class com.adhub.ads.** {*; }
+
+         -keep class com.hubcloud.adhubsdk.** {*; }
+
+         -keep class com.falcon.adpoymer.** { *; }
+
+         -keep class com.qq.e.** {
+             public protected *;
+         }
+
+         -keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod
+
+         -dontwarn  org.apache.**
+
+         -keep class com.baidu.mobads.** { *; }
+         -keep class com.baidu.mobad.** { *; }
+
+         -keep class com.bytedance.sdk.openadsdk.** { *; }
+         -keep public interface com.bytedance.sdk.openadsdk.downloadnew.** {*;}
+         -keep class com.pgl.sys.ces.* {*;}
+
+         -keep class com.inmobi.** { *; }
+         -dontwarn com.inmobi.**
+         -dontwarn com.squareup.picasso.**
+         -keep class com.squareup.picasso.** {*;}
+         -dontwarn com.squareup.picasso.**
+         -dontwarn com.squareup.okhttp.**
+         -keep class com.integralads.avid.library.** {*;}
+         -keep class com.bun.** {*;}
+         -dontwarn com.bun.**
+         -keep class com.iab.** {*;}
+         -dontwarn com.iab.**
