@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:name="com.smurf.app.SmurfApplication"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:theme="@android:style/Theme.NoTitleBar"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         >
         <activity android:name=".SplashActivity"
             android:screenOrientation="portrait"
@@ -26,6 +26,14 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation|keyboardHidden|screenSize"
             />
+
+        <activity android:name=".WebViewActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
+        <activity android:name=".zxing.android.CaptureActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
             android:name=".login.activity.TwiceVertificationActivity"

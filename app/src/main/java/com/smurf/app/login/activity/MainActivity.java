@@ -23,6 +23,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.smurf.app.R;
+import com.smurf.app.WebViewActivity;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
@@ -655,6 +656,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         intent.putExtra(Constants.KEY_ACTION, action);
         intent.putExtra(Constants.KEY_TOKEN,token);
         startActivity(intent);
+
     }
 
     private void toFailedActivigy(int code, String errorMsg){

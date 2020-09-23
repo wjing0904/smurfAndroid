@@ -4,7 +4,9 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,9 +22,12 @@ import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 
 public class WebViewActivity extends Activity {
+    private static final String TAG = "WebViewActivity";
+
     private X5WebView mWebView;
     private static final int REQUEST_CODE_SCAN = 0x0000;
     private static final int CAMERA_PERMISSION = 1;
@@ -142,7 +147,8 @@ public class WebViewActivity extends Activity {
      * 拍照的方法
      */
     private void takePicture(int requestCode) {
-
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(intent, REQUEST_CODE_TAKE);
     }
 
 
@@ -156,6 +162,24 @@ public class WebViewActivity extends Activity {
             }
         }
         if (requestCode == REQUEST_CODE_TAKE) {
+// 解析返回的图片成bitmap
+            Bitmap bmp = (Bitmap) data.getExtras().get("data");
+            String f = System.currentTimeMillis() + ".jpg";
+            File file = new File("/sdcard/pic/" + f);
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(file);
+                bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            } catch (Exception x) {
+                Log.e(TAG, "save Bitmap error=" + x);
+            } finally {
+                try {
+                    fos.flush();
+                    fos.close();
+                } catch (Exception x) {
+                    Log.e(TAG, "save Bitmap error=" + x);
+                }
+            }
 
         }
 
