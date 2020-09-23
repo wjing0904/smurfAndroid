@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.adhub.ads.RewardedVideoAd;
+import com.adhub.ads.RewardedVideoAdListener;
 import com.lcw.library.imagepicker.ImagePicker;
 import com.smurf.app.webView.X5WebView;
 import com.smurf.app.zxing.android.CaptureActivity;
@@ -37,8 +39,7 @@ public class WebViewActivity extends Activity {
 
     private static final int REQUEST_SELECT_IMAGES_CODE = 4;
 
-    private File takeImageFile;
-
+    private RewardedVideoAd mRewardedVideoAd;
 
     private Button btn1, btn2, btn3,btn4;
 
@@ -93,7 +94,7 @@ public class WebViewActivity extends Activity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                showRewadeVideo();
             }
         });
 
@@ -150,6 +151,74 @@ public class WebViewActivity extends Activity {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_CODE_TAKE);
     }
+
+
+    private void showRewadeVideo(){
+        //TODO 拉去广告的 ADId
+        mRewardedVideoAd = new RewardedVideoAd(this, "975",new RewardedVideoAdListener() {
+
+            /**
+             * 获得奖励
+             */
+            @Override
+            public void onRewarded() {
+            }
+
+            /**
+             * 加载失败
+             * @param i 错误码
+             */
+            @Override
+            public void onRewardedVideoAdFailedToLoad(int i) {
+            }
+
+            /**
+             * 广告加载成功
+             */
+            @Override
+            public void onRewardedVideoAdLoaded() {
+                //展示广告
+                if(mRewardedVideoAd.isLoaded()){
+                    mRewardedVideoAd.showAd(WebViewActivity.this);
+                }
+            }
+
+            /**
+             * 广告展示
+             */
+            @Override
+            public void onRewardedVideoAdShown() {
+            }
+
+            /**
+             * 广告关闭
+             */
+            @Override
+            public void onRewardedVideoAdClosed() {
+            }
+
+            /**
+             * 广告点击
+             */
+            @Override
+            public void onRewardedVideoClick() {
+            }
+        },5000);////激励视频加载超时时长，建议5秒以上,该参数单位为ms
+
+        if (!mRewardedVideoAd.isLoaded()) {
+            mRewardedVideoAd.loadAd();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mRewardedVideoAd != null){
+            mRewardedVideoAd.destroy();
+        }
+        super.onDestroy();
+    }
+
+
 
 
     @Override

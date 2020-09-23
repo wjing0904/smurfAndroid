@@ -3,6 +3,7 @@ package com.smurf.app;
 import android.app.Application;
 import android.util.Log;
 
+import com.adhub.ads.AdHubs;
 import com.tencent.smtt.sdk.QbSdk;
 
 import cn.jiguang.share.android.api.JShareInterface;
@@ -54,5 +55,9 @@ public class SmurfApplication  extends Application {
         };
         //x5内核初始化接口
         QbSdk.initX5Environment(getApplicationContext(), cb);
+
+        //TODO 申请广告的APP ID
+        AdHubs.init(this, "277");
+
     }
 }
