@@ -12,12 +12,15 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.lcw.library.imagepicker.ImagePicker;
 import com.smurf.app.webView.X5WebView;
 import com.smurf.app.zxing.android.CaptureActivity;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
 import java.io.File;
+import java.util.List;
 
 public class WebViewActivity extends Activity {
     private X5WebView mWebView;
@@ -27,10 +30,12 @@ public class WebViewActivity extends Activity {
 
     private static final int REQUEST_CODE_TAKE = 3;
 
+    private static final int REQUEST_SELECT_IMAGES_CODE = 4;
+
     private File takeImageFile;
 
 
-    private Button btn1, btn2, btn3;
+    private Button btn1, btn2, btn3,btn4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,7 @@ public class WebViewActivity extends Activity {
         btn1 = findViewById(R.id.btn1);
         btn2 = findViewById(R.id.btn2);
         btn3 = findViewById(R.id.btn3);
+        btn4 = findViewById(R.id.btn4);
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +88,21 @@ public class WebViewActivity extends Activity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+            }
+        });
+
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImagePicker.getInstance()
+                        .setTitle("标题")//设置标题
+                        .showCamera(true)//设置是否显示拍照按钮
+                        .showImage(true)//设置是否展示图片
+                        .showVideo(true)//设置是否展示视频
+                        .setSingleType(true)//设置图片视频不能同时选择
+                        .setMaxCount(9)//设置最大选择图片数目(默认为1，单选)
+                        .start(WebViewActivity.this, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
 
             }
         });
@@ -136,6 +157,10 @@ public class WebViewActivity extends Activity {
         }
         if (requestCode == REQUEST_CODE_TAKE) {
 
+        }
+
+        if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
+            List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
         }
     }
 }

@@ -22,6 +22,13 @@
         android:id="@+id/btn3"
         android:text="激励视频"/>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn4"
+        android:text="图片选取"/>
+
+
     <com.smurf.app.webView.X5WebView
         android:id="@+id/webview"
         android:layout_width="match_parent"

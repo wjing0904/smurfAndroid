@@ -140,4 +140,6 @@ dependencies {
 
     implementation(name: 'msa_mdid_1.0.13', ext: 'aar')
 
+    implementation 'com.lcw.library:imagepicker:2.2.0'
+
 }
