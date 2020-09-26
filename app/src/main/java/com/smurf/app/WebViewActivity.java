@@ -2,6 +2,7 @@ package com.smurf.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -9,6 +10,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -41,6 +43,29 @@ public class WebViewActivity extends Activity {
 
     private Button btn1, btn2, btn3,btn4;
 
+    /**
+     * H5中调用
+     * @param savedInstanceState
+     *
+     * <html>
+     * <head>
+     * <script type="text/javascript">
+     * function displaymessage()
+     * {
+     * JSInterface.changeActivity();
+     * }
+     * </script>
+     * </head>
+     *
+     * <body>
+     * <form>
+     * <input type="button" value="Click me!" onclick="displaymessage()" />
+     * </form>
+     * </body>
+     * </html>
+     */
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,9 +80,38 @@ public class WebViewActivity extends Activity {
             }
         });
         mWebView.getSettings();
+        JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
+        mWebView.addJavascriptInterface(javascriptInterface,"JSInterface");
         mWebView.loadUrl(" http://39.107.84.57:8091/#/home");
 
         initView();
+    }
+
+    public class JavaScriptInterface{
+        Context mContext;
+        public JavaScriptInterface(Context context){
+            mContext = context;
+        }
+
+        @JavascriptInterface
+        public void goSCan(Context context){
+
+        }
+
+        @JavascriptInterface
+        public void takePicture(){
+
+        }
+
+        @JavascriptInterface
+        public void imageSelected(){
+
+        }
+
+        @JavascriptInterface
+        public void openRewarderVideo(){
+
+        }
     }
 
     private void initView() {

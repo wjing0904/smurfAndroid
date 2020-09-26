@@ -34,7 +34,7 @@ public class SmurfApplication  extends Application {
         JVerificationInterface.setDebugMode(true);
         JVerificationInterface.init(this);
 
-
+        
         JShareInterface.setDebugMode(true);
         PlatformConfig platformConfig = new PlatformConfig()
                 .setWechat("wx4a58c62d258121ac", "6f43e3fca5b2c3996c20faf5c2a08729")
