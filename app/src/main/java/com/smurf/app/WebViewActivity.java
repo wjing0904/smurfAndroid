@@ -235,7 +235,10 @@ public class WebViewActivity extends Activity {
                     Log.e(TAG, "save Bitmap error=" + x);
                 }
             }
+            // mWebview.loadUrl("javascript:方法名(参数)");
+            //TODO webview 将处理完的值 传递到 javascripte
 
+            mWebView.loadUrl("javascripte:WriteX");
         }
 
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
