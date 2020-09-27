@@ -1,6 +1,7 @@
 package com.smurf.app;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import com.adhub.ads.RewardedVideoAd;
 import com.adhub.ads.RewardedVideoAdListener;
 import com.lcw.library.imagepicker.ImagePicker;
 import com.smurf.app.webView.X5WebView;
+import com.smurf.app.zxing.android.CaptureActivity;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
@@ -44,8 +46,6 @@ public class WebViewActivity extends Activity {
     private static final int REQUEST_CODE_TAKE = 3;
 
     private static final int REQUEST_SELECT_IMAGES_CODE = 4;
-
-    private Button btn1, btn2, btn3, btn4;
 
     /**
      * H5中调用
@@ -110,24 +110,16 @@ public class WebViewActivity extends Activity {
             }
         }
 
-        @JavascriptInterface
-        public void takePicture() {
-            if (ContextCompat.checkSelfPermission(WebViewActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
-            } else {
-                openCamer();
-            }
-        }
 
         @JavascriptInterface
-        public void imageSelected() {
+        public void imageSelected(int picNum) {
             ImagePicker.getInstance()
                     .setTitle("标题")//设置标题
                     .showCamera(true)//设置是否显示拍照按钮
                     .showImage(true)//设置是否展示图片
                     .showVideo(true)//设置是否展示视频
                     .setSingleType(true)//设置图片视频不能同时选择
-                    .setMaxCount(9)//设置最大选择图片数目(默认为1，单选)
+                    .setMaxCount(picNum ==0? 1:picNum)//设置最大选择图片数目(默认为1，单选)
                     .start(WebViewActivity.this, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
         }
 
@@ -177,6 +169,22 @@ public class WebViewActivity extends Activity {
         startActivityForResult(intent, REQUEST_CODE_TAKE);
     }
 
+    @SuppressLint("JavascriptInterface")
+    @JavascriptInterface
+    private void notifyScanVue(String content){
+        mWebView.loadUrl("javascript:getInviteInfo('"+content+"')");
+
+    }
+    @SuppressLint("JavascriptInterface")
+    @JavascriptInterface
+    private void notifyCamer(List<String> paths){
+        StringBuffer sb = new StringBuffer();
+        for(String s:paths){
+            sb.append(s).append(",");
+        }
+        mWebView.loadUrl("javascript:androidUploadImg('"+sb.toString().substring(0,sb.toString().length()-1)+"')");
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -185,43 +193,13 @@ public class WebViewActivity extends Activity {
         if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
             if (data != null) {
                 String content = data.getStringExtra(DECODED_CONTENT_KEY);
-                mWebView.loadUrl("javascript:getInviteInfo('"+false+","+content+"')");
+                notifyScanVue(content);
             }
-        }
-        if (requestCode == REQUEST_CODE_TAKE) {
-// 解析返回的图片成bitmap
-            Bitmap bmp = (Bitmap) data.getExtras().get("data");
-            String f = System.currentTimeMillis() + ".jpg";
-            File file = new File("/sdcard/pic/" + f);
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream(file);
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            } catch (Exception x) {
-                Log.e(TAG, "save Bitmap error=" + x);
-            } finally {
-                try {
-                    fos.flush();
-                    fos.close();
-                } catch (Exception x) {
-                    Log.e(TAG, "save Bitmap error=" + x);
-                }
-            }
-            // mWebview.loadUrl("javascript:方法名(参数)");
-            /**
-             * 1.原生调用js不带返回值的方法
-             * js带参数的方法 不带返回值
-             * function nativeCallToJS(param) {
-             *     alert(param);
-             * }
-             */
-            //TODO webview 将处理完的值 传递到 javascripte
-
-            mWebView.loadUrl("javascripte:WriteX");
         }
         //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
+            notifyCamer(imagePaths);
         }
     }
 }
