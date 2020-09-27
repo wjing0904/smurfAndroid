@@ -32,6 +32,7 @@ import java.util.List;
 public class WebViewActivity extends Activity {
     private static final String TAG = "WebViewActivity";
 
+    private static final String DECODED_CONTENT_KEY = "codedContent";
 
     private static final String DEBUG_APP_URL = "http://10.13.21.24:8080/#/home";
     private static final String RELEASE_APP_URL = "";
@@ -225,7 +226,8 @@ public class WebViewActivity extends Activity {
         // 扫描二维码/条码回传
         if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
             if (data != null) {
-                mWebView.loadUrl("javascript:jsText('"+false+","+"yyyyyy"+"')");
+                String content = data.getStringExtra(DECODED_CONTENT_KEY);
+                mWebView.loadUrl("javascript:getInviteInfo('"+false+","+content+"')");
             }
         }
         if (requestCode == REQUEST_CODE_TAKE) {
