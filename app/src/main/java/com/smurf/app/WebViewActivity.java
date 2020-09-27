@@ -32,6 +32,10 @@ import java.util.List;
 public class WebViewActivity extends Activity {
     private static final String TAG = "WebViewActivity";
 
+
+    private static final String DEBUG_APP_URL = "http://10.13.21.24:8080/#/home";
+    private static final String RELEASE_APP_URL = "";
+
     private X5WebView mWebView;
     private static final int REQUEST_CODE_SCAN = 0x0000;
     private static final int CAMERA_PERMISSION = 1;
@@ -41,28 +45,27 @@ public class WebViewActivity extends Activity {
 
     private static final int REQUEST_SELECT_IMAGES_CODE = 4;
 
-    private Button btn1, btn2, btn3,btn4;
+    private Button btn1, btn2, btn3, btn4;
 
     /**
      * H5中调用
-     * @param savedInstanceState
      *
-     * <html>
-     * <head>
-     * <script type="text/javascript">
-     * function displaymessage()
-     * {
-     * JSInterface.changeActivity();
-     * }
-     * </script>
-     * </head>
+     * @param savedInstanceState <html>
+     *                           <head>
+     *                           <script type="text/javascript">
+     *                           function displaymessage()
+     *                           {
+     *                           JSInterface.changeActivity();
+     *                           }
+     *                           </script>
+     *                           </head>
      *
-     * <body>
-     * <form>
-     * <input type="button" value="Click me!" onclick="displaymessage()" />
-     * </form>
-     * </body>
-     * </html>
+     *                           <body>
+     *                           <form>
+     *                           <input type="button" value="Click me!" onclick="displaymessage()" />
+     *                           </form>
+     *                           </body>
+     *                           </html>
      */
 
 
@@ -81,35 +84,45 @@ public class WebViewActivity extends Activity {
         });
         mWebView.getSettings();
         JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
-        mWebView.addJavascriptInterface(javascriptInterface,"JSInterface");
-        mWebView.loadUrl(" http://39.107.84.57:8091/#/home");
+        if (BuildConfig.DEBUG) {
+            mWebView.loadUrl(DEBUG_APP_URL);
+        } else {
+            mWebView.loadUrl(RELEASE_APP_URL);
+        }
+
+        mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
 
         initView();
     }
 
-    public class JavaScriptInterface{
+    public class JavaScriptInterface {
         Context mContext;
-        public JavaScriptInterface(Context context){
+
+        public JavaScriptInterface(Context context) {
             mContext = context;
         }
 
         @JavascriptInterface
-        public void goSCan(Context context){
+        public void goSCan() {
+            if (ContextCompat.checkSelfPermission(WebViewActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_SCAN);
+            } else {
+                goScan();
+            }
+        }
+
+        @JavascriptInterface
+        public void takePicture() {
 
         }
 
         @JavascriptInterface
-        public void takePicture(){
+        public void imageSelected() {
 
         }
 
         @JavascriptInterface
-        public void imageSelected(){
-
-        }
-
-        @JavascriptInterface
-        public void openRewarderVideo(){
+        public void openRewarderVideo() {
 
         }
     }
@@ -146,7 +159,7 @@ public class WebViewActivity extends Activity {
         btn3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(WebViewActivity.this,RewadeVideoActivity.class);
+                Intent intent = new Intent(WebViewActivity.this, RewadeVideoActivity.class);
                 startActivity(intent);
             }
         });
@@ -206,14 +219,13 @@ public class WebViewActivity extends Activity {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // 扫描二维码/条码回传
         if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
             if (data != null) {
-
+                mWebView.loadUrl("javascript:jsText('"+false+","+"yyyyyy"+"')");
             }
         }
         if (requestCode == REQUEST_CODE_TAKE) {
@@ -236,11 +248,18 @@ public class WebViewActivity extends Activity {
                 }
             }
             // mWebview.loadUrl("javascript:方法名(参数)");
+            /**
+             * 1.原生调用js不带返回值的方法
+             * js带参数的方法 不带返回值
+             * function nativeCallToJS(param) {
+             *     alert(param);
+             * }
+             */
             //TODO webview 将处理完的值 传递到 javascripte
 
             mWebView.loadUrl("javascripte:WriteX");
         }
-
+        //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
         }
