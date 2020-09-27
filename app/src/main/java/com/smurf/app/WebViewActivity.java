@@ -21,7 +21,6 @@ import com.adhub.ads.RewardedVideoAd;
 import com.adhub.ads.RewardedVideoAdListener;
 import com.lcw.library.imagepicker.ImagePicker;
 import com.smurf.app.webView.X5WebView;
-import com.smurf.app.zxing.android.CaptureActivity;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
@@ -93,7 +92,6 @@ public class WebViewActivity extends Activity {
 
         mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
 
-        initView();
     }
 
     public class JavaScriptInterface {
@@ -114,72 +112,32 @@ public class WebViewActivity extends Activity {
 
         @JavascriptInterface
         public void takePicture() {
-
+            if (ContextCompat.checkSelfPermission(WebViewActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
+            } else {
+                openCamer();
+            }
         }
 
         @JavascriptInterface
         public void imageSelected() {
-
+            ImagePicker.getInstance()
+                    .setTitle("标题")//设置标题
+                    .showCamera(true)//设置是否显示拍照按钮
+                    .showImage(true)//设置是否展示图片
+                    .showVideo(true)//设置是否展示视频
+                    .setSingleType(true)//设置图片视频不能同时选择
+                    .setMaxCount(9)//设置最大选择图片数目(默认为1，单选)
+                    .start(WebViewActivity.this, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
         }
 
         @JavascriptInterface
         public void openRewarderVideo() {
-
+            Intent intent = new Intent(WebViewActivity.this, RewadeVideoActivity.class);
+            startActivity(intent);
         }
     }
 
-    private void initView() {
-        btn1 = findViewById(R.id.btn1);
-        btn2 = findViewById(R.id.btn2);
-        btn3 = findViewById(R.id.btn3);
-        btn4 = findViewById(R.id.btn4);
-
-        btn1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //动态权限申请
-                if (ContextCompat.checkSelfPermission(WebViewActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_SCAN);
-                } else {
-                    goScan();
-                }
-            }
-        });
-
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(WebViewActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
-                } else {
-                    takePicture(REQUEST_CODE_TAKE);
-                }
-            }
-        });
-
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(WebViewActivity.this, RewadeVideoActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        btn4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ImagePicker.getInstance()
-                        .setTitle("标题")//设置标题
-                        .showCamera(true)//设置是否显示拍照按钮
-                        .showImage(true)//设置是否展示图片
-                        .showVideo(true)//设置是否展示视频
-                        .setSingleType(true)//设置图片视频不能同时选择
-                        .setMaxCount(9)//设置最大选择图片数目(默认为1，单选)
-                        .start(WebViewActivity.this, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
-
-            }
-        });
-    }
 
     /**
      * 跳转到扫码界面扫码
@@ -201,7 +159,7 @@ public class WebViewActivity extends Activity {
                 break;
             case CAMERA_PERMISSION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    takePicture(REQUEST_CODE_TAKE);
+                    openCamer();
                 } else {
                     Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机扫码哟！", Toast.LENGTH_SHORT).show();
                 }
@@ -214,7 +172,7 @@ public class WebViewActivity extends Activity {
     /**
      * 拍照的方法
      */
-    private void takePicture(int requestCode) {
+    private void openCamer() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, REQUEST_CODE_TAKE);
     }
