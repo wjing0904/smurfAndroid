@@ -104,7 +104,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     }
 
     @Override
-    public void notifyCamerValueToJs(String value) {
+    public void notifyZxingValueToJs(String value) {
         mWebView.loadUrl("javascript:getInviteInfo('"+value+"')");
     }
 

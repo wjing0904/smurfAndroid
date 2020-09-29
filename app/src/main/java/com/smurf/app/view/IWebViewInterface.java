@@ -6,7 +6,7 @@ package com.smurf.app.view;
 
 public interface IWebViewInterface {
 
-    void notifyCamerValueToJs(String value);
+    void notifyZxingValueToJs(String value);
 
     void notifyImageSelectedValueToJs(String value);
 }
