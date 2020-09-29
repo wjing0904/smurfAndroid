@@ -1,72 +1,37 @@
 package com.smurf.app;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.webkit.JavascriptInterface;
-import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.adhub.ads.RewardedVideoAd;
-import com.adhub.ads.RewardedVideoAdListener;
 import com.lcw.library.imagepicker.ImagePicker;
+import com.smurf.app.jsp.JavaScriptInterface;
+import com.smurf.app.jsp.JavaScriptInterfaceImpl;
+import com.smurf.app.presenter.JavaScriptPresenter;
+import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.webView.X5WebView;
-import com.smurf.app.zxing.android.CaptureActivity;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.List;
 
-public class WebViewActivity extends Activity {
+import static com.smurf.app.StaticNum.REQUEST_CAMERA_CODE;
+import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
+
+public class WebViewActivity extends Activity implements IWebViewInterface {
     private static final String TAG = "WebViewActivity";
 
     private static final String DECODED_CONTENT_KEY = "codedContent";
 
     private static final String DEBUG_APP_URL = "http://10.13.21.24:8080/#/home";
     private static final String RELEASE_APP_URL = "";
-
     private X5WebView mWebView;
-    private static final int REQUEST_CODE_SCAN = 0x0000;
-    private static final int CAMERA_PERMISSION = 1;
-    private static final int CAMERA_PERMISSION_SCAN = 2;
-
-    private static final int REQUEST_CODE_TAKE = 3;
-
-    private static final int REQUEST_SELECT_IMAGES_CODE = 4;
-
-    /**
-     * H5中调用
-     *
-     * @param savedInstanceState <html>
-     *                           <head>
-     *                           <script type="text/javascript">
-     *                           function displaymessage()
-     *                           {
-     *                           JSInterface.changeActivity();
-     *                           }
-     *                           </script>
-     *                           </head>
-     *
-     *                           <body>
-     *                           <form>
-     *                           <input type="button" value="Click me!" onclick="displaymessage()" />
-     *                           </form>
-     *                           </body>
-     *                           </html>
-     */
+    private JavaScriptPresenter javaScriptPresenter;
 
 
     @Override
@@ -83,123 +48,68 @@ public class WebViewActivity extends Activity {
             }
         });
         mWebView.getSettings();
-        JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
+        if(javaScriptPresenter == null){
+            javaScriptPresenter = new JavaScriptPresenter(this,this);
+        }
+        JavaScriptInterface javascriptInterface = new JavaScriptInterfaceImpl(this,javaScriptPresenter);
+        mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
         if (BuildConfig.DEBUG) {
             mWebView.loadUrl(DEBUG_APP_URL);
         } else {
             mWebView.loadUrl(RELEASE_APP_URL);
         }
-
-        mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
-
     }
-
-    public class JavaScriptInterface {
-        Context mContext;
-
-        public JavaScriptInterface(Context context) {
-            mContext = context;
-        }
-
-        @JavascriptInterface
-        public void goSCan() {
-            if (ContextCompat.checkSelfPermission(WebViewActivity.this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(WebViewActivity.this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_SCAN);
-            } else {
-                goScan();
-            }
-        }
-
-
-        @JavascriptInterface
-        public void imageSelected(int picNum) {
-            ImagePicker.getInstance()
-                    .setTitle("标题")//设置标题
-                    .showCamera(true)//设置是否显示拍照按钮
-                    .showImage(true)//设置是否展示图片
-                    .showVideo(true)//设置是否展示视频
-                    .setSingleType(true)//设置图片视频不能同时选择
-                    .setMaxCount(picNum ==0? 1:picNum)//设置最大选择图片数目(默认为1，单选)
-                    .start(WebViewActivity.this, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
-        }
-
-        @JavascriptInterface
-        public void openRewarderVideo() {
-            Intent intent = new Intent(WebViewActivity.this, RewadeVideoActivity.class);
-            startActivity(intent);
-        }
-    }
-
 
     /**
-     * 跳转到扫码界面扫码
+     * 动态权限申请
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
      */
-    private void goScan() {
-        Intent intent = new Intent(this, CaptureActivity.class);
-        startActivityForResult(intent, REQUEST_CODE_SCAN);
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case CAMERA_PERMISSION_SCAN:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    goScan();
-                } else {
-                    Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机扫码哟！", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            case CAMERA_PERMISSION:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    openCamer();
-                } else {
-                    Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机扫码哟！", Toast.LENGTH_SHORT).show();
-                }
-                break;
-
-            default:
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+            switch (requestCode){
+                case REQUEST_CAMERA_CODE:
+                    javaScriptPresenter.openZxing();
+                    break;
+                case REQUEST_SELECT_IMAGES_CODE:
+                    javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
+                    break;
+                default:
+                    break;
+            }
+        }else{
+            Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机哦！", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    /**
-     * 拍照的方法
-     */
-    private void openCamer() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(intent, REQUEST_CODE_TAKE);
-    }
-
-    @SuppressLint("JavascriptInterface")
-    @JavascriptInterface
-    private void notifyScanVue(String content){
-        mWebView.loadUrl("javascript:getInviteInfo('"+content+"')");
-
-    }
-    @SuppressLint("JavascriptInterface")
-    @JavascriptInterface
-    private void notifyCamer(List<String> paths){
-        StringBuffer sb = new StringBuffer();
-        for(String s:paths){
-            sb.append(s).append(",");
-        }
-        mWebView.loadUrl("javascript:androidUploadImg('"+sb.toString().substring(0,sb.toString().length()-1)+"')");
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // 扫描二维码/条码回传
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CAMERA_CODE && resultCode == RESULT_OK) {
             if (data != null) {
                 String content = data.getStringExtra(DECODED_CONTENT_KEY);
-                notifyScanVue(content);
+                if(javaScriptPresenter!= null)
+                    javaScriptPresenter.notifyScanVue(content);
             }
         }
         //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
-            notifyCamer(imagePaths);
+            if(javaScriptPresenter!= null)
+                javaScriptPresenter.notifyCamer(imagePaths);
         }
+    }
+
+    @Override
+    public void notifyCamerValueToJs(String value) {
+        mWebView.loadUrl("javascript:getInviteInfo('"+value+"')");
+    }
+
+    @Override
+    public void notifyImageSelectedValueToJs(String value) {
+        mWebView.loadUrl("javascript:androidUploadImg('"+value+"')");
     }
 }
