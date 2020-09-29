@@ -50,7 +50,7 @@ public class JavaScriptPresenter {
 
     public void notifyScanVue(String content){
         if(webViewInterface!= null)
-            webViewInterface.notifyCamerValueToJs(content);
+            webViewInterface.notifyZxingValueToJs(content);
     }
     public void notifyCamer(List<String> paths){
         StringBuffer sb = new StringBuffer();
