@@ -60,4 +60,10 @@ public class JavaScriptPresenter {
         if(webViewInterface!= null)
             webViewInterface.notifyImageSelectedValueToJs(sb.toString().substring(0,sb.toString().length()-1));
     }
+
+    public void notifyLoaction(String value){
+        if(webViewInterface!= null){
+            webViewInterface.notifyLocation(value);
+        }
+    }
 }

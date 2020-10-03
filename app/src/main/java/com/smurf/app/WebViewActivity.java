@@ -112,4 +112,9 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     public void notifyImageSelectedValueToJs(String value) {
         mWebView.loadUrl("javascript:androidUploadImg('"+value+"')");
     }
+    //TODO 需要跟H5 确定接收city的方法
+    @Override
+    public void notifyLocation(String value) {
+        mWebView.loadUrl("javascript:localCity('"+value+"')");
+    }
 }
