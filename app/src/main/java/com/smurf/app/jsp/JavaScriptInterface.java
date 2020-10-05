@@ -35,7 +35,7 @@ public interface JavaScriptInterface {
      * 图片保存
      */
     @JavascriptInterface
-    public void saveImg(String url);
+    public void openAndSaveImg(String url);
 
     /**
      * 分享功能
@@ -43,5 +43,10 @@ public interface JavaScriptInterface {
      */
     @JavascriptInterface
     public void share(int shareType, String title, String text, Uri uri, ArrayList<Uri> imageUris);
+
+    /**
+     * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
+     */
+    public void signUp(String signUrl);
 
 }

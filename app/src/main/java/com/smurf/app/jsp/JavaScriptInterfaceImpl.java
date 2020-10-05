@@ -17,7 +17,9 @@ import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
 import com.baidu.location.LocationClientOption;
 import com.bumptech.glide.Glide;
+import com.smurf.app.ImageActivity;
 import com.smurf.app.RewadeVideoActivity;
+import com.smurf.app.SignUpActivity;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.utils.SaveImageUtils;
 import com.smurf.app.utils.ShareUtil;
@@ -89,29 +91,10 @@ public class JavaScriptInterfaceImpl implements JavaScriptInterface {
     }
 
     @Override
-    public void saveImg(String url) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final Bitmap myBitmap = Glide.with(mContext).asBitmap()//上下文
-                            .load(url)//url
-                            .centerCrop()
-                            .into(500, 500)
-                            .get() ;
-                    Log.d("sevaImage", "onClick: "+myBitmap.getByteCount());
-                    ((Activity)mContext).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            SaveImageUtils.saveImageToGallerys(mContext,myBitmap);
-                        }
-                    });
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+    public void openAndSaveImg(String url) {
+        Intent intent = new Intent(mContext, ImageActivity.class);
+        intent.putExtra("img_url",url);
+        mContext.startActivity(intent);
     }
     /**
      * 分享功能
@@ -132,6 +115,13 @@ public class JavaScriptInterfaceImpl implements JavaScriptInterface {
             default:
                 break;
         }
+    }
+
+    @Override
+    public void signUp(String signUrl) {
+        Intent intent = new Intent(mContext, SignUpActivity.class);
+        intent.putExtra("sign_url",signUrl);
+        mContext.startActivity(intent);
     }
 
 }

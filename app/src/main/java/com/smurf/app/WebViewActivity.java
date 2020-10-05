@@ -28,7 +28,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private static final String DECODED_CONTENT_KEY = "codedContent";
 
-    private static final String DEBUG_APP_URL = "http://10.13.21.24:8080/#/home";
+    private static final String DEBUG_APP_URL = "http://39.107.84.57:8091/#/home";
     private static final String RELEASE_APP_URL = "";
     private X5WebView mWebView;
     private JavaScriptPresenter javaScriptPresenter;
