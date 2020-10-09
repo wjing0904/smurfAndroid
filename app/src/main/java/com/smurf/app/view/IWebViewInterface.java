@@ -11,4 +11,5 @@ public interface IWebViewInterface {
     void notifyImageSelectedValueToJs(String value);
 
     void notifyLocation(String value);
+
 }
