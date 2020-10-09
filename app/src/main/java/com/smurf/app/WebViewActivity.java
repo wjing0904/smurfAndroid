@@ -86,23 +86,23 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 //                javaScriptPresenter.openZxing();
 //        }
 
-        String[] permissions = new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.INTERNET};
-        List<String>  permissionList = new ArrayList<>();
-        for(int i=0;i<permissions.length;i++){
-            if(ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED){
-                permissionList.add(permissions[i]);
-            }
-        }
-        if(permissionList.size() <=0){
-            if(javaScriptPresenter!= null){
-                javaScriptPresenter.getLocal();
-            }
-        }else{
-            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
-        }
+//        String[] permissions = new String[]{
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION,
+//                Manifest.permission.INTERNET};
+//        List<String>  permissionList = new ArrayList<>();
+//        for(int i=0;i<permissions.length;i++){
+//            if(ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED){
+//                permissionList.add(permissions[i]);
+//            }
+//        }
+//        if(permissionList.size() <=0){
+//            if(javaScriptPresenter!= null){
+//                javaScriptPresenter.getLocal();
+//            }
+//        }else{
+//            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
+//        }
     }
 
     /**
