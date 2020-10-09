@@ -64,12 +64,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             javaScriptPresenter = new JavaScriptPresenter(this,this);
         }
         JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
-        mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
         if (BuildConfig.DEBUG) {
             mWebView.loadUrl(DEBUG_APP_URL);
         } else {
             mWebView.loadUrl(RELEASE_APP_URL);
         }
+        mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
     }
 
     /**
@@ -129,8 +129,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     public void notifyLocation(String value) {
         mWebView.loadUrl("javascript:localCity('"+value+"')");
     }
-
-
 
 
    class JavaScriptInterface {
