@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -206,9 +207,13 @@ public class LoginResultActivity extends Activity implements View.OnClickListene
 //                startActivity(intent);
 //                LoginResultActivity.this.finish();
 //            }
-            tvSuccess.setText("登录成功!");
-            tvPhone.setVisibility(View.VISIBLE);
-            tvPhone.setText("手机号码：xxxxxxxxx");
+//            tvSuccess.setText("登录成功!");
+//            tvPhone.setVisibility(View.VISIBLE);
+//            tvPhone.setText("手机号码：xxxxxxxxx");
+            Toast.makeText(LoginResultActivity.this,"登录成功!",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginResultActivity.this, WebViewActivity.class);
+            startActivity(intent);
+            finish();
         }
     };
 }
