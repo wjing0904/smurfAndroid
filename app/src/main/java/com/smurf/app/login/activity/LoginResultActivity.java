@@ -145,13 +145,13 @@ public class LoginResultActivity extends Activity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-//        finish();
-//        Intent intent = new Intent(this, MainActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(intent);
-
-        Intent intent = new Intent(this, WebViewActivity.class);
+        finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+
+//        Intent intent = new Intent(this, WebViewActivity.class);
+//        startActivity(intent);
     }
 
     public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");

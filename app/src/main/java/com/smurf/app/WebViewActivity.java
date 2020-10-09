@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     private static final String RELEASE_APP_URL = "";
     private X5WebView mWebView;
     private JavaScriptPresenter javaScriptPresenter;
+    private long exitTime = 0;
 
 
     @Override
@@ -117,4 +119,21 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     public void notifyLocation(String value) {
         mWebView.loadUrl("javascript:localCity('"+value+"')");
     }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        ExitApp();
+        return false;
+    }
+    private void ExitApp() {
+        if ((System.currentTimeMillis() - exitTime) > 2000) {
+            Toast.makeText(WebViewActivity.this, "再按一次退出蓝晶灵应用", Toast.LENGTH_SHORT)
+                    .show();
+            exitTime = System.currentTimeMillis();
+        } else {
+            finish();
+        }
+    }
+
 }
