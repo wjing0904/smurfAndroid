@@ -20,26 +20,6 @@ public class X5WebView extends WebView {
 		 * 防止加载网页时调起系统浏览器
 		 */
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			String referer = "http://smurf.langongbao.com";
-			try {
-				if (url.startsWith("weixin://") || url.startsWith("alipays://")) {
-					Intent intent = new Intent();
-					intent.setAction(Intent.ACTION_VIEW);
-					intent.setData(Uri.parse(url));
-					getContext().startActivity(intent);
-					return true;
-				}
-			}catch (Exception e){
-				return false;
-			}
-
-			if(url.contains("https://wx.tenpay.com")){
-				Map<String,String> extraHeaders = new HashMap<>();
-				extraHeaders.put("Referer",referer);
-				view.loadUrl(url,extraHeaders);
-				referer = url;
-				return true;
-			}
 			view.loadUrl(url);
 			return true;
 		}
