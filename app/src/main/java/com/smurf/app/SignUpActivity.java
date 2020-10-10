@@ -72,6 +72,7 @@ public class SignUpActivity extends Activity {
                     referer = url;
                     return true;
                 }
+                mWebView.loadUrl(url);
                 return super.shouldOverrideUrlLoading(view, url);
             }
         });
