@@ -9,12 +9,24 @@ import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class X5WebView extends WebView {
 	private WebViewClient client = new WebViewClient() {
 		/**
 		 * 防止加载网页时调起系统浏览器
 		 */
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			String referer = "http://smurf.langongbao.com";
+			if(url.contains("https://wx.tenpay.com")){
+				Map<String,String> extraHeaders = new HashMap<>();
+				extraHeaders.put("Referer",referer);
+				view.loadUrl(url,extraHeaders);
+				referer = url;
+				return true;
+			}
+
 			view.loadUrl(url);
 			return true;
 		}
