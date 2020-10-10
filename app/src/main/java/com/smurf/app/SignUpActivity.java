@@ -26,7 +26,7 @@ public class SignUpActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_webview);
+        setContentView(R.layout.sign_layout_webview);
         String signUrl = getIntent().getStringExtra("sign_url");
         mWebView = (WebView) findViewById(R.id.webview);
         WebSettings webSetting = mWebView.getSettings();
