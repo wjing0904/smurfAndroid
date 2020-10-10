@@ -28,7 +28,6 @@ public class SignUpActivity extends Activity {
         String signUrl = getIntent().getStringExtra("sign_url");
         mWebView = (WebView) findViewById(R.id.webview);
         mWebView.getSettings();
-        mWebView.loadUrl(signUrl);
         mWebView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
@@ -55,5 +54,6 @@ public class SignUpActivity extends Activity {
                 return super.shouldOverrideUrlLoading(view, url);
             }
         });
+        mWebView.loadUrl(signUrl);
     }
 }
