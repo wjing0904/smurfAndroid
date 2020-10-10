@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -21,10 +22,6 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.baidu.location.BDLocation;
-import com.baidu.location.BDLocationListener;
-import com.baidu.location.LocationClient;
-import com.baidu.location.LocationClientOption;
 import com.lcw.library.imagepicker.ImagePicker;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.utils.ShareUtil;
@@ -50,9 +47,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     private X5WebView mWebView;
     private JavaScriptPresenter javaScriptPresenter;
     private long exitTime = 0;
-    private LocationManager locationManager;
-    private double latitude;
-    private double longitude;
 
 
     @Override
@@ -79,30 +73,25 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             mWebView.loadUrl(RELEASE_APP_URL);
         }
         mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
-//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(((Activity)this), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
-//        } else {
-//            if(javaScriptPresenter!= null)
-//                javaScriptPresenter.openZxing();
-//        }
 
-//        String[] permissions = new String[]{
-//                Manifest.permission.ACCESS_FINE_LOCATION,
-//                Manifest.permission.ACCESS_COARSE_LOCATION,
-//                Manifest.permission.INTERNET};
-//        List<String>  permissionList = new ArrayList<>();
-//        for(int i=0;i<permissions.length;i++){
-//            if(ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED){
-//                permissionList.add(permissions[i]);
-//            }
-//        }
-//        if(permissionList.size() <=0){
-//            if(javaScriptPresenter!= null){
-//                javaScriptPresenter.getLocal();
-//            }
-//        }else{
-//            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
-//        }
+        String[] permissions = new String[]{
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.INTERNET};
+        List<String>  permissionList = new ArrayList<>();
+        for(int i=0;i<permissions.length;i++){
+            if(ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED){
+                permissionList.add(permissions[i]);
+            }
+        }
+        if(permissionList.size() <=0){
+            if(javaScriptPresenter!= null){
+                javaScriptPresenter.getLocal();
+            }
+        }else{
+            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
+        }
+
     }
 
     /**
@@ -178,6 +167,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     @Override
     public void notifyLocation(String value) {
+        Log.d("test",value);
         mWebView.loadUrl("javascript:localCity('" + value + "')");
     }
 
@@ -260,16 +250,22 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          * shareType 0：分享文本内容，1：分享单张图片，2：分享多张图片
          */
         @JavascriptInterface
-        public void share(int shareType, String title, String text, Uri uri, ArrayList<Uri> imageUris) {
+        public void share(int shareType, String title, String text, String imgUri, String videoUrl) {
+            if(isWeixinAvilible(mContext)) {
+
+            }else {
+                Toast.makeText(mContext, "您还没有安装微信，请先安装微信客户端", Toast.LENGTH_SHORT).show();
+            }
+
             switch (shareType) {
                 case 0:
-                    ShareUtil.shareText(mContext, text, title);
+                    ShareUtil.getInstance(WebViewActivity.this).shareText(mContext, text, title);
                     break;
                 case 1:
-                    ShareUtil.shareImage(mContext, uri, title);
+                    ShareUtil.getInstance(WebViewActivity.this).shareImage(mContext, imgUri,title);
                     break;
                 case 2:
-                    ShareUtil.sendMoreImage(mContext, imageUris, title);
+                    ShareUtil.getInstance(WebViewActivity.this).shareWebPage(mContext, videoUrl, title);
                     break;
                 default:
                     break;
@@ -303,5 +299,22 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         } else {
             finish();
         }
+    }
+
+    /**
+     * 判断 用户是否安装微信客户端
+     */
+    public static boolean isWeixinAvilible(Context context) {
+        final PackageManager packageManager = context.getPackageManager();// 获取packagemanager
+        List<PackageInfo> pinfo = packageManager.getInstalledPackages(0);// 获取所有已安装程序的包信息
+        if (pinfo != null) {
+            for (int i = 0; i < pinfo.size(); i++) {
+                String pn = pinfo.get(i).packageName;
+                if (pn.equals("com.tencent.mm")) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -2,31 +2,54 @@ package com.smurf.app.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 
+import com.smurf.app.share.WechatShareManager;
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
+import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
+import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
+
+import java.io.ByteArrayOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 import static android.util.Patterns.EMAIL_ADDRESS;
 
 public class ShareUtil {
-    public static void shareText(Context context, String text, String title) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, text);
-        context.startActivity(Intent.createChooser(intent, title));
+    private static volatile ShareUtil mInstance;
+    private WechatShareManager mShareManager;
+
+    private ShareUtil(Context context) {
+        mShareManager = WechatShareManager.getInstance(context);
+
     }
 
-    public static void shareImage(Context context, Uri uri, String title) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        intent.setType("image/png");
-        intent.putExtra(Intent.EXTRA_STREAM, uri);
-        context.startActivity(Intent.createChooser(intent, title));
+    public static ShareUtil getInstance(Context context) {
+        if (mInstance == null) {
+            synchronized (ShareUtil.class) {
+                if (mInstance == null) {
+                    mInstance = new ShareUtil(context);
+                }
+            }
+        }
+        return mInstance;
     }
 
-    public static void sendMoreImage(Context context, ArrayList<Uri> imageUris, String title) {
-        Intent mulIntent = new Intent(Intent.ACTION_SEND_MULTIPLE);
-        mulIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, imageUris);
-        mulIntent.setType("image/jpeg");
-        context.startActivity(Intent.createChooser(mulIntent, "多图文件分享"));
+    public void shareText(Context context, String text, String title) {
+        WechatShareManager.ShareContentText mShareContentText = (WechatShareManager.ShareContentText) mShareManager.getShareContentText(text);
+        mShareManager.shareByWebchat(mShareContentText, WechatShareManager.WECHAT_SHARE_TYPE_FRENDS);
     }
+
+    public void shareImage(Context context, String uri, String title) {
+        WechatShareManager.ShareContentPicture mShareContentPicture = (WechatShareManager.ShareContentPicture) mShareManager.getShareContentPicture(uri);
+        mShareManager.shareByWebchat(mShareContentPicture, WechatShareManager.WECHAT_SHARE_TYPE_FRENDS);
+    }
+
+    public void shareWebPage(Context context, String uri, String title) {
+        WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,"",uri,-1);
+        mShareManager.shareByWebchat(mShareContentWebPaget, WechatShareManager.WECHAT_SHARE_TYPE_FRENDS);
+    }
+
 }

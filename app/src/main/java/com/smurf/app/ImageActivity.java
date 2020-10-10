@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
+import com.smurf.app.utils.SaveImageUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -44,7 +45,7 @@ public class ImageActivity extends Activity {
 
     }
 
-    private void init(){
+    private void init() {
         imageView = (ImageView) findViewById(R.id.image);
         //大图所依附的dialog
         dialog = new Dialog(ImageActivity.this, R.style.ActivityDialogStyle);
@@ -77,38 +78,21 @@ public class ImageActivity extends Activity {
         });
 
     }
+
     //保存图片
     private void saveCroppedImage(Bitmap bmp) {
-        File file = new File("/sdcard/myFolder");
-        if (!file.exists())
-            file.mkdir();
-
-        file = new File("/sdcard/temp.jpg".trim());
-        String fileName = file.getName();
-        String mName = fileName.substring(0, fileName.lastIndexOf("."));
-        String sName = fileName.substring(fileName.lastIndexOf("."));
-
-        // /sdcard/myFolder/temp_cropped.jpg
-        String newFilePath = "/sdcard/myFolder" + "/" + mName + "_cropped" + sName;
-        file = new File(newFilePath);
-        try {
-            file.createNewFile();
-            FileOutputStream fos = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-            fos.flush();
-            fos.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        SaveImageUtils.saveImageToGallery(ImageActivity.this, bmp);
+        SaveImageUtils.saveImageToGallerys(ImageActivity.this, bmp);
+        finish();
     }
+
     //动态的ImageView
-    private ImageView getImageView(){
+    private ImageView getImageView() {
         ImageView iv = new ImageView(this);
         //宽高
         iv.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         //设置Padding
-        iv.setPadding(20,20,20,20);
+        iv.setPadding(20, 20, 20, 20);
         //imageView设置图片
 //        InputStream is = getResources().openRawResource(R.mipmap.riven);
 //        Drawable drawable = BitmapDrawable.createFromStream(is, null);
