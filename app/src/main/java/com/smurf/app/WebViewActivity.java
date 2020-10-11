@@ -24,6 +24,8 @@ import androidx.core.content.ContextCompat;
 
 import com.lcw.library.imagepicker.ImagePicker;
 import com.smurf.app.presenter.JavaScriptPresenter;
+import com.smurf.app.share.ShareWeChatListener;
+import com.smurf.app.share.Shareboard;
 import com.smurf.app.utils.ShareUtil;
 import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.webView.X5WebView;
@@ -53,6 +55,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_webview);
+//        ShareUtil.getInstance(WebViewActivity.this).shareText(0,"text");
+
+        String url = "https://avatar.csdn.net/2/C/8/1_small_and_smallworld.jpg";
+        ShareUtil.getInstance(WebViewActivity.this).shareImage(0,url);
+
+//        ShareUtil.getInstance(WebViewActivity.this).shareWebPage(0,"https://www.baidu.com", "title","description");
+
 
         mWebView = (X5WebView) findViewById(R.id.webview);
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -91,7 +100,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }else{
             ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
         }
-
     }
 
     /**
@@ -247,29 +255,40 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         /**
          * 分享功能
-         * shareType 0：分享文本内容，1：分享单张图片，2：分享多张图片
+         * shareType 0：分享文本内容，1：分享单张图片，2：网页分享
+         * 分享文本内容：分享内容  text
+         * 分享图片 imageUrl
+         * 分享网页 ：title 标题，description 描述信息 webpageUrl 网页链接
          */
         @JavascriptInterface
-        public void share(int shareType, String title, String text, String imgUri, String videoUrl) {
+        public void share(int shareType, String title, String text, String imgUri, String description,String webpageUrl) {
             if(isWeixinAvilible(mContext)) {
 
             }else {
                 Toast.makeText(mContext, "您还没有安装微信，请先安装微信客户端", Toast.LENGTH_SHORT).show();
             }
 
-            switch (shareType) {
-                case 0:
-                    ShareUtil.getInstance(WebViewActivity.this).shareText(mContext, text, title);
-                    break;
-                case 1:
-                    ShareUtil.getInstance(WebViewActivity.this).shareImage(mContext, imgUri,title);
-                    break;
-                case 2:
-                    ShareUtil.getInstance(WebViewActivity.this).shareWebPage(mContext, videoUrl, title);
-                    break;
-                default:
-                    break;
-            }
+            Shareboard shareboard = new Shareboard(mContext);
+            shareboard.setShareWeChatListener(new ShareWeChatListener() {
+                @Override
+                public void shareWeChat(int type) {
+                    switch (shareType) {
+                        case 0:
+                            ShareUtil.getInstance(WebViewActivity.this).shareText(type,text);
+                            break;
+                        case 1:
+                            ShareUtil.getInstance(WebViewActivity.this).shareImage(type,imgUri);
+                            break;
+                        case 2:
+                            ShareUtil.getInstance(WebViewActivity.this).shareWebPage(type,webpageUrl, title,description);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            });
+            shareboard.show();
+
         }
 
         /**

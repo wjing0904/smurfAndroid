@@ -15,8 +15,11 @@ import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
 
@@ -330,7 +333,7 @@ public class WechatShareManager {
         //构造一个Req
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         //transaction字段用于唯一标识一个请求
-        req.transaction = buildTransaction("textshare");
+        req.transaction = buildTransaction("text");
         req.message = msg;
         //发送的目标场景， 可以选择发送到会话 WXSceneSession 或者朋友圈 WXSceneTimeline。 默认发送到会话。
         req.scene = shareType;
@@ -341,56 +344,33 @@ public class WechatShareManager {
      * 分享图片
      */
     private void sharePicture(ShareContent shareContent, int shareType) {
-//        Thread thread = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Bitmap bitmap = null;
-//                try {
-//                    bitmap = BitmapFactory.decodeStream(new URL(shareContent.getPictureUrl()).openStream());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                WXImageObject imgObj = new WXImageObject(bitmap);
-//
-//                WXMediaMessage msg = new WXMediaMessage();
-//                msg.mediaObject = imgObj;
-//
-//                Bitmap thumbBitmap =  Bitmap.createScaledBitmap(bitmap, THUMB_SIZE, THUMB_SIZE, true);
-//                bitmap.recycle();
-//                msg.thumbData = bmpToByteArray(thumbBitmap, true);  //设置缩略图
-//
-//                SendMessageToWX.Req req = new SendMessageToWX.Req();
-//                req.transaction = buildTransaction("imgshareappdata");
-//                req.message = msg;
-//                req.scene = shareType;
-//                mWXApi.sendReq(req);
-//            }
-//        });
-//        thread.start();
-        Thread thread = new Thread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    WXImageObject imageObject = new WXImageObject();
-                    imageObject.imagePath = shareContent.getPictureUrl();
-                    WXMediaMessage msg = new WXMediaMessage();
-                    msg.mediaObject = imageObject;
                     Bitmap bmp = BitmapFactory.decodeStream(new URL(shareContent.getPictureUrl()).openStream());
-                    Bitmap thumbBmp = Bitmap.createScaledBitmap(bmp, 150, 150, true);
-                    bmp.recycle();
-                    msg.thumbData = Bitmap2Bytes(thumbBmp);
+                    WXImageObject imgObj = new WXImageObject();
+                    Bitmap bitmap = compressScale(bmp);
+                    imgObj.imageData = bmpToByteArray(bitmap, true);
+                    WXMediaMessage msg = new WXMediaMessage();
+                    msg.mediaObject = imgObj;
+
+                    Bitmap thumbBmp = Bitmap.createScaledBitmap(bmp, 120, 120, true);
+                    msg.thumbData = bmpToByteArray(thumbBmp, true);
+                    //压缩缩略图到32kb
+                    if (msg.thumbData != null && msg.thumbData.length > '耀') {        //微信sdk里面判断的大小
+                        msg.thumbData = compressBitmap(thumbBmp, '耀');
+                    }
                     SendMessageToWX.Req req = new SendMessageToWX.Req();
-                    req.transaction = String.valueOf(System.currentTimeMillis());
+                    req.transaction = buildTransaction("img");
                     req.message = msg;
                     req.scene = shareType;
                     mWXApi.sendReq(req);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                }catch (Exception e){
 
+                }
             }
-        });
-        thread.start();
+        }).start();
     }
 
     /*
@@ -409,7 +389,6 @@ public class WechatShareManager {
         } else {
             msg.thumbData = bmpToByteArray(thumb, true);
         }
-
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = buildTransaction("webpage");
         req.message = msg;
@@ -431,9 +410,74 @@ public class WechatShareManager {
         return buf.array();
     }
 
-    public byte[] Bitmap2Bytes(Bitmap bm) {
+    /**
+     * 图片按比例大小压缩方法
+     *
+     * @param image （根据Bitmap图片压缩）
+     * @return
+     */
+    private Bitmap compressScale(Bitmap image) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        return baos.toByteArray();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        // 判断如果图片大于1M,进行压缩避免在生成图片（BitmapFactory.decodeStream）时溢出
+        if (baos.toByteArray().length / 1024 > 3072) {
+            baos.reset();// 重置baos即清空baos
+            image.compress(Bitmap.CompressFormat.JPEG, 80, baos);// 这里压缩50%，把压缩后的数据存放到baos中
+        }
+        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());
+        BitmapFactory.Options newOpts = new BitmapFactory.Options();
+        // 开始读入图片，此时把options.inJustDecodeBounds 设回true了
+        newOpts.inJustDecodeBounds = true;
+        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);
+        newOpts.inJustDecodeBounds = false;
+        int w = newOpts.outWidth;
+        int h = newOpts.outHeight;
+        // 现在主流手机比较多是800*480分辨率，所以高和宽我们设置为
+//         float hh = 800f;// 这里设置高度为800f
+//         float ww = 480f;// 这里设置宽度为480f
+        float hh = 512f;
+        float ww = 512f;
+        // 缩放比。由于是固定比例缩放，只用高或者宽其中一个数据进行计算即可
+        int be = 1;// be=1表示不缩放
+        if (w > h && w > ww) {// 如果宽度大的话根据宽度固定大小缩放
+            be = (int) (newOpts.outWidth / ww);
+        } else if (w < h && h > hh) { // 如果高度高的话根据高度固定大小缩放
+            be = (int) (newOpts.outHeight / hh);
+        }
+        if (be <= 0)
+            be = 1;
+        newOpts.inSampleSize = be; // 设置缩放比例
+        // newOpts.inPreferredConfig = Config.RGB_565;//降低图片从ARGB888到RGB565
+        // 重新读入图片，注意此时已经把options.inJustDecodeBounds 设回false了
+        isBm = new ByteArrayInputStream(baos.toByteArray());
+        bitmap = BitmapFactory.decodeStream(isBm, null, newOpts);
+        return compressImage(bitmap);// 压缩好比例大小后再进行质量压缩
+//        return bitmap;
+    }
+
+    private Bitmap compressImage(Bitmap image) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.JPEG, 100, baos);// 质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
+        int options = 90;
+        while (baos.toByteArray().length / 1024 > 100) { // 循环判断如果压缩后图片是否大于100kb,大于继续压缩
+            baos.reset(); // 重置baos即清空baos
+            image.compress(Bitmap.CompressFormat.JPEG, options, baos);// 这里压缩options%，把压缩后的数据存放到baos中
+            options -= 10;// 每次都减少10
+        }
+        ByteArrayInputStream isBm = new ByteArrayInputStream(baos.toByteArray());// 把压缩后的数据baos存放到ByteArrayInputStream中
+        Bitmap bitmap = BitmapFactory.decodeStream(isBm, null, null);// 把ByteArrayInputStream数据生成图片
+        return bitmap;
+    }
+
+    private byte[] compressBitmap(Bitmap bitmap, int maxkb) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, output);
+        int options = 100;
+        while (output.toByteArray().length > maxkb&& options != 10) {
+            output.reset(); //清空output
+            bitmap.compress(Bitmap.CompressFormat.JPEG, options, output);//这里压缩options%，把压缩后的数据存放到output中
+            options -= 10;
+        }
+        return output.toByteArray();
     }
 }
