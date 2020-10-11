@@ -55,14 +55,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_webview);
-//        ShareUtil.getInstance(WebViewActivity.this).shareText(0,"text");
-
-        String url = "https://avatar.csdn.net/2/C/8/1_small_and_smallworld.jpg";
-        ShareUtil.getInstance(WebViewActivity.this).shareImage(0,url);
-
-//        ShareUtil.getInstance(WebViewActivity.this).shareWebPage(0,"https://www.baidu.com", "title","description");
-
-
+        test();
         mWebView = (X5WebView) findViewById(R.id.webview);
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -335,5 +328,14 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
         return false;
+    }
+
+    private void test(){
+        //        ShareUtil.getInstance(WebViewActivity.this).shareText(0,"text");
+
+//        String url = "https://avatar.csdn.net/2/C/8/1_small_and_smallworld.jpg";
+//        ShareUtil.getInstance(WebViewActivity.this).shareImage(0,url);
+
+//        ShareUtil.getInstance(WebViewActivity.this).shareWebPage(0,"https://www.baidu.com", "title","description");
     }
 }

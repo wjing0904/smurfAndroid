@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -29,6 +30,7 @@ import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
 import com.smurf.app.login.utils.ScreenUtils;
 import com.smurf.app.login.utils.ToastUtil;
+import com.smurf.app.presenter.InstallAppPresenter;
 
 import cn.jiguang.share.android.api.AuthListener;
 import cn.jiguang.share.android.api.JShareInterface;
@@ -44,18 +46,20 @@ import cn.jiguang.verifysdk.api.JVerifyUIClickCallback;
 import cn.jiguang.verifysdk.api.JVerifyUIConfig;
 import cn.jiguang.verifysdk.api.VerifyListener;
 
-public class MainActivity extends Activity implements View.OnClickListener {
+public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
 
     private String mNumStr;
     private boolean mHasPermission;
-    private Button btnLogin;
-    private LinearLayout mProgressbar;
-    private Button btnLoginDialog;
+//    private Button btnLogin;
+//    private LinearLayout mProgressbar;
+//    private Button btnLoginDialog;
     private boolean dialogFlag;
     private int winHeight;
     private int winWidth;
+
+    private InstallAppPresenter installAppPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,16 +77,18 @@ public class MainActivity extends Activity implements View.OnClickListener {
             winWidth = point.x;
         }
 
-//        Log.d(TAG,"winHeight="+winHeight);
+//        setContentView(R.layout.activity_main);
 
-        setContentView(R.layout.activity_main);
+//        //检查APP是否需要更新
+//        if(installAppPresenter == null){
+//            installAppPresenter = new InstallAppPresenter(this);
+//        }
+//        installAppPresenter.checkAppInstall();
+//        installAppPresenter.test();
+
 
         ScreenUtils.tryFullScreenWhenLandscape(this);
-
-        initView();
         initPermission();
-
-
 
         getApplication().registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
             @Override
@@ -92,7 +98,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void onActivityStarted(Activity activity) {
                 if (activity.getLocalClassName().equals("com.cmic.sso.sdk.activity.LoginAuthActivity")||activity.getLocalClassName().equals("cn.jiguang.verifysdk.CtLoginActivity")){
-                    mProgressbar.setVisibility(View.GONE);
+//                    mProgressbar.setVisibility(View.GONE);
                 }
             }
 
@@ -121,6 +127,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             }
         });
+
+        initShowLoginPage();
     }
 
 
@@ -144,93 +152,27 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }).request();
     }
 
-    private void initView() {
-        btnLogin = (Button) findViewById(R.id.btn_login);
-        btnLoginDialog = (Button) findViewById(R.id.btn_login_dialog);
-        Button btnRegister = (Button) findViewById(R.id.btn_register);
-        mProgressbar = (LinearLayout) findViewById(R.id.progressbar);
-
-        btnLogin.setOnClickListener(this);
-        btnLoginDialog.setOnClickListener(this);
-        btnRegister.setOnClickListener(this);
-
-    }
-
-
-    @Override
-    public void onClick(View v) {
-        if(!mHasPermission){
-            ToastUtil.showShortToast(this,"请先授予权限");
-            initPermission();
-            return;
-        }
-        JVerifyUIConfig.Builder uiConfigBuilder= null;
-        switch (v.getId()) {
-            case R.id.btn_login:
-                btnLoginDialog.setEnabled(false);
-                btnLogin.setEnabled(false);
-                dialogFlag =false;
-                mProgressbar.setVisibility(View.VISIBLE);
-
-                JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(),getFullScreenLandscapeConfig());
-                JVerificationInterface.loginAuth(this, new VerifyListener() {
+    private void initShowLoginPage(){
+        JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(),getFullScreenLandscapeConfig());
+        JVerificationInterface.loginAuth(this, new VerifyListener() {
+            @Override
+            public void onResult(final int code, final String token, String operator) {
+                Log.e(TAG, "onResult: code=" + code + ",token=" + token + ",operator=" + operator);
+                final String errorMsg = "operator=" + operator + ",code=" + code + "\ncontent=" + token;
+                runOnUiThread(new Runnable() {
                     @Override
-                    public void onResult(final int code, final String token, String operator) {
-                        Log.e(TAG, "onResult: code=" + code + ",token=" + token + ",operator=" + operator);
-                        final String errorMsg = "operator=" + operator + ",code=" + code + "\ncontent=" + token;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressbar.setVisibility(View.GONE);
-                                btnLoginDialog.setEnabled(true);
-                                btnLogin.setEnabled(true);
-                                if (code == Constants.CODE_LOGIN_SUCCESS) {
-                                    toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS,token);
-                                    Log.e(TAG, "onResult: loginSuccess");
-                                } else if(code != Constants.CODE_LOGIN_CANCELD){
-                                    Log.e(TAG, "onResult: loginError");
-                                    toFailedActivigy(code,token);
-                                }
-                            }
-                        });
+                    public void run() {
+                        if (code == Constants.CODE_LOGIN_SUCCESS) {
+                            toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS,token);
+                            Log.e(TAG, "onResult: loginSuccess");
+                        } else if(code != Constants.CODE_LOGIN_CANCELD){
+                            Log.e(TAG, "onResult: loginError");
+                            toFailedActivigy(code,token);
+                        }
                     }
                 });
-                break;
-            case R.id.btn_login_dialog:
-                btnLoginDialog.setEnabled(false);
-                btnLogin.setEnabled(false);
-                dialogFlag =true;
-                mProgressbar.setVisibility(View.VISIBLE);
-
-                JVerificationInterface.setCustomUIWithConfig(getDialogPortraitConfig(),getDialogLandscapeConfig());
-                JVerificationInterface.loginAuth(this, new VerifyListener() {
-                    @Override
-                    public void onResult(final int code, final String token, String operator) {
-                        Log.e(TAG, "onResult: code=" + code + ",token=" + token + ",operator=" + operator);
-                        final String errorMsg = "operator=" + operator + ",code=" + code + "\ncontent=" + token;
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mProgressbar.setVisibility(View.GONE);
-                                btnLoginDialog.setEnabled(true);
-                                btnLogin.setEnabled(true);
-                                if (code == Constants.CODE_LOGIN_SUCCESS) {
-                                    toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS,token);
-                                    Log.e(TAG, "onResult: loginSuccess");
-                                } else if(code != Constants.CODE_LOGIN_CANCELD){
-                                    Log.e(TAG, "onResult: loginError");
-                                    toFailedActivigy(code,token);
-                                }
-                            }
-                        });
-                    }
-                });
-                break;
-            case R.id.btn_register:
-                Intent intent = new Intent(MainActivity.this, VerifyActivity.class);
-                startActivityForResult(intent,0);
-                break;
-        }
+            }
+        });
     }
 
 
@@ -240,7 +182,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         uiConfigBuilder.setLogoOffsetY(103);
         uiConfigBuilder.setNumFieldOffsetY(190);
         uiConfigBuilder.setPrivacyState(true);
-        uiConfigBuilder.setLogoImgPath("ic_icon");
+        uiConfigBuilder.setLogoImgPath("logo");
         uiConfigBuilder.setNavTransparent(true);
         uiConfigBuilder.setNavReturnImgPath("btn_back");
         uiConfigBuilder.setCheckedImgPath(null);
@@ -253,7 +195,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         uiConfigBuilder.setLogBtnHeight(45);
         uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5,0xFF8998FF);
 //        uiConfigBuilder.setPrivacyTopOffsetY(310);
-        uiConfigBuilder.setPrivacyText("登录即同意《","","","》并授权极光认证Demo获取本机号码");
+        uiConfigBuilder.setPrivacyText("登录即同意《","","","》并使用本机号码登录");
         uiConfigBuilder.setPrivacyCheckboxHidden(true);
         uiConfigBuilder.setPrivacyTextCenterGravity(true);
         uiConfigBuilder.setPrivacyTextSize(12);
@@ -265,7 +207,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         layoutParamPhoneLogin.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         TextView tvPhoneLogin = new TextView(this);
-        tvPhoneLogin.setText("手机号码登录");
+        tvPhoneLogin.setText("其他手机号登录");
         tvPhoneLogin.setLayoutParams(layoutParamPhoneLogin);
         uiConfigBuilder.addCustomView(tvPhoneLogin, false, new JVerifyUIClickCallback() {
             @Override
@@ -286,7 +228,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         ImageView btnWechat = new ImageView(this);
         ImageView btnQQ = new ImageView(this);
-        ImageView btnXinlang = new ImageView(this);
 
         btnWechat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,23 +241,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 JShareInterface.authorize(QQ.Name, mAuthListener);
             }
         });
-        btnXinlang.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JShareInterface.authorize(SinaWeibo.Name, mAuthListener);
-            }
-        });
 
         btnWechat.setImageResource(R.drawable.o_wechat);
         btnQQ.setImageResource(R.drawable.o_qqx);
-        btnXinlang.setImageResource(R.drawable.o_weibo);
 
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         btnParam.setMargins(25,0,25,0);
 
         layoutLoginGroup.addView(btnWechat,btnParam);
         layoutLoginGroup.addView(btnQQ,btnParam);
-        layoutLoginGroup.addView(btnXinlang,btnParam);
         uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
             @Override
             public void onClicked(Context context, View view) {
@@ -371,7 +304,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         uiConfigBuilder.setLogoOffsetY(20);
         uiConfigBuilder.setNumFieldOffsetY(110);
         uiConfigBuilder.setPrivacyState(true);
-        uiConfigBuilder.setLogoImgPath("ic_icon");
+        uiConfigBuilder.setLogoImgPath("logo");
         uiConfigBuilder.setNavTransparent(true);
         uiConfigBuilder.setNavReturnImgPath("btn_back");
         uiConfigBuilder.setCheckedImgPath("cb_chosen");
@@ -397,7 +330,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
         layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         TextView tvPhoneLogin = new TextView(this);
-        tvPhoneLogin.setText("手机号码登录");
+        tvPhoneLogin.setText("其他手机号登录");
         tvPhoneLogin.setLayoutParams(layoutParamPhoneLogin);
         uiConfigBuilder.addNavControlView(tvPhoneLogin, new JVerifyUIClickCallback() {
             @Override
@@ -418,7 +351,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
         ImageView btnWechat = new ImageView(this);
         ImageView btnQQ = new ImageView(this);
-        ImageView btnXinlang = new ImageView(this);
 
 
         btnWechat.setOnClickListener(new View.OnClickListener() {
@@ -435,24 +367,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             }
         });
-        btnXinlang.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JShareInterface.authorize(SinaWeibo.Name, mAuthListener);
-
-            }
-        });
 
         btnWechat.setImageResource(R.drawable.o_wechat);
         btnQQ.setImageResource(R.drawable.o_qqx);
-        btnXinlang.setImageResource(R.drawable.o_weibo);
 
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         btnParam.setMargins(25,0,25,0);
 
         layoutLoginGroup.addView(btnWechat,btnParam);
         layoutLoginGroup.addView(btnQQ,btnParam);
-        layoutLoginGroup.addView(btnXinlang,btnParam);
         uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
             @Override
             public void onClicked(Context context, View view) {
@@ -499,148 +422,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
 
-    private JVerifyUIConfig getDialogPortraitConfig(){
-        int widthDp = px2dip(this, winWidth);
-        JVerifyUIConfig.Builder uiConfigBuilder = new JVerifyUIConfig.Builder().setDialogTheme(widthDp-60, 300, 0, 0, false);
-//        uiConfigBuilder.setLogoHeight(30);
-//        uiConfigBuilder.setLogoWidth(30);
-//        uiConfigBuilder.setLogoOffsetY(-15);
-//        uiConfigBuilder.setLogoOffsetX((widthDp-40)/2-15-20);
-//        uiConfigBuilder.setLogoImgPath("logo_login_land");
-        uiConfigBuilder.setLogoHidden(true);
-
-        uiConfigBuilder.setNumFieldOffsetY(104).setNumberColor(Color.BLACK);
-        uiConfigBuilder.setSloganOffsetY(135);
-        uiConfigBuilder.setSloganTextColor(0xFFD0D0D9);
-        uiConfigBuilder.setLogBtnOffsetY(161);
-
-        uiConfigBuilder.setPrivacyOffsetY(15);
-        uiConfigBuilder.setCheckedImgPath("cb_chosen");
-        uiConfigBuilder.setUncheckedImgPath("cb_unchosen");
-        uiConfigBuilder.setNumberColor(0xFF222328);
-        uiConfigBuilder.setLogBtnImgPath("selector_btn_normal");
-        uiConfigBuilder.setPrivacyState(true);
-        uiConfigBuilder.setLogBtnText("一键登录");
-        uiConfigBuilder.setLogBtnHeight(44);
-        uiConfigBuilder.setLogBtnWidth(250);
-        uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5,0xFF8998FF);
-        uiConfigBuilder.setPrivacyText("登录即同意《","","","》并授权极光认证Demo获取本机号码");
-        uiConfigBuilder.setPrivacyCheckboxHidden(true);
-        uiConfigBuilder.setPrivacyTextCenterGravity(true);
-//        uiConfigBuilder.setPrivacyOffsetX(52-15);
-        uiConfigBuilder.setPrivacyTextSize(10);
-
-
-
-        // 图标和标题
-        LinearLayout layoutTitle = new LinearLayout(this);
-        RelativeLayout.LayoutParams layoutTitleParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutTitleParam.setMargins(0,dp2Pix(this,50), 0,0);
-        layoutTitleParam.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        layoutTitleParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        layoutTitleParam.setLayoutDirection(LinearLayout.HORIZONTAL);
-        layoutTitle.setLayoutParams(layoutTitleParam);
-
-        ImageView img = new ImageView(this);
-        img.setImageResource(R.drawable.logo_login_land);
-        TextView tvTitle = new TextView(this);
-        tvTitle.setText("极光认证");
-        tvTitle.setTextSize(19);
-        tvTitle.setTextColor(Color.BLACK);
-        tvTitle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-
-        LinearLayout.LayoutParams imgParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        imgParam.setMargins(0,0,dp2Pix(this,6),0);
-        LinearLayout.LayoutParams titleParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        imgParam.setMargins(0,0,dp2Pix(this,4),0);
-        layoutTitle.addView(img,imgParam);
-        layoutTitle.addView(tvTitle,titleParam);
-        uiConfigBuilder.addCustomView(layoutTitle,false,null);
-
-        // 关闭按钮
-        ImageView closeButton = new ImageView(this);
-
-        RelativeLayout.LayoutParams mLayoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mLayoutParams1.setMargins(0, dp2Pix(this,10.0f),dp2Pix(this,10),0);
-        mLayoutParams1.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        mLayoutParams1.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        closeButton.setLayoutParams(mLayoutParams1);
-        closeButton.setImageResource(R.drawable.btn_close);
-        uiConfigBuilder.addCustomView(closeButton, true, null);
-
-        return uiConfigBuilder.build();
-    }
-
-    private JVerifyUIConfig getDialogLandscapeConfig(){
-        int widthDp = px2dip(this, winWidth);
-        JVerifyUIConfig.Builder uiConfigBuilder = new JVerifyUIConfig.Builder().setDialogTheme(480, widthDp-100, 0, 0, false);
-//        uiConfigBuilder.setLogoHeight(40);
-//        uiConfigBuilder.setLogoWidth(40);
-//        uiConfigBuilder.setLogoOffsetY(-15);
-//        uiConfigBuilder.setLogoImgPath("logo_login_land");
-        uiConfigBuilder.setLogoHidden(true);
-
-        uiConfigBuilder.setNumFieldOffsetY(104).setNumberColor(Color.BLACK);
-        uiConfigBuilder.setNumberSize(22);
-        uiConfigBuilder.setSloganOffsetY(135);
-        uiConfigBuilder.setSloganTextColor(0xFFD0D0D9);
-        uiConfigBuilder.setLogBtnOffsetY(161);
-
-        uiConfigBuilder.setPrivacyOffsetY(15);
-        uiConfigBuilder.setCheckedImgPath("cb_chosen");
-        uiConfigBuilder.setUncheckedImgPath("cb_unchosen");
-        uiConfigBuilder.setNumberColor(0xFF222328);
-        uiConfigBuilder.setLogBtnImgPath("selector_btn_normal");
-        uiConfigBuilder.setPrivacyState(true);
-        uiConfigBuilder.setLogBtnText("一键登录");
-        uiConfigBuilder.setLogBtnHeight(44);
-        uiConfigBuilder.setLogBtnWidth(250);
-        uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5,0xFF8998FF);
-        uiConfigBuilder.setPrivacyText("登录即同意《","","","》并授权极光认证Demo获取本机号码");
-        uiConfigBuilder.setPrivacyCheckboxHidden(true);
-        uiConfigBuilder.setPrivacyTextCenterGravity(true);
-//        uiConfigBuilder.setPrivacyOffsetX(52-15);
-        uiConfigBuilder.setPrivacyTextSize(10);
-
-        // 图标和标题
-        LinearLayout layoutTitle = new LinearLayout(this);
-        RelativeLayout.LayoutParams layoutTitleParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutTitleParam.setMargins(dp2Pix(this,20),dp2Pix(this,15), 0,0);
-        layoutTitleParam.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        layoutTitleParam.setLayoutDirection(LinearLayout.HORIZONTAL);
-        layoutTitle.setLayoutParams(layoutTitleParam);
-
-        ImageView img = new ImageView(this);
-        img.setImageResource(R.drawable.logo_login_land);
-        TextView tvTitle = new TextView(this);
-        tvTitle.setText("极光认证");
-        tvTitle.setTextSize(19);
-        tvTitle.setTextColor(Color.BLACK);
-        tvTitle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-
-        LinearLayout.LayoutParams imgParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        imgParam.setMargins(0,0,dp2Pix(this,6),0);
-        LinearLayout.LayoutParams titleParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        imgParam.setMargins(0,0,dp2Pix(this,4),0);
-        layoutTitle.addView(img,imgParam);
-        layoutTitle.addView(tvTitle,titleParam);
-        uiConfigBuilder.addCustomView(layoutTitle,false,null);
-
-
-        // 关闭按钮
-        ImageView closeButton = new ImageView(this);
-
-        RelativeLayout.LayoutParams mLayoutParams1 = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mLayoutParams1.setMargins(0, dp2Pix(this,10.0f),dp2Pix(this,10),0);
-        mLayoutParams1.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        mLayoutParams1.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        closeButton.setLayoutParams(mLayoutParams1);
-        closeButton.setImageResource(R.drawable.btn_close);
-        uiConfigBuilder.addCustomView(closeButton, true, null);
-
-        return uiConfigBuilder.build();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -652,13 +433,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
 
     private void toSuccessActivity(int action, String token) {
-        Intent intent = new Intent(this, LoginResultActivity.class);
-        intent.putExtra(Constants.KEY_ACTION, action);
-        intent.putExtra(Constants.KEY_TOKEN,token);
+        Intent intent = new Intent(this, WebViewActivity.class);
         startActivity(intent);
+        finish();
 
     }
-
     private void toFailedActivigy(int code, String errorMsg){
         String msg = errorMsg;
         if (code == 2003){
@@ -674,20 +453,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
         }else if (code == 6006){
             msg = "预取号结果超时，需要重新预取号";
         }
-        Intent intent = new Intent(this, LoginResultActivity.class);
-        intent.putExtra(Constants.KEY_ACTION,Constants.ACTION_LOGIN_FAILED);
-        intent.putExtra(Constants.KEY_ERORRO_MSG,msg);
-        intent.putExtra(Constants.KEY_ERROR_CODE,code);
-        startActivity(intent);
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
 
     private void toFailedActivityThird(int code, String errorMsg) {
         String msg = errorMsg;
-        Intent intent = new Intent(this, LoginResultActivity.class);
-        intent.putExtra(Constants.KEY_ACTION, Constants.ACTION_THIRD_AUTHORIZED_FAILED);
-        intent.putExtra(Constants.KEY_ERORRO_MSG, msg);
-        intent.putExtra(Constants.KEY_ERROR_CODE, code);
-        startActivity(intent);
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
 
     private void toNativeVerifyActivity() {
@@ -758,5 +529,4 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
         }
     };
-
 }
