@@ -68,11 +68,11 @@ public class MainActivity extends Activity {
             @Override
             public void updateNotify() {
                 finish();
+                initShowLoginPage();
             }
-
         });
         installAppPresenter.checkAppInstall();
-        initShowLoginPage();
+
     }
 
 
