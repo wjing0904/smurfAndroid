@@ -52,10 +52,6 @@ public class MainActivity extends Activity {
 
     private String mNumStr;
     private boolean mHasPermission;
-//    private Button btnLogin;
-//    private LinearLayout mProgressbar;
-//    private Button btnLoginDialog;
-    private boolean dialogFlag;
     private int winHeight;
     private int winWidth;
 
@@ -132,10 +128,6 @@ public class MainActivity extends Activity {
     }
 
 
-    private boolean portrait;
-
-
-
     @SuppressLint("WrongConstant")
     private void initPermission() {
         PermissionUtils.permission(PermissionConstants.STORAGE,PermissionConstants.PHONE)
@@ -153,7 +145,7 @@ public class MainActivity extends Activity {
     }
 
     private void initShowLoginPage(){
-        JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(),getFullScreenLandscapeConfig());
+        JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(),null);
         JVerificationInterface.loginAuth(this, new VerifyListener() {
             @Override
             public void onResult(final int code, final String token, String operator) {
@@ -196,7 +188,7 @@ public class MainActivity extends Activity {
         uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5,0xFF8998FF);
 //        uiConfigBuilder.setPrivacyTopOffsetY(310);
         uiConfigBuilder.setPrivacyText("登录即同意《","","","》并使用本机号码登录");
-        uiConfigBuilder.setPrivacyCheckboxHidden(true);
+        uiConfigBuilder.setPrivacyCheckboxHidden(false);
         uiConfigBuilder.setPrivacyTextCenterGravity(true);
         uiConfigBuilder.setPrivacyTextSize(12);
 //        uiConfigBuilder.setPrivacyOffsetX(52-15);
@@ -296,132 +288,6 @@ public class MainActivity extends Activity {
         return uiConfigBuilder.build();
     }
 
-    private JVerifyUIConfig getFullScreenLandscapeConfig(){
-        JVerifyUIConfig.Builder uiConfigBuilder = new JVerifyUIConfig.Builder();
-        uiConfigBuilder.setStatusBarHidden(true);
-        uiConfigBuilder.setSloganTextColor(0xFFD0D0D9);
-        uiConfigBuilder.setSloganOffsetY(145);
-        uiConfigBuilder.setLogoOffsetY(20);
-        uiConfigBuilder.setNumFieldOffsetY(110);
-        uiConfigBuilder.setPrivacyState(true);
-        uiConfigBuilder.setLogoImgPath("logo");
-        uiConfigBuilder.setNavTransparent(true);
-        uiConfigBuilder.setNavReturnImgPath("btn_back");
-        uiConfigBuilder.setCheckedImgPath("cb_chosen");
-        uiConfigBuilder.setUncheckedImgPath("cb_unchosen");
-        uiConfigBuilder.setNumberColor(0xFF222328);
-        uiConfigBuilder.setLogBtnImgPath("selector_btn_normal");
-        uiConfigBuilder.setLogBtnTextColor(0xFFFFFFFF);
-        uiConfigBuilder.setLogBtnText("一键登录");
-        uiConfigBuilder.setLogBtnOffsetY(175);
-        uiConfigBuilder.setLogBtnWidth(300);
-        uiConfigBuilder.setLogBtnHeight(45);
-        uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5,0xFF8998FF);
-        uiConfigBuilder.setPrivacyText("登录即同意《","","","》并授权极光认证Demo获取本机号码");
-        uiConfigBuilder.setPrivacyCheckboxHidden(true);
-        uiConfigBuilder.setPrivacyTextCenterGravity(true);
-        uiConfigBuilder.setPrivacyTextSize(12);
-//        uiConfigBuilder.setPrivacyOffsetX(52-15);
-        uiConfigBuilder.setPrivacyOffsetY(18);
-
-        // 手机登录按钮
-        RelativeLayout.LayoutParams layoutParamPhoneLogin = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamPhoneLogin.setMargins(0,  dp2Pix(this,15.0f),dp2Pix(this,15.0f),0);
-        layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-        layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        TextView tvPhoneLogin = new TextView(this);
-        tvPhoneLogin.setText("其他手机号登录");
-        tvPhoneLogin.setLayoutParams(layoutParamPhoneLogin);
-        uiConfigBuilder.addNavControlView(tvPhoneLogin, new JVerifyUIClickCallback() {
-            @Override
-            public void onClicked(Context context, View view) {
-                toNativeVerifyActivity();
-            }
-        });
-
-        // 微信qq新浪登录
-
-        LinearLayout layoutLoginGroup = new LinearLayout(this);
-        RelativeLayout.LayoutParams layoutLoginGroupParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutLoginGroupParam.setMargins(0,dp2Pix(this,235), 0,0);
-        layoutLoginGroupParam.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
-        layoutLoginGroupParam.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        layoutLoginGroupParam.setLayoutDirection(LinearLayout.HORIZONTAL);
-        layoutLoginGroup.setLayoutParams(layoutLoginGroupParam);
-
-        ImageView btnWechat = new ImageView(this);
-        ImageView btnQQ = new ImageView(this);
-
-
-        btnWechat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JShareInterface.authorize(Wechat.Name, mAuthListener);
-
-            }
-        });
-        btnQQ.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JShareInterface.authorize(QQ.Name, mAuthListener);
-
-            }
-        });
-
-        btnWechat.setImageResource(R.drawable.o_wechat);
-        btnQQ.setImageResource(R.drawable.o_qqx);
-
-        LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        btnParam.setMargins(25,0,25,0);
-
-        layoutLoginGroup.addView(btnWechat,btnParam);
-        layoutLoginGroup.addView(btnQQ,btnParam);
-        uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
-            @Override
-            public void onClicked(Context context, View view) {
-//                ToastUtil.showToast(MainActivity.this, "功能未实现", 1000);
-            }
-        });
-
-
-
-        final View dialogViewTitle = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_title,null, false);
-
-        uiConfigBuilder.addNavControlView(dialogViewTitle, new JVerifyUIClickCallback() {
-            @Override
-            public void onClicked(Context context, View view) {
-
-            }
-        });
-
-        final View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_agreement_land,null, false);
-
-        dialogView.findViewById(R.id.dialog_login_no).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JVerificationInterface.dismissLoginAuthActivity();
-            }
-        });
-
-        dialogView.findViewById(R.id.dialog_login_yes).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogView.setVisibility(View.GONE);
-                dialogViewTitle.setVisibility(View.GONE);
-            }
-        });
-
-        uiConfigBuilder.addCustomView(dialogView, false, new JVerifyUIClickCallback() {
-            @Override
-            public void onClicked(Context context, View view) {
-//                ToastUtil.showToast(MainActivity.this, "功能未实现", 1000);
-            }
-        });
-
-        return uiConfigBuilder.build();
-    }
-
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
@@ -473,11 +339,6 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             return (int) dp;
         }
-    }
-
-    private int px2dip(Context context, int pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
     }
 
     private AuthListener mAuthListener = new AuthListener() {
