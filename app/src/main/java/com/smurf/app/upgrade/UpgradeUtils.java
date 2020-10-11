@@ -11,7 +11,7 @@ import androidx.core.content.FileProvider;
 import java.io.File;
 
 
-class UpgradeUtils {
+public class UpgradeUtils {
 
     private UpgradeUtils() {
     }

@@ -30,6 +30,7 @@ import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
 import com.smurf.app.login.utils.ScreenUtils;
 import com.smurf.app.login.utils.ToastUtil;
+import com.smurf.app.presenter.InstallAPPListener;
 import com.smurf.app.presenter.InstallAppPresenter;
 
 import cn.jiguang.share.android.api.AuthListener;
@@ -58,14 +59,19 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        //检查APP是否需要更新
-//        if(installAppPresenter == null){
-//            installAppPresenter = new InstallAppPresenter(this);
-//        }
-//        installAppPresenter.checkAppInstall();
-//        installAppPresenter.test();
         initPermission();
+        //检查APP是否需要更新
+        if(installAppPresenter == null){
+            installAppPresenter = new InstallAppPresenter(this);
+        }
+        installAppPresenter.setInstallAppListener(new InstallAPPListener() {
+            @Override
+            public void updateNotify() {
+                finish();
+            }
+
+        });
+        installAppPresenter.checkAppInstall();
 
         finish();
         initShowLoginPage();
