@@ -8,8 +8,11 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.smurf.app.R;
+import com.smurf.app.WebViewActivity;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.utils.ScreenUtils;
+
+import java.nio.channels.WritableByteChannel;
 
 
 public class NativeVerifyActivity extends Activity implements View.OnClickListener {
@@ -41,9 +44,7 @@ public class NativeVerifyActivity extends Activity implements View.OnClickListen
     }
 
     private void toSuccessActivity(int action, String token) {
-        Intent intent = new Intent(this, LoginResultActivity.class);
-        intent.putExtra(Constants.KEY_ACTION, action);
-        intent.putExtra(Constants.KEY_TOKEN,token);
+        Intent intent = new Intent(this, WebViewActivity.class);
         startActivity(intent);
     }
 }

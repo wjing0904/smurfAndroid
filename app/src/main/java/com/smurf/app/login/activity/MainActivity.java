@@ -52,8 +52,6 @@ public class MainActivity extends Activity {
 
     private String mNumStr;
     private boolean mHasPermission;
-    private int winHeight;
-    private int winWidth;
 
     private InstallAppPresenter installAppPresenter;
 
@@ -61,68 +59,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Display defaultDisplay = getWindowManager().getDefaultDisplay();
-        Point point = new Point();
-        defaultDisplay.getSize(point);
-        Log.d(TAG,"winHeight px="+point.y);
-        if (point.x>point.y){
-            winHeight = point.x;
-            winWidth =   point.y;
-        }else {
-            winHeight =   point.y;
-            winWidth = point.x;
-        }
-
-//        setContentView(R.layout.activity_main);
-
 //        //检查APP是否需要更新
 //        if(installAppPresenter == null){
 //            installAppPresenter = new InstallAppPresenter(this);
 //        }
 //        installAppPresenter.checkAppInstall();
 //        installAppPresenter.test();
-
-
-        ScreenUtils.tryFullScreenWhenLandscape(this);
         initPermission();
 
-        getApplication().registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
-            @Override
-            public void onActivityCreated(Activity activity, Bundle bundle) {
-            }
-
-            @Override
-            public void onActivityStarted(Activity activity) {
-                if (activity.getLocalClassName().equals("com.cmic.sso.sdk.activity.LoginAuthActivity")||activity.getLocalClassName().equals("cn.jiguang.verifysdk.CtLoginActivity")){
-//                    mProgressbar.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onActivityResumed(Activity activity) {
-
-            }
-
-            @Override
-            public void onActivityPaused(Activity activity) {
-
-            }
-
-            @Override
-            public void onActivityStopped(Activity activity) {
-
-            }
-
-            @Override
-            public void onActivitySaveInstanceState(Activity activity, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onActivityDestroyed(Activity activity) {
-
-            }
-        });
         finish();
         initShowLoginPage();
     }
