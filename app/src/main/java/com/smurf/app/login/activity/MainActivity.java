@@ -72,8 +72,6 @@ public class MainActivity extends Activity {
 
         });
         installAppPresenter.checkAppInstall();
-
-        finish();
         initShowLoginPage();
     }
 
