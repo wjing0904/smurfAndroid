@@ -16,7 +16,7 @@ import java.io.IOException;
 public class SaveImageUtils {
     public static void saveImageToGallery(Context context, Bitmap bmp) {
         // 首先保存图片
-        File appDir = new File(context.getCacheDir().getPath(), "Boohee");
+        File appDir = new File(FileUtils.getAppPath());
         if (!appDir.exists()) {
             appDir.mkdirs();
         }
@@ -54,7 +54,7 @@ public class SaveImageUtils {
         }
         // 首先保存图片
 //        File appDir = new File(BaseApplication.app.getTmpDir(), "ywq");
-        File appDir = new File(context.getCacheDir().getPath(), "Boohee");
+        File appDir = new File(context.getCacheDir().getPath());
         if (!appDir.exists()) {
             appDir.mkdir();
         }

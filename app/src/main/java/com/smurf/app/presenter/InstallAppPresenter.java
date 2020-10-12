@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
 import com.smurf.app.upgrade.UpgradeUtils;
+import com.smurf.app.utils.FileUtils;
 import com.smurf.app.utils.ThreadUtils;
 
 import java.io.File;
@@ -37,40 +38,41 @@ public class InstallAppPresenter {
 
     private static final String APK_INSTALL_URL = "http://39.107.84.57:8090/api/sys/vno/detect";
     private Context mContext;
-    private  String versionName = "";
-    private  int versioncode;
+    private String versionName = "";
+    private int versioncode;
     private InstallAPPListener installAPPListener;
 
     @SuppressLint("HandlerLeak")
-    private Handler handler = new Handler(){
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
             String apkPath = (String) msg.obj;
-            UpgradeUtils.getInstance().installAPK(mContext,apkPath);
-            if(installAPPListener!= null)
+            UpgradeUtils.getInstance().installAPK(mContext, apkPath);
+            if (installAPPListener != null)
                 installAPPListener.updateNotify();
         }
     };
 
 
-    public InstallAppPresenter(Context context){
+    public InstallAppPresenter(Context context) {
         this.mContext = context;
     }
 
-    public void setInstallAppListener(InstallAPPListener installAppListener){
+    public void setInstallAppListener(InstallAPPListener installAppListener) {
         this.installAPPListener = installAppListener;
     }
+
     /**
      * 检查APK是否需要更新
      */
-    public void checkAppInstall(){
+    public void checkAppInstall() {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpClient client =  new OkHttpClient();
+                OkHttpClient client = new OkHttpClient();
                 FormBody.Builder builder = new FormBody.Builder();
-                builder.add("vuo","");
+                builder.add("vuo", "");
                 Request request = new Request.Builder().url(APK_INSTALL_URL).build();
                 Call call = client.newCall(request);
                 call.enqueue(new Callback() {
@@ -79,8 +81,8 @@ public class InstallAppPresenter {
                         ThreadUtils.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(mContext,"网路异常，请检查网络",Toast.LENGTH_SHORT).show();
-                                if(installAPPListener!= null)
+                                Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
+                                if (installAPPListener != null)
                                     installAPPListener.updateNotify();
                                 return;
                             }
@@ -89,17 +91,17 @@ public class InstallAppPresenter {
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
-                        if(response==null){
-                            if(installAPPListener!= null)
+                        if (response == null) {
+                            if (installAPPListener != null)
                                 installAPPListener.updateNotify();
                             return;
                         }
                         Gson gson = new Gson();
-                        CouponBean couponBean = gson.fromJson(response.toString(),CouponBean.class);
-                        if(couponBean.isSuccess() || couponBean.getCode() ==0 && couponBean.getData().isIsInstallAppX()){
+                        CouponBean couponBean = gson.fromJson(response.toString(), CouponBean.class);
+                        if (couponBean.isSuccess() || couponBean.getCode() == 0 && couponBean.getData().isIsInstallAppX()) {
                             //弹窗，升级
                             getAppVersionName(mContext);
-                            UpgradeDialog upgradeDialog = new UpgradeDialog(mContext,null,versioncode);
+                            UpgradeDialog upgradeDialog = new UpgradeDialog(mContext, null, versioncode);
                             upgradeDialog.setUpgradeNormalListener(new UpgradeDialog.UpgradeNormalListener() {
                                 @Override
                                 public void upgradeForce(String installUrl) {
@@ -108,8 +110,8 @@ public class InstallAppPresenter {
                                 }
                             });
                             upgradeDialog.show();
-                        }else{
-                            if(installAPPListener!= null)
+                        } else {
+                            if (installAPPListener != null)
                                 installAPPListener.updateNotify();
                             return;
                         }
@@ -121,78 +123,72 @@ public class InstallAppPresenter {
     }
 
 
-    private void downApk(String loadApkUrl)
-    {
+    private void downApk(String loadApkUrl) {
         InputStream is = null;
         FileOutputStream fos = null;
+        File apkFile = null;
         try {
-            File apkFile = null;
-            if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
-            {
-                // 获得存储卡的路径
-                String sdpath = Environment.getExternalStorageDirectory() + "/";
-                String mSavePath = sdpath + "download";
-                URL url = new URL(loadApkUrl);
-                // 创建连接
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.connect();
-                // 获取文件大小
-                int length = conn.getContentLength();
-                // 创建输入流
-                is = conn.getInputStream();
+            // 获得存储卡的路径
+            String sdpath = FileUtils.getAppPath() + "/";
+            String mSavePath = sdpath + "download";
+            URL url = new URL(loadApkUrl);
+            // 创建连接
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.connect();
+            // 获取文件大小
+            int length = conn.getContentLength();
+            // 创建输入流
+            is = conn.getInputStream();
 
-                File file = new File(mSavePath);
-                // 判断文件目录是否存在
-                if (!file.exists())
-                {
-                    file.mkdir();
-                }
-                apkFile = new File(mSavePath, "smurf");
-                fos = new FileOutputStream(apkFile);
-                int count = 0;
-                // 缓存
-                byte buf[] = new byte[1024];
-                // 写入到文件中
-                do
-                {
-                    int numread = is.read(buf);
-                    // 写入文件
-                    fos.write(buf, 0, numread);
-                } while (true);// 点击取消就停止下载.
-
+            File file = new File(mSavePath);
+            // 判断文件目录是否存在
+            if (!file.exists()) {
+                file.mkdir();
             }
-            Message message = handler.obtainMessage();
-            message.obj = apkFile.getAbsolutePath();
-            handler.sendMessage(message);
+            apkFile = new File(mSavePath, "smurf");
+            fos = new FileOutputStream(apkFile);
+            int count = 0;
+            // 缓存
+            byte buf[] = new byte[1024];
+            // 写入到文件中
+            do {
+                int numread = is.read(buf);
+                // 写入文件
+                fos.write(buf, 0, numread);
+            } while (true);// 点击取消就停止下载.
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-            if(fos!=null){
+        } finally {
+            if (fos != null) {
                 try {
                     fos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
-            if(is!= null){
+            if (is != null) {
                 try {
                     is.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+
+            Message message = handler.obtainMessage();
+            message.obj = apkFile.getAbsolutePath();
+            handler.sendMessage(message);
         }
 
     }
 
 
-
     /**
      * 返回当前程序版本名  build.gradle里的
      */
-    private  String getAppVersionName(Context context) {
+    private String getAppVersionName(Context context) {
         try {
             // ---get the package info---
             PackageManager pm = context.getPackageManager();
