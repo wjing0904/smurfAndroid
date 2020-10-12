@@ -248,40 +248,43 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         /**
          * 分享功能
+         * type 0:朋友 1；朋友圈
          * shareType 0：分享文本内容，1：分享单张图片，2：网页分享
          * 分享文本内容：分享内容  text
          * 分享图片 imageUrl
          * 分享网页 ：title 标题，description 描述信息 webpageUrl 网页链接
          */
         @JavascriptInterface
-        public void share(int shareType, String title, String text, String imgUri, String description,String webpageUrl) {
+        public void share(int type ,int shareType, String title, String text, String imgUri, String description,String webpageUrl) {
             if(isWeixinAvilible(mContext)) {
 
             }else {
                 Toast.makeText(mContext, "您还没有安装微信，请先安装微信客户端", Toast.LENGTH_SHORT).show();
             }
 
-            Shareboard shareboard = new Shareboard(mContext);
-            shareboard.setShareWeChatListener(new ShareWeChatListener() {
-                @Override
-                public void shareWeChat(int type) {
-                    switch (shareType) {
-                        case 0:
-                            ShareUtil.getInstance(WebViewActivity.this).shareText(type,text);
-                            break;
-                        case 1:
-                            ShareUtil.getInstance(WebViewActivity.this).shareImage(type,imgUri);
-                            break;
-                        case 2:
-                            ShareUtil.getInstance(WebViewActivity.this).shareWebPage(type,webpageUrl, title,description);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            });
-            shareboard.show();
+            switch (shareType) {
+                case 0:
+                    ShareUtil.getInstance(WebViewActivity.this).shareText(type, text);
+                    break;
+                case 1:
+                    ShareUtil.getInstance(WebViewActivity.this).shareImage(type, imgUri);
+                    break;
+                case 2:
+                    ShareUtil.getInstance(WebViewActivity.this).shareWebPage(type, webpageUrl, title, description);
+                    break;
+                default:
+                    break;
 
+//            Shareboard shareboard = new Shareboard(mContext);
+//            shareboard.setShareWeChatListener(new ShareWeChatListener() {
+//                @Override
+//                public void shareWeChat(int type) {
+//
+//                    }
+//                }
+//            });
+//            shareboard.show();
+            }
         }
 
         /**
