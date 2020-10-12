@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 
+import com.smurf.app.R;
 import com.smurf.app.share.WechatShareManager;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
@@ -61,11 +62,11 @@ public class ShareUtil {
 
     public void shareWebPage(int shareType, String uri, String title,String description) {
         if(shareType ==0){
-            WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,"",uri,-1);
+            WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,"",uri);
             mShareManager.shareByWebchat(mShareContentWebPaget, WechatShareManager.WECHAT_SHARE_TYPE_TALK);
         }
         if(shareType ==1){
-            WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,description,uri,-1);
+            WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,description,uri);
             mShareManager.shareByWebchat(mShareContentWebPaget, WechatShareManager.WECHAT_SHARE_TYPE_FRENDS);
         }
 

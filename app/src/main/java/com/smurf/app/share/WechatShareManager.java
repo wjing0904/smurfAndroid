@@ -258,9 +258,9 @@ public class WechatShareManager {
     /*
      * 获取网页分享对象
      */
-    public ShareContent getShareContentWebpag(String title, String content, String url, int pictureResource) {
+    public ShareContent getShareContentWebpag(String title, String content, String url) {
         if (mShareContentWebpag == null) {
-            mShareContentWebpag = new ShareContentWebpage(title, content, url, pictureResource);
+            mShareContentWebpag = new ShareContentWebpage(title, content, url, R.mipmap.logo);
         }
         return (ShareContentWebpage) mShareContentWebpag;
     }
@@ -384,10 +384,10 @@ public class WechatShareManager {
         msg.description = shareContent.getContent();
 
         Bitmap thumb = BitmapFactory.decodeResource(mContext.getResources(), shareContent.getPictureResource());
-        if (thumb == null) {
-            Toast.makeText(mContext, "图片不能为空", Toast.LENGTH_SHORT).show();
-        } else {
-            msg.thumbData = bmpToByteArray(thumb, true);
+        msg.thumbData = bmpToByteArray(thumb, true);
+        //压缩缩略图到32kb
+        if (msg.thumbData != null && msg.thumbData.length > '耀') {        //微信sdk里面判断的大小
+            msg.thumbData = compressBitmap(thumb, '耀');
         }
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = buildTransaction("webpage");
