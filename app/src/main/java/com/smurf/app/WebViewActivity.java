@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.share.ShareWeChatListener;
 import com.smurf.app.share.Shareboard;
@@ -168,41 +169,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private String getImgInputStream(List<Image> images){
         StringBuffer imgInputs = new StringBuffer();
-        for(Image image :images){
-            imgInputs.append(imageToBase64(image.getPath())).append("|");
-        }
+        BitmapUtils.comPressImg(images.get(0).getPath());
+        imgInputs.append(BitmapUtils.imageToBase64(images.get(0).getPath())).append("|");
         return imgInputs.toString().substring(0,imgInputs.toString().length()-1);
     }
 
-    private String imageToBase64(String path){
-        if(TextUtils.isEmpty(path)){
-            return null;
-        }
-        InputStream is = null;
-        byte[] data = null;
-        String result = null;
-        try{
-            is = new FileInputStream(path);
-            //创建一个字符流大小的数组。
-            data = new byte[is.available()];
-            //写入数组
-            is.read(data);
-            //用默认的编码格式进行编码
-            result = Base64.encodeToString(data,Base64.DEFAULT);
-        }catch (Exception e){
-            e.printStackTrace();
-        }finally {
-            if(null !=is){
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
 
-        }
-        return result;
-    }
 
 
     @Override
