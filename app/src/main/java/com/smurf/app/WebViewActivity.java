@@ -14,6 +14,8 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.JavascriptInterface;
@@ -33,6 +35,9 @@ import com.smurf.app.webView.X5WebView;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -155,15 +160,50 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<Image> images = ImagePicker.getImages(data);
-            List<String> paths = new ArrayList<>();
-            for(Image image :images){
-                paths.add(image.getPath());
-            }
             if (javaScriptPresenter != null)
-                javaScriptPresenter.notifyCamer(paths);
+                javaScriptPresenter.notifyCamer(getImgInputStream(images));
 
         }
     }
+
+    private String getImgInputStream(List<Image> images){
+        StringBuffer imgInputs = new StringBuffer();
+        for(Image image :images){
+            imgInputs.append(imageToBase64(image.getPath())).append("|");
+        }
+        return imgInputs.toString().substring(0,imgInputs.toString().length()-1);
+    }
+
+    private String imageToBase64(String path){
+        if(TextUtils.isEmpty(path)){
+            return null;
+        }
+        InputStream is = null;
+        byte[] data = null;
+        String result = null;
+        try{
+            is = new FileInputStream(path);
+            //创建一个字符流大小的数组。
+            data = new byte[is.available()];
+            //写入数组
+            is.read(data);
+            //用默认的编码格式进行编码
+            result = Base64.encodeToString(data,Base64.DEFAULT);
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            if(null !=is){
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        return result;
+    }
+
 
     @Override
     public void notifyZxingValueToJs(String value) {

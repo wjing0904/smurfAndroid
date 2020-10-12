@@ -15,6 +15,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 
+import com.esafirm.imagepicker.features.ImagePicker;
+
 import java.io.File;
 
 import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
@@ -48,6 +50,8 @@ public class H5FaceWebChromeClient extends WebChromeClient {
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
         if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
             Log.d("liuluchao","receiver h5 info");
+            toOpenImgChoose();
+            return;
         }
         return;
 
@@ -57,6 +61,8 @@ public class H5FaceWebChromeClient extends WebChromeClient {
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
         if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
             Log.d("liuluchao","receiver h5 info");
+            toOpenImgChoose();
+            return;
         }
         return;
     }
@@ -67,19 +73,16 @@ public class H5FaceWebChromeClient extends WebChromeClient {
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
         if (WBH5FaceVerifySDK.getInstance().recordVideoForApi21(webView, filePathCallback, activity, fileChooserParams)) {
             Log.d("liuluchao","receiver h5 info");
+            toOpenImgChoose();
+            return true;
         }
         return true;
     }
 
     //跳转相机
     private void toOpenImgChoose() {
-//        ImagePicker.getInstance()
-//                .setShowCamera(true)//设置是否显示拍照按钮
-//                .showImage(true)//设置是否展示图片
-//                .showVideo(true)//设置是否展示视频
-//                .setSingleType(true)//设置图片视频不能同时选择
-//                .setMaxCount(1)//设置最大选择图片数目(默认为1，单选)
-//                .start(activity, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
+        ImagePicker.create(activity).limit(1) // Activity or Fragment
+                .start();
     }
 
 }
