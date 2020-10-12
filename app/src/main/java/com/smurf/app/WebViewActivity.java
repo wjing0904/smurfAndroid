@@ -211,8 +211,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     }
 
     @Override
-    public void notifyImageSelectedValueToJs(String value,String name) {
-        mWebView.loadUrl("javascript:androidUploadImg('" + value + "','"+name +")");
+    public void notifyImageSelectedValueToJs(String value) {
+        mWebView.loadUrl("javascript:androidUploadImg('" + value +")");
+    }
+
+    @Override
+    public void notifyImageName(String name) {
+        mWebView.loadUrl("javascript:imageName('" + name +")");
     }
 
     @Override
