@@ -261,7 +261,7 @@ public class WechatShareManager {
      */
     public ShareContent getShareContentWebpag(String title, String content, String url) {
         if (mShareContentWebpag == null) {
-            mShareContentWebpag = new ShareContentWebpage(title, content, url, R.mipmap.logo);
+            mShareContentWebpag = new ShareContentWebpage(title, content, url, R.drawable.wx_webp_logo);
         }
         return (ShareContentWebpage) mShareContentWebpag;
     }
@@ -350,7 +350,7 @@ public class WechatShareManager {
             public void run() {
                 try {
                     Bitmap bmp = BitmapFactory.decodeStream(new URL(shareContent.getPictureUrl()).openStream());
-                    WXImageObject imgObj = new WXImageObject();
+                    WXImageObject imgObj = new WXImageObject(bmp);
                     Bitmap bitmap = BitmapUtils.compressScale(bmp);
                     imgObj.imageData =BitmapUtils. bmpToByteArray(bitmap, true);
                     WXMediaMessage msg = new WXMediaMessage();
