@@ -33,7 +33,9 @@ import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.smurf.app.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.StaticNum.REQUEST_LOCAL_CODE;
@@ -69,6 +71,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             javaScriptPresenter = new JavaScriptPresenter(this, this);
         }
         JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
+
         if (BuildConfig.DEBUG) {
             mWebView.loadUrl(DEBUG_APP_URL);
         } else {
@@ -292,9 +295,24 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          */
         @JavascriptInterface
         public void signUp(String signUrl) {
-            Intent intent = new Intent(mContext, SignUpActivity.class);
-            intent.putExtra("sign_url", signUrl);
-            mContext.startActivity(intent);
+//            Intent intent = new Intent(mContext, SignUpActivity.class);
+//            intent.putExtra("sign_url", signUrl);
+//            mContext.startActivity(intent);
+
+            if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(signUrl));
+                startActivity(intent);
+                return;
+            }
+
+            if (signUrl.contains("https://wx.tenpay.com")) {
+                Map<String, String> extraHeaders = new HashMap<>();
+                extraHeaders.put("Referer", "http://smurf.langongbao.com");
+                mWebView.loadUrl(signUrl, extraHeaders);
+                return;
+            }
         }
 
     }
