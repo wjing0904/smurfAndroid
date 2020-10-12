@@ -161,7 +161,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<Image> images = ImagePicker.getImages(data);
             if (javaScriptPresenter != null)
-                javaScriptPresenter.notifyCamer(getImgInputStream(images));
+                javaScriptPresenter.notifyCamer(getImgInputStream(images),images.get(0).getName());
 
         }
     }
@@ -211,8 +211,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     }
 
     @Override
-    public void notifyImageSelectedValueToJs(String value) {
-        mWebView.loadUrl("javascript:androidUploadImg('" + value + "')");
+    public void notifyImageSelectedValueToJs(String value,String name) {
+        mWebView.loadUrl("javascript:androidUploadImg('" + value + "','"+name +")");
     }
 
     @Override

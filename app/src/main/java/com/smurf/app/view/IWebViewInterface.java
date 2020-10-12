@@ -8,7 +8,7 @@ public interface IWebViewInterface {
 
     void notifyZxingValueToJs(String value);
 
-    void notifyImageSelectedValueToJs(String value);
+    void notifyImageSelectedValueToJs(String value,String name);
 
     void notifyLocation(String value);
 

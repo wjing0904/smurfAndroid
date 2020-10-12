@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -36,6 +38,42 @@ public class SignUpActivity extends Activity {
         setContentView(R.layout.sign_layout_webview);
         signUrl = getIntent().getStringExtra("sign_url");
         mWebView = findViewById(R.id.webview);
+        WebSettings settings = mWebView.getSettings();
+
+        settings.setJavaScriptEnabled(true);    //设置webview支持javascript
+//        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+        settings.setLoadsImagesAutomatically(true);    //支持自动加载图片
+        settings.setUseWideViewPort(true);    //设置webview推荐使用的窗口，使html界面自适应屏幕
+        settings.setLoadWithOverviewMode(true);
+        settings.setSaveFormData(true);    //设置webview保存表单数据
+        settings.setSavePassword(true);    //设置webview保存密码
+
+//        int mDensity = DensityUtils.getDensityDpi(context);
+//        if (mDensity == 120) {
+//            settings.setDefaultZoom(WebSettings.ZoomDensity.CLOSE);
+//        } else if (mDensity == 160) {
+//            settings.setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);
+//        } else if (mDensity == 240) {
+//            settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
+//        }
+//        settings.setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);    //设置中等像素密度，medium=160dpi
+        settings.setSupportZoom(true);    //支持缩放
+        settings.setSupportMultipleWindows(true);
+        settings.setAppCacheEnabled(true); //设置APP可以缓存
+        settings.setDatabaseEnabled(true);
+        settings.setDomStorageEnabled(true);//返回上个界面不刷新  允许本地缓存
+        //        settings.setCacheMode(WebSettings.LOAD_DEFAULT);// 设置缓存LOAD_DEFAULT   LOAD_CACHE_ONLY,LOAD_NO_CACHE
+        settings.setAllowFileAccess(true);// 设置可以访问文件
+        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);//不支持放大缩小
+        settings.setDisplayZoomControls(false);//不支持放大缩小
+        //      NORMAL：正常显示，没有渲染变化。
+        //      SINGLE_COLUMN：把所有内容放到WebView组件等宽的一列中。   //这个是强制的，把网页都挤变形了
+        //      NARROW_COLUMNS：可能的话，使所有列的宽度不超过屏幕宽度。 //好像是默认的
+
+        mWebView.setLongClickable(true);
+        mWebView.setScrollbarFadingEnabled(true);
+        mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        mWebView.setDrawingCacheEnabled(true);
         if (Build.VERSION.SDK_INT >= 23) {
             askForPermission();
         }

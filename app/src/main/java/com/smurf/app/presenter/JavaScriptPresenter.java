@@ -141,9 +141,9 @@ public class JavaScriptPresenter {
         if(webViewInterface!= null)
             webViewInterface.notifyZxingValueToJs(content);
     }
-    public void notifyCamer(String imageInput){
+    public void notifyCamer(String imageInput,String name){
         if(webViewInterface!= null)
-            webViewInterface.notifyImageSelectedValueToJs(imageInput);
+            webViewInterface.notifyImageSelectedValueToJs(imageInput,name);
     }
 
     public void notifyLoaction(String value){
