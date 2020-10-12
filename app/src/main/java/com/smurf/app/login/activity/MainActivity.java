@@ -127,7 +127,7 @@ public class MainActivity extends Activity {
         uiConfigBuilder.setNavReturnImgPath("btn_back");
         uiConfigBuilder.setCheckedImgPath(null);
         uiConfigBuilder.setNumberColor(0xFF222328);
-        uiConfigBuilder.setLogBtnImgPath("selector_btn_normal");
+        uiConfigBuilder.setLogBtnImgPath("login_btn");
         uiConfigBuilder.setLogBtnTextColor(0xFFFFFFFF);
         uiConfigBuilder.setLogBtnText("一键登录");
         uiConfigBuilder.setLogBtnOffsetY(255);
