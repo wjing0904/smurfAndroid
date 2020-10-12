@@ -155,9 +155,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<Image> images = ImagePicker.getImages(data);
-//            List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_RESULT_ITEMS);
-//            if (javaScriptPresenter != null)
-//                javaScriptPresenter.notifyCamer(imagePaths);
+            List<String> paths = new ArrayList<>();
+            for(Image image :images){
+                paths.add(image.getPath());
+            }
+            if (javaScriptPresenter != null)
+                javaScriptPresenter.notifyCamer(paths);
+
         }
     }
 
