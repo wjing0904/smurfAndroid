@@ -295,10 +295,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          */
         @JavascriptInterface
         public void signUp(String signUrl) {
-//            Intent intent = new Intent(mContext, SignUpActivity.class);
-//            intent.putExtra("sign_url", signUrl);
-//            mContext.startActivity(intent);
-
             if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
@@ -313,6 +309,9 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                 mWebView.loadUrl(signUrl, extraHeaders);
                 return;
             }
+            Intent intent = new Intent(mContext, SignUpActivity.class);
+            intent.putExtra("sign_url", signUrl);
+            mContext.startActivity(intent);
         }
 
     }
