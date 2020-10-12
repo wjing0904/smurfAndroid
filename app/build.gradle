@@ -141,7 +141,10 @@ dependencies {
 
     implementation(name: 'msa_mdid_1.0.13', ext: 'aar')
 
-    implementation 'com.lcw.library:imagepicker:2.2.0'
+    implementation 'com.github.esafirm.android-image-picker:imagepicker:2.0.0'
+    // for experimental rx picker
+    implementation 'com.github.esafirm.android-image-picker:rximagepicker:2.0.0'
+
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
 
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'

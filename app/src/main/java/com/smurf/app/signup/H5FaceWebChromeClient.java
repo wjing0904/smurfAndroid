@@ -1,0 +1,85 @@
+package com.smurf.app.signup;
+
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.webkit.ConsoleMessage;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+
+
+import java.io.File;
+
+import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
+
+
+public class H5FaceWebChromeClient extends WebChromeClient {
+    private static final String TAG = "H5FaceWebChromeClient";
+    private Activity activity;
+
+    public H5FaceWebChromeClient(Activity mActivity) {
+        this.activity = mActivity;
+    }
+
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        return super.onJsPrompt(view, url, message, defaultValue, result);
+    }
+
+    @Override
+    public boolean onJsConfirm(WebView view, String url, String message, JsResult result) {
+        return super.onJsConfirm(view, url, message, result);
+    }
+
+    @TargetApi(8)
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        return super.onConsoleMessage(consoleMessage);
+    }
+
+    // For Android >= 3.0
+    public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
+        if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
+            Log.d("liuluchao","receiver h5 info");
+        }
+        return;
+
+    }
+
+    // For Android >= 4.1
+    public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
+        if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
+            Log.d("liuluchao","receiver h5 info");
+        }
+        return;
+    }
+
+    // For Lollipop 5.0+ Devices
+    @TargetApi(21)
+    @Override
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        if (WBH5FaceVerifySDK.getInstance().recordVideoForApi21(webView, filePathCallback, activity, fileChooserParams)) {
+            Log.d("liuluchao","receiver h5 info");
+        }
+        return true;
+    }
+
+    //跳转相机
+    private void toOpenImgChoose() {
+//        ImagePicker.getInstance()
+//                .setShowCamera(true)//设置是否显示拍照按钮
+//                .showImage(true)//设置是否展示图片
+//                .showVideo(true)//设置是否展示视频
+//                .setSingleType(true)//设置图片视频不能同时选择
+//                .setMaxCount(1)//设置最大选择图片数目(默认为1，单选)
+//                .start(activity, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
+    }
+
+}

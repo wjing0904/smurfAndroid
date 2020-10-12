@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,7 +19,8 @@ import android.webkit.JavascriptInterface;
 
 import androidx.core.app.ActivityCompat;
 
-import com.lcw.library.imagepicker.ImagePicker;
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.features.ReturnMode;
 import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.zxing.android.CaptureActivity;
 
@@ -45,14 +47,9 @@ public class JavaScriptPresenter {
 
     public void openImageSelected(int picNum) {
         this.picSelectedNum = picNum;
-        ImagePicker.getInstance()
-                .setTitle("标题")//设置标题
-                .showCamera(true)//设置是否显示拍照按钮
-                .showImage(true)//设置是否展示图片
-                .showVideo(true)//设置是否展示视频
-                .setSingleType(true)//设置图片视频不能同时选择
-                .setMaxCount(picNum ==0? 1:picNum)//设置最大选择图片数目(默认为1，单选)
-                .start(((Activity)mContext), REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
+        ImagePicker.create((Activity)mContext).limit(picNum <=0 ?1:picNum) // Activity or Fragment
+                .start(REQUEST_SELECT_IMAGES_CODE);
+
     }
     public void getLocal(){
         locationManager = (LocationManager)(((Activity)mContext).getSystemService(Context.LOCATION_SERVICE));

@@ -55,7 +55,7 @@ public class SplashActivity extends Activity implements ILoginViewInterface {
 
     @Override
     public void openLoginActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, WebViewActivity.class);
         startActivity(intent);
         finish();
     }

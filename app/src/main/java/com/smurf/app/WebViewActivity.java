@@ -22,7 +22,8 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.lcw.library.imagepicker.ImagePicker;
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.share.ShareWeChatListener;
 import com.smurf.app.share.Shareboard;
@@ -153,9 +154,10 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }
         //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
-            List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
-            if (javaScriptPresenter != null)
-                javaScriptPresenter.notifyCamer(imagePaths);
+            List<Image> images = ImagePicker.getImages(data);
+//            List<String> imagePaths = data.getStringArrayListExtra(ImagePicker.EXTRA_RESULT_ITEMS);
+//            if (javaScriptPresenter != null)
+//                javaScriptPresenter.notifyCamer(imagePaths);
         }
     }
 
