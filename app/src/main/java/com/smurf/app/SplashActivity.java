@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.smurf.app.login.activity.MainActivity;
+import com.smurf.app.presenter.InstallAPPListener;
+import com.smurf.app.presenter.InstallAppPresenter;
 import com.smurf.app.presenter.SplashPresenter;
 import com.smurf.app.view.ILoginViewInterface;
 
@@ -19,6 +21,8 @@ public class SplashActivity extends Activity implements ILoginViewInterface {
     private ImageView logoImg;
     private TextView delayTime;
     private SplashPresenter presenter;
+    private InstallAppPresenter installAppPresenter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,10 +35,21 @@ public class SplashActivity extends Activity implements ILoginViewInterface {
         logoImg = findViewById(R.id.logo_img);
         Glide.with(this).load(R.mipmap.logo_start).into(logoImg);
         delayTime = findViewById(R.id.record_time_txt);
-        if (presenter == null) {
-            presenter = new SplashPresenter(this);
+        //检查APP是否需要更新
+        if(installAppPresenter == null){
+            installAppPresenter = new InstallAppPresenter(this);
         }
-        presenter.startTimeDelay();
+        installAppPresenter.setInstallAppListener(new InstallAPPListener() {
+            @Override
+            public void updateNotify() {
+                if (presenter == null) {
+                    presenter = new SplashPresenter(SplashActivity.this);
+                }
+                presenter.startTimeDelay();
+            }
+        });
+        installAppPresenter.checkAppInstall();
+
     }
 
     @Override

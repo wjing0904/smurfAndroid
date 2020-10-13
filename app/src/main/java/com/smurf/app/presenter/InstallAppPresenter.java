@@ -36,21 +36,40 @@ import okhttp3.Response;
 
 public class InstallAppPresenter {
 
+    private static final int MSG_UPDATE = 0;
+    private static final int MSG_PROGRESS = 1;
+    private static final int MSG_DELAYTIME = 2;
+
     private static final String APK_INSTALL_URL = "http://39.107.84.57:8090/api/sys/vno/detect";
     private Context mContext;
     private String versionName = "";
     private int versioncode;
     private InstallAPPListener installAPPListener;
+    private UpgradeDialog upgradeDialog;
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            String apkPath = (String) msg.obj;
-            UpgradeUtils.getInstance().installAPK(mContext, apkPath);
-            if (installAPPListener != null)
-                installAPPListener.updateNotify();
+            switch (msg.what){
+                case MSG_PROGRESS:
+                    String num = (String) msg.obj;
+                    if(upgradeDialog!= null)
+                        upgradeDialog.setProgress(num);
+                    break;
+                case MSG_UPDATE:
+                    String apkPath = (String) msg.obj;
+                    UpgradeUtils.getInstance().installAPK(mContext, apkPath);
+                    if (installAPPListener != null)
+                        installAPPListener.updateNotify();
+                    break;
+                case MSG_DELAYTIME:
+                    if (installAPPListener != null)
+                        installAPPListener.updateNotify();
+                    break;
+            }
+
         }
     };
 
@@ -82,8 +101,7 @@ public class InstallAppPresenter {
                             @Override
                             public void run() {
                                 Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
-                                if (installAPPListener != null)
-                                    installAPPListener.updateNotify();
+                                handler.sendEmptyMessage(MSG_DELAYTIME);
                                 return;
                             }
                         });
@@ -92,28 +110,30 @@ public class InstallAppPresenter {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (response == null) {
-                            if (installAPPListener != null)
-                                installAPPListener.updateNotify();
+                            handler.sendEmptyMessage(MSG_DELAYTIME);
                             return;
                         }
-                        Gson gson = new Gson();
-                        CouponBean couponBean = gson.fromJson(response.toString(), CouponBean.class);
-                        if (couponBean.isSuccess() || couponBean.getCode() == 0 && couponBean.getData().isIsInstallAppX()) {
-                            //弹窗，升级
-                            getAppVersionName(mContext);
-                            UpgradeDialog upgradeDialog = new UpgradeDialog(mContext, null, versioncode);
-                            upgradeDialog.setUpgradeNormalListener(new UpgradeDialog.UpgradeNormalListener() {
-                                @Override
-                                public void upgradeForce(String installUrl) {
-                                    //下载并通知升级
-                                    downApk(installUrl);
-                                }
-                            });
-                            upgradeDialog.show();
-                        } else {
-                            if (installAPPListener != null)
-                                installAPPListener.updateNotify();
-                            return;
+                        try {
+                            Gson gson = new Gson();
+                            CouponBean couponBean = gson.fromJson(response.toString(), CouponBean.class);
+                            if (couponBean.isSuccess() || couponBean.getCode() == 0 && couponBean.getData().isIsInstallAppX()) {
+                                //弹窗，升级
+                                getAppVersionName(mContext);
+                                upgradeDialog = new UpgradeDialog(mContext, null, versioncode);
+                                upgradeDialog.setUpgradeNormalListener(new UpgradeDialog.UpgradeNormalListener() {
+                                    @Override
+                                    public void upgradeForce(String installUrl) {
+                                        //下载并通知升级
+                                        downApk(installUrl);
+                                    }
+                                });
+                                upgradeDialog.show();
+                            } else {
+                                handler.sendEmptyMessage(MSG_DELAYTIME);
+                                return;
+                            }
+                        }catch (Exception e){
+                            handler.sendEmptyMessage(MSG_DELAYTIME);
                         }
                     }
                 });
@@ -154,6 +174,11 @@ public class InstallAppPresenter {
             do {
                 int numread = is.read(buf);
                 // 写入文件
+                count += numread;
+                Message message = handler.obtainMessage();
+                message.what = MSG_PROGRESS;
+                message.obj = (count/length) *100;
+                handler.sendMessage(message);
                 fos.write(buf, 0, numread);
             } while (true);// 点击取消就停止下载.
 
@@ -178,6 +203,7 @@ public class InstallAppPresenter {
             }
 
             Message message = handler.obtainMessage();
+            message.what = MSG_UPDATE;
             message.obj = apkFile.getAbsolutePath();
             handler.sendMessage(message);
         }

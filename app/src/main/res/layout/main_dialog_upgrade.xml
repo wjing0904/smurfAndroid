@@ -45,6 +45,7 @@
         android:background="@drawable/updataversionbut_bg">
 
         <TextView
+            android:id="@+id/update_num"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

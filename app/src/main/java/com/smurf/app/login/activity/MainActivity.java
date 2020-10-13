@@ -54,25 +54,12 @@ public class MainActivity extends Activity {
     private String mNumStr;
     private boolean mHasPermission;
 
-    private InstallAppPresenter installAppPresenter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initPermission();
-        //检查APP是否需要更新
-        if(installAppPresenter == null){
-            installAppPresenter = new InstallAppPresenter(this);
-        }
-        installAppPresenter.setInstallAppListener(new InstallAPPListener() {
-            @Override
-            public void updateNotify() {
-                finish();
-                initShowLoginPage();
-            }
-        });
-        installAppPresenter.checkAppInstall();
-
+        finish();
+        initShowLoginPage();
     }
 
 

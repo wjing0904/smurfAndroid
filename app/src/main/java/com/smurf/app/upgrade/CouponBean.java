@@ -10,7 +10,7 @@ public class CouponBean {
 
     private boolean success;
     private int code;
-    private Object message;
+    private String message;
     private DataBean data;
 
     public boolean isSuccess() {
@@ -29,11 +29,11 @@ public class CouponBean {
         this.code = code;
     }
 
-    public Object getMessage() {
+    public String getMessage() {
         return message;
     }
 
-    public void setMessage(Object message) {
+    public void setMessage(String message) {
         this.message = message;
     }
 

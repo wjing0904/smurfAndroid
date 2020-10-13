@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.smurf.app.R;
@@ -16,6 +17,7 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
     private UpgradeNormalListener mUpgradeNormalListener;
     private LinearLayout upgradeLayout;
     private CouponBean couponBean;
+    private TextView updateNum;
     private int versionCode;
 
     public UpgradeDialog(Context context,CouponBean couponBean,int versionCode) {
@@ -42,6 +44,7 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
         contextTxt = findViewById(R.id.updataversion_msg);
         versionCodeTxt = findViewById(R.id.updataversioncode);
         upgradeLayout = findViewById(R.id.dialog_sure);
+        updateNum = findViewById(R.id.update_num);
         upgradeLayout.setOnClickListener(this);
     }
 
@@ -56,7 +59,7 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
         if (versionCodeTxt != null) {
             versionCodeTxt.setText(String.valueOf(versionCode));
         }
-
+        setProgress("立即升级");
     }
 
     @Override
@@ -66,9 +69,16 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
                 CouponBean.DataBean data = couponBean.getData();
                 if (data != null && contextTxt != null) {
                     mUpgradeNormalListener.upgradeForce(data.getUrlX());
+                    setProgress("0/100");
+                    upgradeLayout.setOnClickListener(null);
                 }
             };
 
+        }
+    }
+    public void setProgress(String num){
+        if(updateNum!= null){
+            updateNum.setText(num);
         }
     }
 
