@@ -23,9 +23,8 @@ import java.io.IOException;
 
 public class ImageActivity extends Activity {
     private ImageView imageView;
-    private Dialog dialog;
-    private ImageView mImageView;
     private String imgUrl;
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,41 +34,21 @@ public class ImageActivity extends Activity {
         init();
 
         Glide.with(this).load(imgUrl).into(imageView);
-        //小图的点击事件（弹出大图）
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.show();
-            }
-        });
+
+
 
     }
 
     private void init() {
         imageView = (ImageView) findViewById(R.id.image);
-        //大图所依附的dialog
-        dialog = new Dialog(ImageActivity.this, R.style.ActivityDialogStyle);
-        mImageView = getImageView();
-        dialog.setContentView(mImageView);
-
-        //大图的点击事件（点击让他消失）
-        mImageView.setOnClickListener(new View.OnClickListener() {
+        imageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        //大图的长按监听
-        mImageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                //弹出的“保存图片”的Dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(ImageActivity.this);
+            public boolean onLongClick(View view) {
+                builder = new AlertDialog.Builder(ImageActivity.this);
                 builder.setItems(new String[]{getResources().getString(R.string.save_picture)}, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        saveCroppedImage(((BitmapDrawable) mImageView.getDrawable()).getBitmap());
+                        saveCroppedImage(((BitmapDrawable) imageView.getDrawable()).getBitmap());
                     }
                 });
                 builder.show();
@@ -77,6 +56,12 @@ public class ImageActivity extends Activity {
             }
         });
 
+//        imageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                builder.dismiss();
+//            }
+//        });
     }
 
     //保存图片
@@ -84,21 +69,6 @@ public class ImageActivity extends Activity {
         SaveImageUtils.saveImageToGallery(ImageActivity.this, bmp);
         SaveImageUtils.saveImageToGallerys(ImageActivity.this, bmp);
         finish();
-    }
-
-    //动态的ImageView
-    private ImageView getImageView() {
-        ImageView iv = new ImageView(this);
-        //宽高
-        iv.setLayoutParams(new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        //设置Padding
-        iv.setPadding(20, 20, 20, 20);
-        //imageView设置图片
-//        InputStream is = getResources().openRawResource(R.mipmap.riven);
-//        Drawable drawable = BitmapDrawable.createFromStream(is, null);
-        Glide.with(this).load(imgUrl).into(iv);
-//        iv.setImageDrawable(drawable);
-        return iv;
     }
 
 }

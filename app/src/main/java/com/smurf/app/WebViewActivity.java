@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,17 +20,22 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.share.ShareWeChatListener;
 import com.smurf.app.share.Shareboard;
+import com.smurf.app.utils.SaveImageUtils;
 import com.smurf.app.utils.ShareUtil;
 import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.webView.X5WebView;
@@ -338,6 +344,21 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }
 
     }
+
+    @JavascriptInterface
+    public void saveImage(String url) {
+        Glide.with(this)
+                .asBitmap()
+                .load(url)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        SaveImageUtils.saveImageToGallery(WebViewActivity.this, resource);
+                        SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);
+                    }
+                });
+    }
+
 
 
     @Override
