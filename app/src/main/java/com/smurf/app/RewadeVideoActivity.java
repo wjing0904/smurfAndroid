@@ -10,6 +10,9 @@ import android.widget.Toast;
 
 import com.adhub.ads.RewardedVideoAd;
 import com.adhub.ads.RewardedVideoAdListener;
+import com.smurf.app.event.VideoEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 
 public class RewadeVideoActivity extends Activity {
@@ -43,6 +46,9 @@ public class RewadeVideoActivity extends Activity {
             @Override
             public void onRewardedVideoAdFailedToLoad(int i) {
                 dismissLoadingDialog();
+                VideoEvent videoEvent = new VideoEvent();
+                videoEvent.isVideoEnd = true;
+                EventBus.getDefault().post(videoEvent);
                 Toast.makeText(RewadeVideoActivity.this,"视频加载失败",Toast.LENGTH_SHORT).show();
             }
 
@@ -54,6 +60,9 @@ public class RewadeVideoActivity extends Activity {
                 dismissLoadingDialog();
                 //展示广告
                 if(mRewardedVideoAd.isLoaded()){
+                    VideoEvent videoEvent = new VideoEvent();
+                    videoEvent.isVideoEnd = false;
+                    EventBus.getDefault().post(videoEvent);
                     mRewardedVideoAd.showAd(RewadeVideoActivity.this);
                 }
             }
@@ -71,6 +80,9 @@ public class RewadeVideoActivity extends Activity {
             @Override
             public void onRewardedVideoAdClosed() {
                 dismissLoadingDialog();
+                VideoEvent videoEvent = new VideoEvent();
+                videoEvent.isVideoEnd = true;
+                EventBus.getDefault().post(videoEvent);
                 finish();
             }
 

@@ -25,6 +25,7 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.event.LoginEvent;
 import com.smurf.app.event.TokenEvent;
+import com.smurf.app.event.VideoEvent;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
@@ -124,6 +125,18 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRecordTimeEvent(VideoEvent event) {
+        if(mWebView!= null) {
+            if(event.isVideoEnd) {
+                mWebView.loadUrl("javascript:videoEnd()");
+            }else{
+                mWebView.loadUrl("javascript:videoStart()");
+            }
+        }
+    }
+
 
     /**
      * 动态权限申请
