@@ -154,7 +154,6 @@ public class MainActivity extends Activity {
         layoutLoginGroup.setLayoutParams(layoutLoginGroupParam);
 
         ImageView btnWechat = new ImageView(this);
-        ImageView btnQQ = new ImageView(this);
 
         btnWechat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,21 +161,13 @@ public class MainActivity extends Activity {
                 JShareInterface.authorize(Wechat.Name, mAuthListener);
             }
         });
-        btnQQ.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JShareInterface.authorize(QQ.Name, mAuthListener);
-            }
-        });
 
         btnWechat.setImageResource(R.drawable.o_wechat);
-        btnQQ.setImageResource(R.drawable.o_qqx);
 
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         btnParam.setMargins(25,0,25,0);
 
         layoutLoginGroup.addView(btnWechat,btnParam);
-        layoutLoginGroup.addView(btnQQ,btnParam);
         uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
             @Override
             public void onClicked(Context context, View view) {

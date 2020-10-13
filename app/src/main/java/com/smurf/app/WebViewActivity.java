@@ -32,6 +32,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.share.ShareWeChatListener;
@@ -345,6 +346,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
 
+
+
         /**
          * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
          */
@@ -367,6 +370,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             Intent intent = new Intent(mContext, SignUpActivity.class);
             intent.putExtra("sign_url", signUrl);
             mContext.startActivity(intent);
+        }
+
+        @JavascriptInterface
+        public void openLoginPage(){
+            Intent intent = new Intent(mContext, MainActivity.class);
+            startActivity(intent);
         }
 
     }
