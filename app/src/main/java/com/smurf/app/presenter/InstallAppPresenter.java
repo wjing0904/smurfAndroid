@@ -196,17 +196,15 @@ public class InstallAppPresenter {
                     // 缓存
                     byte buf[] = new byte[1024];
                     // 写入到文件中
-                    do {
-                        int numread = is.read(buf);
-                        // 写入文件
+                    int numread;
+                    while((numread=is.read(buf)) !=-1){
+                        fos.write(buf, 0, numread);
                         count += numread;
                         Message message = handler.obtainMessage();
                         message.what = MSG_PROGRESS;
                         message.obj = String.valueOf(df.format((count / length)*100) + "%");
                         handler.sendMessage(message);
-                        fos.write(buf, 0, numread);
-                    } while (true);// 点击取消就停止下载.
-
+                    }
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -226,12 +224,11 @@ public class InstallAppPresenter {
                             e.printStackTrace();
                         }
                     }
-
-                    Message message = handler.obtainMessage();
-                    message.what = MSG_UPDATE;
-                    message.obj = apkFile.getAbsolutePath();
-                    handler.sendMessage(message);
                 }
+                Message message = handler.obtainMessage();
+                message.what = MSG_UPDATE;
+                message.obj = apkFile.getAbsolutePath();
+                handler.sendMessage(message);
             }
         });
         thread.start();
