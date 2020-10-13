@@ -68,8 +68,8 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
             if (couponBean != null) {
                 CouponBean.DataBean data = couponBean.getData();
                 if (data != null && contextTxt != null) {
-                    mUpgradeNormalListener.upgradeForce(data.getUrlX());
-                    setProgress("0/100");
+                    mUpgradeNormalListener.upgradeForce(data.getUrl());
+                    setProgress("0");
                     upgradeLayout.setOnClickListener(null);
                 }
             };

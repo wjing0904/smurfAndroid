@@ -19,6 +19,9 @@ import com.smurf.app.upgrade.UpgradeUtils;
 import com.smurf.app.utils.FileUtils;
 import com.smurf.app.utils.ThreadUtils;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,12 +29,15 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class InstallAppPresenter {
@@ -52,10 +58,10 @@ public class InstallAppPresenter {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            switch (msg.what){
+            switch (msg.what) {
                 case MSG_PROGRESS:
                     String num = (String) msg.obj;
-                    if(upgradeDialog!= null)
+                    if (upgradeDialog != null)
                         upgradeDialog.setProgress(num);
                     break;
                 case MSG_UPDATE:
@@ -89,22 +95,30 @@ public class InstallAppPresenter {
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
+                MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("vno", getAppVersionName(mContext));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                //1 . 拿到OkHttpClient对象
                 OkHttpClient client = new OkHttpClient();
-                FormBody.Builder builder = new FormBody.Builder();
-                builder.add("vuo", "");
-                Request request = new Request.Builder().url(APK_INSTALL_URL).build();
-                Call call = client.newCall(request);
-                call.enqueue(new Callback() {
+                //创建一个RequestBody(参数1：数据类型 参数2传递的json串)
+                RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
+                //3 . 构建Request,将FormBody作为Post方法的参数传入
+                Request request = new Request.Builder()
+                        .url(APK_INSTALL_URL)
+                        .post(requestBody)
+                        .build();
+
+                client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        ThreadUtils.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
-                                handler.sendEmptyMessage(MSG_DELAYTIME);
-                                return;
-                            }
-                        });
+                        Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
+                        handler.sendEmptyMessage(MSG_DELAYTIME);
+                        return;
                     }
 
                     @Override
@@ -113,26 +127,33 @@ public class InstallAppPresenter {
                             handler.sendEmptyMessage(MSG_DELAYTIME);
                             return;
                         }
+
                         try {
                             Gson gson = new Gson();
-                            CouponBean couponBean = gson.fromJson(response.toString(), CouponBean.class);
-                            if (couponBean.isSuccess() || couponBean.getCode() == 0 && couponBean.getData().isIsInstallAppX()) {
+                            CouponBean couponBean = gson.fromJson(response.body().string(), CouponBean.class);
+                            if (couponBean.isSuccess() || couponBean.getCode() == 0 && couponBean.getData().isInstallApp()) {
                                 //弹窗，升级
-                                getAppVersionName(mContext);
-                                upgradeDialog = new UpgradeDialog(mContext, null, versioncode);
-                                upgradeDialog.setUpgradeNormalListener(new UpgradeDialog.UpgradeNormalListener() {
+                                ThreadUtils.runOnUiThread(new Runnable() {
                                     @Override
-                                    public void upgradeForce(String installUrl) {
-                                        //下载并通知升级
-                                        downApk(installUrl);
+                                    public void run() {
+                                        getAppVersionName(mContext);
+                                        upgradeDialog = new UpgradeDialog(mContext, couponBean, versioncode);
+                                        upgradeDialog.setUpgradeNormalListener(new UpgradeDialog.UpgradeNormalListener() {
+                                            @Override
+                                            public void upgradeForce(String installUrl) {
+                                                //下载并通知升级
+                                                downApk(installUrl);
+                                            }
+                                        });
+                                        upgradeDialog.show();
                                     }
                                 });
-                                upgradeDialog.show();
+
                             } else {
                                 handler.sendEmptyMessage(MSG_DELAYTIME);
                                 return;
                             }
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             handler.sendEmptyMessage(MSG_DELAYTIME);
                         }
                     }
@@ -144,70 +165,76 @@ public class InstallAppPresenter {
 
 
     private void downApk(String loadApkUrl) {
-        InputStream is = null;
-        FileOutputStream fos = null;
-        File apkFile = null;
-        try {
-            // 获得存储卡的路径
-            String sdpath = FileUtils.getAppPath() + "/";
-            String mSavePath = sdpath + "download";
-            URL url = new URL(loadApkUrl);
-            // 创建连接
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.connect();
-            // 获取文件大小
-            int length = conn.getContentLength();
-            // 创建输入流
-            is = conn.getInputStream();
-
-            File file = new File(mSavePath);
-            // 判断文件目录是否存在
-            if (!file.exists()) {
-                file.mkdir();
-            }
-            apkFile = new File(mSavePath, "smurf");
-            fos = new FileOutputStream(apkFile);
-            int count = 0;
-            // 缓存
-            byte buf[] = new byte[1024];
-            // 写入到文件中
-            do {
-                int numread = is.read(buf);
-                // 写入文件
-                count += numread;
-                Message message = handler.obtainMessage();
-                message.what = MSG_PROGRESS;
-                message.obj = (count/length) *100;
-                handler.sendMessage(message);
-                fos.write(buf, 0, numread);
-            } while (true);// 点击取消就停止下载.
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fos != null) {
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                InputStream is = null;
+                FileOutputStream fos = null;
+                File apkFile = null;
                 try {
-                    fos.close();
+                    // 获得存储卡的路径
+                    String sdpath = FileUtils.getAppPath() + "/";
+                    String mSavePath = sdpath + "download";
+                    URL url = new URL(loadApkUrl);
+                    // 创建连接
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.connect();
+                    // 获取文件大小
+                    int length = conn.getContentLength();
+                    // 创建输入流
+                    is = conn.getInputStream();
+
+                    File file = new File(mSavePath);
+                    // 判断文件目录是否存在
+                    if (!file.exists()) {
+                        file.mkdir();
+                    }
+                    apkFile = new File(mSavePath, "smurf");
+                    fos = new FileOutputStream(apkFile);
+                    float count = 0;
+                    DecimalFormat df = new DecimalFormat("#.##");
+                    // 缓存
+                    byte buf[] = new byte[1024];
+                    // 写入到文件中
+                    do {
+                        int numread = is.read(buf);
+                        // 写入文件
+                        count += numread;
+                        Message message = handler.obtainMessage();
+                        message.what = MSG_PROGRESS;
+                        message.obj = String.valueOf(df.format((count / length)*100) + "%");
+                        handler.sendMessage(message);
+                        fos.write(buf, 0, numread);
+                    } while (true);// 点击取消就停止下载.
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } finally {
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (is != null) {
+                        try {
+                            is.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Message message = handler.obtainMessage();
+                    message.what = MSG_UPDATE;
+                    message.obj = apkFile.getAbsolutePath();
+                    handler.sendMessage(message);
                 }
             }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Message message = handler.obtainMessage();
-            message.what = MSG_UPDATE;
-            message.obj = apkFile.getAbsolutePath();
-            handler.sendMessage(message);
-        }
-
+        });
+        thread.start();
     }
 
 

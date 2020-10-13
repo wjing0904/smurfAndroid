@@ -1,5 +1,6 @@
 package com.smurf.app.presenter;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
@@ -15,6 +16,7 @@ public class SplashPresenter {
 
     //开始录音倒计时 3s
     private Handler handler = new Handler() {
+        @SuppressLint("HandlerLeak")
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);

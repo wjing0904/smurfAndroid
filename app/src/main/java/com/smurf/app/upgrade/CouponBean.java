@@ -54,9 +54,25 @@ public class CouponBean {
          */
 
         private String vno;
-        private String urlX;
-        private boolean isInstallAppX;
+        private String url;
+        private boolean isInstallApp;
         private String explain;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public boolean isInstallApp() {
+            return isInstallApp;
+        }
+
+        public void setInstallApp(boolean installApp) {
+            isInstallApp = installApp;
+        }
 
         public String getVno() {
             return vno;
@@ -66,21 +82,6 @@ public class CouponBean {
             this.vno = vno;
         }
 
-        public String getUrlX() {
-            return urlX;
-        }
-
-        public void setUrlX(String urlX) {
-            this.urlX = urlX;
-        }
-
-        public boolean isIsInstallAppX() {
-            return isInstallAppX;
-        }
-
-        public void setIsInstallAppX(boolean isInstallAppX) {
-            this.isInstallAppX = isInstallAppX;
-        }
 
         public String getExplain() {
             return explain;

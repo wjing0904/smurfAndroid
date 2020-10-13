@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -313,7 +314,18 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                     ShareUtil.getInstance(WebViewActivity.this).shareText(type, text);
                     break;
                 case 1:
-                    ShareUtil.getInstance(WebViewActivity.this).shareImage(type, imgUri);
+                    Intent intent = new Intent();
+                    ComponentName cop = new ComponentName("com.tencent.mm","com.tencent.mm.ui.tools.ShareImgUI");
+                    intent.setComponent(cop);
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(imgUri));
+//            intent.putExtra("Kdescription", !TextUtils.isEmpty(content) ? content : "");
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    // context.startActivity(intent);
+                    startActivity(Intent.createChooser(intent, "Share"));
+
+//                    ShareUtil.getInstance(WebViewActivity.this).shareImage(type, imgUri);
                     break;
                 case 2:
                     ShareUtil.getInstance(WebViewActivity.this).shareWebPage(type, webpageUrl, title, description);

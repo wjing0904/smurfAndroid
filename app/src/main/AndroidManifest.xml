@@ -212,6 +212,18 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+<!--        com.smurf.app-->
+
+        <provider
+            android:name="com.smurf.app.upgrade.SumrfFileProvider"
+            android:authorities="com.smurf.app.fileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_smurf_paths" />
+        </provider>
+
         <provider
             android:name="com.bytedance.sdk.openadsdk.multipro.TTMultiProvider"
             android:authorities="${applicationId}.TTMultiProvider"
