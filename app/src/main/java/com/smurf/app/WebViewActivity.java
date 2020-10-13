@@ -272,10 +272,24 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          * 图片保存
          */
         @JavascriptInterface
-        public void openAndSaveImg(String url) {
-            Intent intent = new Intent(mContext, ImageActivity.class);
-            intent.putExtra("img_url", url);
-            mContext.startActivity(intent);
+        public void openAndSaveImg(int type,String url) {
+            if(type ==0) {
+                Intent intent = new Intent(mContext, ImageActivity.class);
+                intent.putExtra("img_url", url);
+                mContext.startActivity(intent);
+            }
+            if(type ==1){
+                Glide.with(WebViewActivity.this)
+                        .asBitmap()
+                        .load(url)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                                SaveImageUtils.saveImageToGallery(WebViewActivity.this, resource);
+                                SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);
+                            }
+                        });
+            }
         }
 
         /**
@@ -344,22 +358,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }
 
     }
-
-    @JavascriptInterface
-    public void saveImage(String url) {
-        Glide.with(this)
-                .asBitmap()
-                .load(url)
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                        SaveImageUtils.saveImageToGallery(WebViewActivity.this, resource);
-                        SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);
-                    }
-                });
-    }
-
-
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
