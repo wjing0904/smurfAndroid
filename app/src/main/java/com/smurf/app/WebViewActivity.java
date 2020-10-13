@@ -1,27 +1,18 @@
 package com.smurf.app;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -32,11 +23,11 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.smurf.app.event.LoginEvent;
+import com.smurf.app.event.TokenEvent;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
-import com.smurf.app.share.ShareWeChatListener;
-import com.smurf.app.share.Shareboard;
 import com.smurf.app.utils.SaveImageUtils;
 import com.smurf.app.utils.ShareUtil;
 import com.smurf.app.view.IWebViewInterface;
@@ -44,9 +35,10 @@ import com.smurf.app.webView.X5WebView;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,6 +55,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private static final String DEBUG_APP_URL = "http://39.107.84.57:8091/#/home";
     private static final String RELEASE_APP_URL = "";
+    private static final String DEBUG_PHONE_LOGIN = "http://39.107.84.57:8091/#/phoneLogin";
+    private static final String RELEASE_PHONE_LOGIN = "";
     private X5WebView mWebView;
     private JavaScriptPresenter javaScriptPresenter;
     private long exitTime = 0;
@@ -110,6 +104,24 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }else{
             ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
+        }
+        EventBus.getDefault().register(this);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRecordTimeEvent(TokenEvent event) {
+        if(mWebView!= null)
+            mWebView.loadUrl("javascript:toOnePhoneLogin('" + event.getCode() + "')");
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRecordTimeEvent(LoginEvent event) {
+        if(mWebView!= null) {
+            if(BuildConfig.DEBUG) {
+                mWebView.loadUrl(DEBUG_PHONE_LOGIN);
+            }else{
+                mWebView.loadUrl(RELEASE_PHONE_LOGIN);
+            }
         }
     }
 
@@ -420,5 +432,11 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 //        ShareUtil.getInstance(WebViewActivity.this).shareImage(0,url);
 
 //        ShareUtil.getInstance(WebViewActivity.this).shareWebPage(0,"https://www.baidu.com", "title","description");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

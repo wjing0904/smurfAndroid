@@ -2,36 +2,27 @@ package com.smurf.app.login.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.smurf.app.R;
-import com.smurf.app.WebViewActivity;
+import com.smurf.app.event.LoginEvent;
+import com.smurf.app.event.TokenEvent;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
-import com.smurf.app.login.utils.ScreenUtils;
-import com.smurf.app.login.utils.ToastUtil;
-import com.smurf.app.presenter.InstallAPPListener;
-import com.smurf.app.presenter.InstallAppPresenter;
+
+import org.greenrobot.eventbus.EventBus;
 
 import cn.jiguang.share.android.api.AuthListener;
 import cn.jiguang.share.android.api.JShareInterface;
@@ -39,9 +30,7 @@ import cn.jiguang.share.android.api.Platform;
 import cn.jiguang.share.android.model.AccessTokenInfo;
 import cn.jiguang.share.android.model.BaseResponseInfo;
 import cn.jiguang.share.android.utils.Logger;
-import cn.jiguang.share.qqmodel.QQ;
 import cn.jiguang.share.wechat.Wechat;
-import cn.jiguang.share.weibo.SinaWeibo;
 import cn.jiguang.verifysdk.api.JVerificationInterface;
 import cn.jiguang.verifysdk.api.JVerifyUIClickCallback;
 import cn.jiguang.verifysdk.api.JVerifyUIConfig;
@@ -225,8 +214,11 @@ public class MainActivity extends Activity {
 
 
     private void toSuccessActivity(int action, String token) {
-        Intent intent = new Intent(this, WebViewActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, WebViewActivity.class);
+////        startActivity(intent);
+        TokenEvent codeEvent = new TokenEvent();
+        codeEvent.setCode(token);
+        EventBus.getDefault().post(codeEvent);
         finish();
 
     }
@@ -254,8 +246,9 @@ public class MainActivity extends Activity {
     }
 
     private void toNativeVerifyActivity() {
-        Intent intent = new Intent(this, NativeVerifyActivity.class);
-        startActivity(intent);
+        LoginEvent codeEvent = new LoginEvent();
+        EventBus.getDefault().post(codeEvent);
+        finish();
     }
 
     private int dp2Pix(Context context, float dp) {
