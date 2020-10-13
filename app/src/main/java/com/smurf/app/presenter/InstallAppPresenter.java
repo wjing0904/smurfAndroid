@@ -137,7 +137,7 @@ public class InstallAppPresenter {
                                     @Override
                                     public void run() {
                                         getAppVersionName(mContext);
-                                        upgradeDialog = new UpgradeDialog(mContext, couponBean, versioncode);
+                                        upgradeDialog = new UpgradeDialog(mContext, couponBean, getAppVersionName(mContext));
                                         upgradeDialog.setUpgradeNormalListener(new UpgradeDialog.UpgradeNormalListener() {
                                             @Override
                                             public void upgradeForce(String installUrl) {

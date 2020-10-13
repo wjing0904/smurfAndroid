@@ -18,12 +18,12 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
     private LinearLayout upgradeLayout;
     private CouponBean couponBean;
     private TextView updateNum;
-    private int versionCode;
+    private String versionName;
 
-    public UpgradeDialog(Context context,CouponBean couponBean,int versionCode) {
+    public UpgradeDialog(Context context,CouponBean couponBean,String versionName) {
         super(context, R.style.public_dialog);
         this.couponBean = couponBean;
-        this.versionCode = versionCode;
+        this.versionName = versionName;
     }
 
     public UpgradeDialog setUpgradeNormalListener(UpgradeNormalListener upgradeNormalListener) {
@@ -57,7 +57,7 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
         }
 
         if (versionCodeTxt != null) {
-            versionCodeTxt.setText(String.valueOf(versionCode));
+            versionCodeTxt.setText(versionName);
         }
         setProgress("立即升级");
     }
