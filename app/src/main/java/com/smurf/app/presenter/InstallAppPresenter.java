@@ -116,7 +116,12 @@ public class InstallAppPresenter {
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
+                        ThreadUtils.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         handler.sendEmptyMessage(MSG_DELAYTIME);
                         return;
                     }
