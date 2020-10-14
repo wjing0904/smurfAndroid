@@ -116,8 +116,10 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(TokenEvent event) {
-        if (mWebView != null)
+        if (mWebView != null) {
             mWebView.loadUrl("javascript:toOnePhoneLogin('" + event.getCode() + "')");
+            mWebView.loadUrl("javascript:toWxLogin('" + event.getType() + "')");
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

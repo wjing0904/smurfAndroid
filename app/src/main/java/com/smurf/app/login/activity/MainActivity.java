@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         if (code == Constants.CODE_LOGIN_SUCCESS) {
-                            toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS,token);
+                            toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS,token,0);
                             Log.e(TAG, "onResult: loginSuccess");
                         } else if(code != Constants.CODE_LOGIN_CANCELD){
                             Log.e(TAG, "onResult: loginError");
@@ -216,9 +216,10 @@ public class MainActivity extends Activity {
     }
 
 
-    private void toSuccessActivity(int action, String token) {
+    private void toSuccessActivity(int action, String token,int type) {
         TokenEvent codeEvent = new TokenEvent();
         codeEvent.setCode(token);
+        codeEvent.setType(type);
         EventBus.getDefault().post(codeEvent);
         finish();
 
@@ -286,7 +287,7 @@ public class MainActivity extends Activity {
                         toastMsg = "授权成功:" + data.toString();
                         Logger.dd(TAG, "openid:" + openid + ",token:" + token + ",expiration:" + expiration + ",refresh_token:" + refresh_token);
                         Logger.dd(TAG, "originData:" + originData);
-                        toSuccessActivity(Constants.ACTION_THIRD_AUTHORIZED_SUCCESS, token);
+                        toSuccessActivity(Constants.ACTION_THIRD_AUTHORIZED_SUCCESS, token,1);
                         Log.e(TAG, "onResult: loginSuccess");
                     }
                     break;

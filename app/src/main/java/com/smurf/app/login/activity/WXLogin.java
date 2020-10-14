@@ -47,6 +47,7 @@ public class WXLogin {
                         toastMsg = "授权成功:" + data.toString();
                         TokenEvent codeEvent = new TokenEvent();
                         codeEvent.setCode(token);
+                        codeEvent.setType(1);
                         EventBus.getDefault().post(codeEvent);
                     }
                     break;
