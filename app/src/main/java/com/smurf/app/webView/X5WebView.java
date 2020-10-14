@@ -72,6 +72,8 @@ public class X5WebView extends WebView {
         // webSetting.setRenderPriority(WebSettings.RenderPriority.HIGH);
         webSetting.setCacheMode(WebSettings.LOAD_NO_CACHE);
         webSetting.setAllowUniversalAccessFromFileURLs(true);
+        String ua = webSetting.getUserAgentString();
+        webSetting.setUserAgentString(ua+";  SMURF_APP /");
     }
 
     public X5WebView(Context arg0) {

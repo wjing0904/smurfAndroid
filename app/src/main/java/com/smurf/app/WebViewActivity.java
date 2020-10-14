@@ -27,6 +27,7 @@ import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.event.TokenEvent;
 import com.smurf.app.event.VideoEvent;
 import com.smurf.app.login.activity.MainActivity;
+import com.smurf.app.login.activity.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
 import com.smurf.app.utils.SaveImageUtils;
@@ -372,6 +373,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         public void openLoginPage() {
             Intent intent = new Intent(mContext, MainActivity.class);
             startActivity(intent);
+        }
+
+        @JavascriptInterface
+        public void wxLogin(){
+            WXLogin wxLogin = new WXLogin(mContext);
+            wxLogin.login();
         }
 
     }
