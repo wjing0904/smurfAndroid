@@ -168,14 +168,14 @@ public class MainActivity extends Activity {
         });
 
 
-        final View dialogViewTitle = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_title,null, false);
-
-        uiConfigBuilder.addNavControlView(dialogViewTitle, new JVerifyUIClickCallback() {
-            @Override
-            public void onClicked(Context context, View view) {
-
-            }
-        });
+//        final View dialogViewTitle = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_title,null, false);
+//
+//        uiConfigBuilder.addNavControlView(dialogViewTitle, new JVerifyUIClickCallback() {
+//            @Override
+//            public void onClicked(Context context, View view) {
+//
+//            }
+//        });
 
 //        final View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_agreement,null, false);
 //
