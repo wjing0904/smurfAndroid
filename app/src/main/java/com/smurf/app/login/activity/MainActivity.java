@@ -15,8 +15,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.smurf.app.BuildConfig;
 import com.smurf.app.R;
-import com.smurf.app.event.LoginEvent;
+import com.smurf.app.WebViewActivity;
 import com.smurf.app.event.TokenEvent;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
@@ -39,6 +40,8 @@ import cn.jiguang.verifysdk.api.VerifyListener;
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
+    private static final String DEBUG_PHONE_LOGIN = "http://39.107.84.57:8091/#/phoneLogin";
+    private static final String RELEASE_PHONE_LOGIN = "";
 
     private String mNumStr;
     private boolean mHasPermission;
@@ -174,30 +177,30 @@ public class MainActivity extends Activity {
             }
         });
 
-        final View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_agreement,null, false);
-
-        dialogView.findViewById(R.id.dialog_login_no).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                JVerificationInterface.dismissLoginAuthActivity();
-            }
-        });
-
-        dialogView.findViewById(R.id.dialog_login_yes).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogView.setVisibility(View.GONE);
-                dialogViewTitle.setVisibility(View.GONE);
-            }
-        });
-
-
-        uiConfigBuilder.addCustomView(dialogView, false, new JVerifyUIClickCallback() {
-            @Override
-            public void onClicked(Context context, View view) {
-//                ToastUtil.showToast(MainActivity.this, "功能未实现", 1000);
-            }
-        });
+//        final View dialogView = LayoutInflater.from(getApplicationContext()).inflate(R.layout.dialog_login_agreement,null, false);
+//
+//        dialogView.findViewById(R.id.dialog_login_no).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                JVerificationInterface.dismissLoginAuthActivity();
+//            }
+//        });
+//
+//        dialogView.findViewById(R.id.dialog_login_yes).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialogView.setVisibility(View.GONE);
+//                dialogViewTitle.setVisibility(View.GONE);
+//            }
+//        });
+//
+//
+//        uiConfigBuilder.addCustomView(dialogView, false, new JVerifyUIClickCallback() {
+//            @Override
+//            public void onClicked(Context context, View view) {
+////                ToastUtil.showToast(MainActivity.this, "功能未实现", 1000);
+//            }
+//        });
 
 
         return uiConfigBuilder.build();
@@ -214,8 +217,6 @@ public class MainActivity extends Activity {
 
 
     private void toSuccessActivity(int action, String token) {
-//        Intent intent = new Intent(this, WebViewActivity.class);
-////        startActivity(intent);
         TokenEvent codeEvent = new TokenEvent();
         codeEvent.setCode(token);
         EventBus.getDefault().post(codeEvent);
@@ -246,8 +247,15 @@ public class MainActivity extends Activity {
     }
 
     private void toNativeVerifyActivity() {
-        LoginEvent codeEvent = new LoginEvent();
-        EventBus.getDefault().post(codeEvent);
+        String url = null;
+        if(BuildConfig.DEBUG) {
+            url = DEBUG_PHONE_LOGIN;
+        }else{
+            url = RELEASE_PHONE_LOGIN;
+        }
+        Intent intent = new Intent(this, WebViewActivity.class);
+        intent.putExtra("web_url",url);
+        startActivity(intent);
         finish();
     }
 

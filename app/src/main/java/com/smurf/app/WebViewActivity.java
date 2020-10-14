@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +24,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
-import com.smurf.app.event.LoginEvent;
 import com.smurf.app.event.TokenEvent;
 import com.smurf.app.event.VideoEvent;
 import com.smurf.app.login.activity.MainActivity;
@@ -40,6 +40,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,20 +56,19 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private static final String DECODED_CONTENT_KEY = "codedContent";
 
-    private static final String DEBUG_APP_URL = "http://39.107.84.57:8091/#/home";
-    private static final String RELEASE_APP_URL = "";
-    private static final String DEBUG_PHONE_LOGIN = "http://39.107.84.57:8091/#/phoneLogin";
-    private static final String RELEASE_PHONE_LOGIN = "";
+
     private X5WebView mWebView;
     private JavaScriptPresenter javaScriptPresenter;
     private long exitTime = 0;
-
+    private String webUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_webview);
         test();
+
+        webUrl = getIntent().getStringExtra("web_url");
         mWebView = (X5WebView) findViewById(R.id.webview);
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -81,57 +82,49 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             javaScriptPresenter = new JavaScriptPresenter(this, this);
         }
         JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
-
-        if (BuildConfig.DEBUG) {
-            mWebView.loadUrl(DEBUG_APP_URL);
-        } else {
-            mWebView.loadUrl(RELEASE_APP_URL);
-        }
+        mWebView.loadUrl(webUrl);
         mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
 
         String[] permissions = new String[]{
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.INTERNET};
-        List<String>  permissionList = new ArrayList<>();
-        for(int i=0;i<permissions.length;i++){
-            if(ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED){
+        List<String> permissionList = new ArrayList<>();
+        for (int i = 0; i < permissions.length; i++) {
+            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
                 permissionList.add(permissions[i]);
             }
         }
-        if(permissionList.size() <=0){
-            if(javaScriptPresenter!= null){
+        if (permissionList.size() <= 0) {
+            if (javaScriptPresenter != null) {
                 javaScriptPresenter.getLocal();
             }
-        }else{
+        } else {
             ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
         }
         EventBus.getDefault().register(this);
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        webUrl = intent.getStringExtra("web_url");
+        mWebView.loadUrl(webUrl);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(TokenEvent event) {
-        if(mWebView!= null)
+        if (mWebView != null)
             mWebView.loadUrl("javascript:toOnePhoneLogin('" + event.getCode() + "')");
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRecordTimeEvent(LoginEvent event) {
-        if(mWebView!= null) {
-            if(BuildConfig.DEBUG) {
-                mWebView.loadUrl(DEBUG_PHONE_LOGIN);
-            }else{
-                mWebView.loadUrl(RELEASE_PHONE_LOGIN);
-            }
-        }
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(VideoEvent event) {
-        if(mWebView!= null) {
-            if(event.isVideoEnd) {
+        if (mWebView != null) {
+            if (event.isVideoEnd) {
                 mWebView.loadUrl("javascript:videoEnd()");
-            }else{
+            } else {
                 mWebView.loadUrl("javascript:videoStart()");
             }
         }
@@ -140,6 +133,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     /**
      * 动态权限申请
+     *
      * @param requestCode
      * @param permissions
      * @param grantResults
@@ -163,17 +157,17 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机哦！", Toast.LENGTH_SHORT).show();
         }
 
-        if(requestCode == REQUEST_LOCAL_CODE){
-            for(int i=0;i<grantResults.length;i++){
-                if(grantResults[i] == -1){
+        if (requestCode == REQUEST_LOCAL_CODE) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == -1) {
                     haspermission = true;
                 }
             }
-            if(haspermission){
+            if (haspermission) {
                 Toast.makeText(this, "你拒绝了权限申请，无法进行定位哦！", Toast.LENGTH_SHORT).show();
 
-            }else{
-                if(javaScriptPresenter != null)
+            } else {
+                if (javaScriptPresenter != null)
                     javaScriptPresenter.getLocal();
             }
         }
@@ -195,19 +189,17 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<Image> images = ImagePicker.getImages(data);
             if (javaScriptPresenter != null)
-                javaScriptPresenter.notifyCamer(getImgInputStream(images),images.get(0).getName());
+                javaScriptPresenter.notifyCamer(getImgInputStream(images), images.get(0).getName());
 
         }
     }
 
-    private String getImgInputStream(List<Image> images){
+    private String getImgInputStream(List<Image> images) {
         StringBuffer imgInputs = new StringBuffer();
         BitmapUtils.comPressImg(images.get(0).getPath());
         imgInputs.append(BitmapUtils.imageToBase64(images.get(0).getPath())).append("|");
-        return imgInputs.toString().substring(0,imgInputs.toString().length()-1);
+        return imgInputs.toString().substring(0, imgInputs.toString().length() - 1);
     }
-
-
 
 
     @Override
@@ -217,17 +209,17 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     @Override
     public void notifyImageSelectedValueToJs(String value) {
-        mWebView.loadUrl("javascript:androidUploadImg('" + value +"')");
+        mWebView.loadUrl("javascript:androidUploadImg('" + value + "')");
     }
 
     @Override
     public void notifyImageName(String name) {
-        mWebView.loadUrl("javascript:imageName('" + name +"')");
+        mWebView.loadUrl("javascript:imageName('" + name + "')");
     }
 
     @Override
     public void notifyLocation(String value) {
-        Log.d("test",value);
+        Log.d("test", value);
         mWebView.loadUrl("javascript:localCity('" + value + "')");
     }
 
@@ -240,7 +232,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }
 
         /**
-         *  js 调用原生二维码
+         * js 调用原生二维码
          */
         @JavascriptInterface
         public void goSCan() {
@@ -254,6 +246,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         /**
          * js调用原生图片选择
+         *
          * @param picNum
          */
         @JavascriptInterface
@@ -280,17 +273,17 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.INTERNET};
-            List<String>  permissionList = new ArrayList<>();
-            for(int i=0;i<permissions.length;i++){
-                if(ActivityCompat.checkSelfPermission(mContext, permissions[i]) != PackageManager.PERMISSION_GRANTED){
+            List<String> permissionList = new ArrayList<>();
+            for (int i = 0; i < permissions.length; i++) {
+                if (ActivityCompat.checkSelfPermission(mContext, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
                     permissionList.add(permissions[i]);
                 }
             }
-            if(permissionList.size() <=0){
-                if(javaScriptPresenter!= null){
+            if (permissionList.size() <= 0) {
+                if (javaScriptPresenter != null) {
                     javaScriptPresenter.getLocal();
                 }
-            }else{
+            } else {
                 ActivityCompat.requestPermissions(((Activity) mContext), permissions, REQUEST_LOCAL_CODE);
             }
         }
@@ -299,13 +292,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          * 图片保存
          */
         @JavascriptInterface
-        public void openAndSaveImg(int type,String url) {
-            if(type ==0) {
+        public void openAndSaveImg(int type, String url) {
+            if (type == 0) {
                 Intent intent = new Intent(mContext, ImageActivity.class);
                 intent.putExtra("img_url", url);
                 mContext.startActivity(intent);
             }
-            if(type ==1){
+            if (type == 1) {
                 Glide.with(WebViewActivity.this)
                         .asBitmap()
                         .load(url)
@@ -328,10 +321,10 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          * 分享网页 ：title 标题，description 描述信息 webpageUrl 网页链接
          */
         @JavascriptInterface
-        public void share(int type ,int shareType, String title, String text, String imgUri, String description,String webpageUrl) {
-            if(isWeixinAvilible(mContext)) {
+        public void share(int type, int shareType, String title, String text, String imgUri, String description, String webpageUrl) {
+            if (isWeixinAvilible(mContext)) {
 
-            }else {
+            } else {
                 Toast.makeText(mContext, "您还没有安装微信，请先安装微信客户端", Toast.LENGTH_SHORT).show();
             }
 
@@ -340,37 +333,15 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                     ShareUtil.getInstance(WebViewActivity.this).shareText(type, text);
                     break;
                 case 1:
-                    Intent intent = new Intent();
-                    ComponentName cop = new ComponentName("com.tencent.mm","com.tencent.mm.ui.tools.ShareImgUI");
-                    intent.setComponent(cop);
-                    intent.setAction(Intent.ACTION_SEND);
-                    intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(imgUri));
-//            intent.putExtra("Kdescription", !TextUtils.isEmpty(content) ? content : "");
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    // context.startActivity(intent);
-                    startActivity(Intent.createChooser(intent, "Share"));
-
-//                    ShareUtil.getInstance(WebViewActivity.this).shareImage(type, imgUri);
+                    ShareUtil.getInstance(WebViewActivity.this).shareImage(type, imgUri);
                     break;
                 case 2:
                     ShareUtil.getInstance(WebViewActivity.this).shareWebPage(type, webpageUrl, title, description);
                     break;
                 default:
                     break;
-
-//            Shareboard shareboard = new Shareboard(mContext);
-//            shareboard.setShareWeChatListener(new ShareWeChatListener() {
-//                @Override
-//                public void shareWeChat(int type) {
-//
-//                    }
-//                }
-//            });
-//            shareboard.show();
             }
         }
-
 
 
         /**
@@ -398,7 +369,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }
 
         @JavascriptInterface
-        public void openLoginPage(){
+        public void openLoginPage() {
             Intent intent = new Intent(mContext, MainActivity.class);
             startActivity(intent);
         }
@@ -438,11 +409,11 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         return false;
     }
 
-    private void test(){
+    private void test() {
         //        ShareUtil.getInstance(WebViewActivity.this).shareText(0,"text");
 
 //        String url = "https://avatar.csdn.net/2/C/8/1_small_and_smallworld.jpg";
-//        ShareUtil.getInstance(WebViewActivity.this).shareImage(0,url);
+//        ShareUtil.getInstance(WebViewActivity.this).shareImage(0, url);
 
 //        ShareUtil.getInstance(WebViewActivity.this).shareWebPage(0,"https://www.baidu.com", "title","description");
     }

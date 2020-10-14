@@ -5,8 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
 import com.smurf.app.R;
 import com.smurf.app.login.utils.BitmapUtils;
+import com.smurf.app.utils.SaveImageUtils;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
@@ -351,8 +354,6 @@ public class WechatShareManager {
                 try {
                     Bitmap bmp = BitmapFactory.decodeStream(new URL(shareContent.getPictureUrl()).openStream());
                     WXImageObject imgObj = new WXImageObject(bmp);
-                    Bitmap bitmap = BitmapUtils.compressScale(bmp);
-                    imgObj.imageData =BitmapUtils. bmpToByteArray(bitmap, true);
                     WXMediaMessage msg = new WXMediaMessage();
                     msg.mediaObject = imgObj;
 
