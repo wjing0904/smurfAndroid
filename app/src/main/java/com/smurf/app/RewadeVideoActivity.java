@@ -49,7 +49,8 @@ public class RewadeVideoActivity extends Activity {
                 VideoEvent videoEvent = new VideoEvent();
                 videoEvent.isVideoEnd = true;
                 EventBus.getDefault().post(videoEvent);
-                Toast.makeText(RewadeVideoActivity.this,"视频加载失败",Toast.LENGTH_SHORT).show();
+                Toast.makeText(RewadeVideoActivity.this,"视频加载失败，请确定网络环境后重新点击观看",Toast.LENGTH_SHORT).show();
+                finish();
             }
 
             /**
