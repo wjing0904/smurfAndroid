@@ -228,18 +228,29 @@ public class MainActivity extends Activity {
         String msg = errorMsg;
         if (code == 2003){
             msg = "网络连接不通";
+            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+
         }else if (code == 2005){
             msg = "请求超时";
+            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+
         }else if (code == 2016){
             msg = "当前网络环境不支持认证";
+            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+
         }else if (code == 2010){
             msg = "未开启读取手机状态权限";
+            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+
         }else if (code == 6001){
             msg = "获取loginToken失败";
+            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+
         }else if (code == 6006){
             msg = "预取号结果超时，需要重新预取号";
+            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+
         }
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
     }
 
     private void toFailedActivityThird(int code, String errorMsg) {
