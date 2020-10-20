@@ -383,12 +383,19 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             wxLogin.login();
         }
 
+        @JavascriptInterface
+        public void exitApp(){
+            ExitApp();
+        }
+
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        ExitApp();
-        return false;
+        if(mWebView!= null){
+            mWebView.loadUrl("javascript:back()");
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     private void ExitApp() {
