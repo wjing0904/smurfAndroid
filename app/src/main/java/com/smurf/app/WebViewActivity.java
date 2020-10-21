@@ -395,7 +395,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         if(mWebView!= null){
             mWebView.loadUrl("javascript:back()");
         }
-        return super.dispatchKeyEvent(event);
+        return true;
     }
 
     private void ExitApp() {
