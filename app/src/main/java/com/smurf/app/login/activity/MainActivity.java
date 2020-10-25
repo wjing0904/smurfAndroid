@@ -249,8 +249,18 @@ public class MainActivity extends Activity {
         }else if (code == 6006){
             msg = "预取号结果超时，需要重新预取号";
             Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
-
         }
+
+        String url = null;
+        if(BuildConfig.DEBUG) {
+            url = DEBUG_PHONE_LOGIN;
+        }else{
+            url = RELEASE_PHONE_LOGIN;
+        }
+        Intent intent = new Intent(this, WebViewActivity.class);
+        intent.putExtra("web_url",url);
+        startActivity(intent);
+        finish();
     }
 
     private void toFailedActivityThird(int code, String errorMsg) {
