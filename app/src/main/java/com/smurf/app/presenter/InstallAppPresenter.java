@@ -143,7 +143,7 @@ public class InstallAppPresenter {
                         try {
                             Gson gson = new Gson();
                             CouponBean couponBean = gson.fromJson(response.body().string(), CouponBean.class);
-                            if (couponBean.isSuccess() || couponBean.getCode() == 0 && couponBean.getData().isInstallApp()) {
+                            if (couponBean.isSuccess() && couponBean.getCode() == 0 && couponBean.getData().isInstallApp()) {
                                 //弹窗，升级
                                 ThreadUtils.runOnUiThread(new Runnable() {
                                     @Override

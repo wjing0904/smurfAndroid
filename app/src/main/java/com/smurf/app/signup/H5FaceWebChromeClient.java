@@ -48,22 +48,24 @@ public class H5FaceWebChromeClient extends WebChromeClient {
 
     // For Android >= 3.0
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType) {
-        if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
-            Log.d("liuluchao","receiver h5 info");
-            toOpenImgChoose();
-            return;
-        }
+        toOpenImgChoose();
+//        if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
+//            Log.d("liuluchao","receiver h5 info");
+//
+//            return;
+//        }
         return;
 
     }
 
     // For Android >= 4.1
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
-        if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
-            Log.d("liuluchao","receiver h5 info");
-            toOpenImgChoose();
-            return;
-        }
+        toOpenImgChoose();
+//        if (WBH5FaceVerifySDK.getInstance().recordVideoForApiBelow21(uploadMsg, acceptType, activity)) {
+//            Log.d("liuluchao","receiver h5 info");
+//
+//            return;
+//        }
         return;
     }
 
@@ -71,11 +73,12 @@ public class H5FaceWebChromeClient extends WebChromeClient {
     @TargetApi(21)
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-        if (WBH5FaceVerifySDK.getInstance().recordVideoForApi21(webView, filePathCallback, activity, fileChooserParams)) {
-            Log.d("liuluchao","receiver h5 info");
-            toOpenImgChoose();
-            return true;
-        }
+        toOpenImgChoose();
+//        if (WBH5FaceVerifySDK.getInstance().recordVideoForApi21(webView, filePathCallback, activity, fileChooserParams)) {
+//            Log.d("liuluchao","receiver h5 info");
+//
+//            return true;
+//        }
         return true;
     }
 
