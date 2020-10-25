@@ -20,10 +20,6 @@ import com.smurf.app.view.ILoginViewInterface;
 
 public class SplashActivity extends Activity implements ILoginViewInterface {
 
-
-    private static final String DEBUG_APP_URL = "http://39.107.84.57:8091/#/home";
-    private static final String RELEASE_APP_URL = "";
-
     private ImageView logoImg;
     private TextView delayTime;
     private SplashPresenter presenter;
@@ -85,9 +81,9 @@ public class SplashActivity extends Activity implements ILoginViewInterface {
     public void openLoginActivity() {
         String url = null;
         if (BuildConfig.DEBUG) {
-            url = DEBUG_APP_URL;
+            url = StaticURL.DEBUG_APP_URL;
         } else {
-            url = RELEASE_APP_URL;
+            url = StaticURL.RELEASE_APP_URL;
         }
         Intent intent = new Intent(this, WebViewActivity.class);
         intent.putExtra("web_url",url);

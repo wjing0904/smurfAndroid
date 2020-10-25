@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.smurf.app.BuildConfig;
 import com.smurf.app.R;
+import com.smurf.app.StaticURL;
 import com.smurf.app.WebViewActivity;
 import com.smurf.app.event.TokenEvent;
 import com.smurf.app.login.common.Constants;
@@ -40,8 +41,6 @@ import cn.jiguang.verifysdk.api.VerifyListener;
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
-    private static final String DEBUG_PHONE_LOGIN = "http://39.107.84.57:8091/#/phoneLogin";
-    private static final String RELEASE_PHONE_LOGIN = "";
 
     private String mNumStr;
     private boolean mHasPermission;
@@ -253,9 +252,9 @@ public class MainActivity extends Activity {
 
         String url = null;
         if(BuildConfig.DEBUG) {
-            url = DEBUG_PHONE_LOGIN;
+            url = StaticURL.DEBUG_PHONE_LOGIN;
         }else{
-            url = RELEASE_PHONE_LOGIN;
+            url = StaticURL.RELEASE_PHONE_LOGIN;
         }
         Intent intent = new Intent(this, WebViewActivity.class);
         intent.putExtra("web_url",url);
@@ -271,9 +270,9 @@ public class MainActivity extends Activity {
     private void toNativeVerifyActivity() {
         String url = null;
         if(BuildConfig.DEBUG) {
-            url = DEBUG_PHONE_LOGIN;
+            url = StaticURL.DEBUG_PHONE_LOGIN;
         }else{
-            url = RELEASE_PHONE_LOGIN;
+            url = StaticURL.RELEASE_PHONE_LOGIN;
         }
         Intent intent = new Intent(this, WebViewActivity.class);
         intent.putExtra("web_url",url);
