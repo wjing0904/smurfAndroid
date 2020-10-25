@@ -43,14 +43,13 @@ public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
     private String mNumStr;
-    private boolean mHasPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         initPermission();
         finish();
-        initShowLoginPage();
+//        initShowLoginPage();
     }
 
 
@@ -60,12 +59,13 @@ public class MainActivity extends Activity {
         .callback(new PermissionUtils.SimpleCallback() {
             @Override
             public void onGranted() {
-                mHasPermission = true;
+                initShowLoginPage();
             }
 
             @Override
             public void onDenied() {
-                mHasPermission = false;
+                Toast.makeText(MainActivity.this,"未开启读取手机状态权限",Toast.LENGTH_SHORT).show();
+
             }
         }).request();
     }
