@@ -158,7 +158,7 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         btnParam.setMargins(25,0,25,0);
 
-        layoutLoginGroup.addView(btnWechat,btnParam);
+//        layoutLoginGroup.addView(btnWechat,btnParam);
         uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
             @Override
             public void onClicked(Context context, View view) {

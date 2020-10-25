@@ -11,7 +11,7 @@ public class StaticURL {
 
     //升级地址
     public static final String DEBUG_APK_INSTALL_URL = "http://39.107.84.57:8093/api/sys/vno/detect";
-    public static final String RELEASE_APK_INSTALL_URL = "https://smurf.langongbao.com/api/sys/vno/detect";
+    public static final String RELEASE_APK_INSTALL_URL = "https://api.langongbao.com/api/sys/vno/detect";
 
 
 }
