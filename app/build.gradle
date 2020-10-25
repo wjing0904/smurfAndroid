@@ -49,7 +49,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             shrinkResources false // 为 true 在打包时会删除没有用到的资源 （https://www.jianshu.com/p/77cbe147aea8）

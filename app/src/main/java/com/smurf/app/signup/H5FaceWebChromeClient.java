@@ -86,6 +86,8 @@ public class H5FaceWebChromeClient extends WebChromeClient {
     private void toOpenImgChoose() {
         ImagePicker.create(activity).limit(1) // Activity or Fragment
                 .start();
+
+
     }
 
 }
