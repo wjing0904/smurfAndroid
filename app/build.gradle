@@ -8,8 +8,8 @@ android {
         applicationId "com.smurf.app"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode 1028
+        versionName "1028"
         multiDexEnabled true //就是这句，添加进来
 
 
