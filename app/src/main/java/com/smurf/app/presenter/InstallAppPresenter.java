@@ -13,6 +13,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.smurf.app.BuildConfig;
+import com.smurf.app.StaticURL;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
 import com.smurf.app.upgrade.UpgradeUtils;
@@ -46,7 +48,6 @@ public class InstallAppPresenter {
     private static final int MSG_PROGRESS = 1;
     private static final int MSG_DELAYTIME = 2;
 
-    private static final String APK_INSTALL_URL = "http://39.107.84.57:8090/api/sys/vno/detect";
     private Context mContext;
     private String versionName = "";
     private int versioncode;
@@ -108,8 +109,14 @@ public class InstallAppPresenter {
                 //创建一个RequestBody(参数1：数据类型 参数2传递的json串)
                 RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
                 //3 . 构建Request,将FormBody作为Post方法的参数传入
+                String url = null;
+                if(BuildConfig.DEBUG){
+                    url = StaticURL.DEBUG_APK_INSTALL_URL;
+                }else{
+                    url = StaticURL.RELEASE_APK_INSTALL_URL;
+                }
                 Request request = new Request.Builder()
-                        .url(APK_INSTALL_URL)
+                        .url(url)
                         .post(requestBody)
                         .build();
 

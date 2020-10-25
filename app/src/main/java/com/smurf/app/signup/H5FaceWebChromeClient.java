@@ -81,12 +81,8 @@ public class H5FaceWebChromeClient extends WebChromeClient {
 
     //跳转相机
     private void toOpenImgChoose() {
-//        ImagePicker.create(activity).limit(1) // Activity or Fragment
-//                .start();
-        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.addCategory(Intent.CATEGORY_OPENABLE);
-        i.setType("image/*");
-        activity.startActivityForResult(Intent.createChooser(i, "Image Chooser"), 0);
+        ImagePicker.create(activity).limit(1) // Activity or Fragment
+                .start();
     }
 
 }

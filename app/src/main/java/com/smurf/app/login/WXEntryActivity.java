@@ -25,4 +25,5 @@ public class WXEntryActivity extends WeChatHandleActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
     }
+
 }

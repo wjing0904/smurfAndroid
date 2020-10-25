@@ -66,7 +66,7 @@ public class WechatShareManager {
 
     private void initWechatShare(Context context) {
         if (mWXApi == null) {
-            mWXApi = WXAPIFactory.createWXAPI(context, WECHAT_APP_ID, true);
+            mWXApi = WXAPIFactory.createWXAPI(context, WECHAT_APP_ID);
         }
         mWXApi.registerApp(WECHAT_APP_ID);
     }
