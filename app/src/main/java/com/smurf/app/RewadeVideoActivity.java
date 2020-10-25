@@ -16,6 +16,7 @@ import org.greenrobot.eventbus.EventBus;
 
 
 public class RewadeVideoActivity extends Activity {
+    private static final String ADID = "102903";
 
     private RewardedVideoAd mRewardedVideoAd;
     private AlertDialog alertDialog;
@@ -30,7 +31,7 @@ public class RewadeVideoActivity extends Activity {
 
     private void showRewadeVideo(){
         //TODO 拉去广告的 ADId
-        mRewardedVideoAd = new RewardedVideoAd(this, "975",new RewardedVideoAdListener() {
+        mRewardedVideoAd = new RewardedVideoAd(this, ADID,new RewardedVideoAdListener() {
 
             /**
              * 获得奖励

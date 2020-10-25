@@ -13,6 +13,8 @@ import cn.jiguang.verifysdk.api.RequestCallback;
 
 public class SmurfApplication  extends Application {
 
+    private static final String APPID = "20018";
+
     private static SmurfApplication SApp;
 
     public static SmurfApplication getApp() {
@@ -55,7 +57,7 @@ public class SmurfApplication  extends Application {
         QbSdk.initX5Environment(getApplicationContext(), cb);
 
         //TODO 申请广告的APP ID
-        AdHubs.init(this, "277");
+        AdHubs.init(this, APPID);
 
     }
 }
