@@ -127,7 +127,7 @@ public class SignUpActivity extends Activity {
             }
         } else {
             mWebView.setWebViewClient(new WebViewClient());
-            mWebView.setWebChromeClient(new H5FaceWebChromeClient(SignUpActivity.this));
+//            mWebView.setWebChromeClient(new H5FaceWebChromeClient(SignUpActivity.this));
             WBH5FaceVerifySDK.getInstance().setWebViewSettings(mWebView, getApplicationContext());
             mWebView.loadUrl(signUrl);
         }
@@ -146,7 +146,7 @@ public class SignUpActivity extends Activity {
                                 if (grantResults[3] == PackageManager.PERMISSION_GRANTED) {
 
                                     mWebView.setWebViewClient(new WebViewClient());
-                                    mWebView.setWebChromeClient(new H5FaceWebChromeClient(SignUpActivity.this));
+//                                    mWebView.setWebChromeClient(new H5FaceWebChromeClient(SignUpActivity.this));
                                     WBH5FaceVerifySDK.getInstance().setWebViewSettings(mWebView, getApplicationContext());
                                     mWebView.loadUrl(signUrl);
 
@@ -179,8 +179,8 @@ public class SignUpActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (WBH5FaceVerifySDK.getInstance().receiveH5FaceVerifyResult(requestCode, resultCode, data))
-            Log.d("liuluchao","receiver h5 info");
+//        if (WBH5FaceVerifySDK.getInstance().receiveH5FaceVerifyResult(requestCode, resultCode, data))
+//            Log.d("liuluchao","receiver h5 info");
         return;
     }
 

@@ -4,7 +4,5 @@ public interface ILoginViewInterface {
 
     void startTime(int time);
 
-    void openLoginActivity();
-
-    void hiddenTimeTxt();
+    void hiddenDelayView();
 }

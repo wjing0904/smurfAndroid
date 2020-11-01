@@ -73,7 +73,7 @@ public class H5FaceWebChromeClient extends WebChromeClient {
     @TargetApi(21)
     @Override
     public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-        toOpenImgChoose();
+//        toOpenImgChoose();
 //        if (WBH5FaceVerifySDK.getInstance().recordVideoForApi21(webView, filePathCallback, activity, fileChooserParams)) {
 //            Log.d("liuluchao","receiver h5 info");
 //
@@ -84,10 +84,12 @@ public class H5FaceWebChromeClient extends WebChromeClient {
 
     //跳转相机
     private void toOpenImgChoose() {
-        ImagePicker.create(activity).limit(1) // Activity or Fragment
-                .start();
+//        ImagePicker.create(activity).limit(1) // Activity or Fragment
+//                .start();
 
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
+        activity.startActivity(takePictureIntent);//跳转界面传回拍照所得数据
     }
 
 }

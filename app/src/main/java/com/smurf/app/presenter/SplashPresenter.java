@@ -26,8 +26,7 @@ public class SplashPresenter {
             if (time == 0) {
                 handler.removeMessages(MSG_DELAY_TIME_WHAT);
                 if(loginViewInterface!= null) {
-                    loginViewInterface.hiddenTimeTxt();
-                    loginViewInterface.openLoginActivity();
+                    loginViewInterface.hiddenDelayView();
                 }
             } else {
                 handler.sendEmptyMessageDelayed(MSG_DELAY_TIME_WHAT, 1000);

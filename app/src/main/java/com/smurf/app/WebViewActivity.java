@@ -13,7 +13,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.JavascriptInterface;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
@@ -29,9 +33,13 @@ import com.smurf.app.event.VideoEvent;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.login.activity.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
+import com.smurf.app.presenter.InstallAPPListener;
+import com.smurf.app.presenter.InstallAppPresenter;
 import com.smurf.app.presenter.JavaScriptPresenter;
+import com.smurf.app.presenter.SplashPresenter;
 import com.smurf.app.utils.SaveImageUtils;
 import com.smurf.app.utils.ShareUtil;
+import com.smurf.app.view.ILoginViewInterface;
 import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.webView.X5WebView;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
@@ -52,24 +60,42 @@ import static com.smurf.app.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.StaticNum.REQUEST_LOCAL_CODE;
 import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
-public class WebViewActivity extends Activity implements IWebViewInterface {
+public class WebViewActivity extends Activity implements IWebViewInterface, ILoginViewInterface {
     private static final String TAG = "WebViewActivity";
 
     private static final String DECODED_CONTENT_KEY = "codedContent";
+    private String webUrl=null;
 
 
     private X5WebView mWebView;
     private JavaScriptPresenter javaScriptPresenter;
     private long exitTime = 0;
-    private String webUrl;
+
+
+    private ImageView logoImg;
+    private TextView delayTime;
+    private SplashPresenter presenter;
+    private InstallAppPresenter installAppPresenter;
+    //先定义
+    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+
+    private static String[] PERMISSIONS_STORAGE = {
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE" };
+
+    private FrameLayout fmLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_webview);
-        test();
 
-        webUrl = getIntent().getStringExtra("web_url");
+        initView();
+        if (BuildConfig.DEBUG) {
+            webUrl = StaticURL.DEBUG_APP_URL;
+        } else {
+            webUrl = StaticURL.RELEASE_APP_URL;
+        }
         mWebView = (X5WebView) findViewById(R.id.webview);
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -107,10 +133,37 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     }
 
+    private void initView(){
+        logoImg = findViewById(R.id.logo_img);
+        Glide.with(this).load(R.mipmap.logo_start).into(logoImg);
+        delayTime = findViewById(R.id.record_time_txt);
+        fmLayout = findViewById(R.id.delay_layout);
+        verifyStoragePermissions(this);
+
+        //检查APP是否需要更新
+        if(installAppPresenter == null){
+            installAppPresenter = new InstallAppPresenter(this);
+        }
+        installAppPresenter.setInstallAppListener(new InstallAPPListener() {
+            @Override
+            public void updateNotify() {
+                if (presenter == null) {
+                    presenter = new SplashPresenter(WebViewActivity.this);
+                }
+                presenter.startTimeDelay();
+            }
+        });
+        installAppPresenter.checkAppInstall();
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        webUrl = intent.getStringExtra("web_url");
+        if (BuildConfig.DEBUG) {
+            webUrl = StaticURL.DEBUG_APP_URL;
+        } else {
+            webUrl = StaticURL.RELEASE_APP_URL;
+        }
         mWebView.loadUrl(webUrl);
     }
 
@@ -132,7 +185,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
     }
-
 
     /**
      * 动态权限申请
@@ -224,6 +276,47 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     public void notifyLocation(String value) {
         Log.d("test", value);
         mWebView.loadUrl("javascript:localCity('" + value + "')");
+    }
+
+    @Override
+    public void startTime(int time) {
+        if (delayTime != null)
+            delayTime.setText(time + "s");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (delayTime.getVisibility() == View.GONE && presenter != null) {
+            delayTime.setVisibility(View.VISIBLE);
+            presenter.resertTime();
+            presenter.startTimeDelay();
+        }
+    }
+
+    @Override
+    public void hiddenDelayView() {
+        if (delayTime != null)
+            delayTime.setVisibility(View.GONE);
+
+        if(fmLayout!= null){
+            fmLayout.setVisibility(View.GONE);
+        }
+    }
+
+    //然后通过一个函数来申请
+    private  void verifyStoragePermissions(Activity activity) {
+        try {
+            //检测是否有写的权限
+            int permission = ActivityCompat.checkSelfPermission(activity,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                // 没有写的权限，去申请写的权限，会弹出对话框
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -346,7 +439,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
 
-
         /**
          * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
          */
@@ -423,15 +515,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
         return false;
-    }
-
-    private void test() {
-        //        ShareUtil.getInstance(WebViewActivity.this).shareText(0,"text");
-
-//        String url = "https://avatar.csdn.net/2/C/8/1_small_and_smallworld.jpg";
-//        ShareUtil.getInstance(WebViewActivity.this).shareImage(0, url);
-
-//        ShareUtil.getInstance(WebViewActivity.this).shareWebPage(0,"https://www.baidu.com", "title","description");
     }
 
     @Override

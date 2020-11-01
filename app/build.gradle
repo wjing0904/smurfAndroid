@@ -15,7 +15,7 @@ android {
 
         ndk {
             //兼容的 cpu 类型
-            abiFilters 'armeabi'
+            abiFilters 'armeabi','x86'
         }
         manifestPlaceholders = [
                 JPUSH_PKGNAME : applicationId,
