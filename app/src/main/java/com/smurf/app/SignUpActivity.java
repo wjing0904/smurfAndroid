@@ -1,25 +1,37 @@
 package com.smurf.app;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
-import android.webkit.WebSettings;
+import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
-import com.smurf.app.signup.H5FaceWebChromeClient;
-import com.smurf.app.signup.WBH5FaceVerifySDK;
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.esafirm.imagepicker.features.ImagePicker;
+
+import java.io.File;
+
+import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
 /**
  * 签约&& 认证
@@ -27,10 +39,18 @@ import com.smurf.app.signup.WBH5FaceVerifySDK;
 
 public class SignUpActivity extends Activity {
      private static final String TAG= "SignUpActivity";
+    final static int REQUEST_PERMISSION = 1;
     private WebView mWebView;
-    private static final int PERMISSION_QUEST_FACE_VERIFY = 12;
-    private AlertDialog.Builder builder = null;
-    private AlertDialog dialog;
+    //拍照图片路径
+    private String cameraFielPath;
+    //5.0以下使用
+    private ValueCallback<Uri> uploadMessage;
+    // 5.0及以上使用
+    private ValueCallback<Uri[]> uploadMessageAboveL;
+    //图片
+    private final static int FILE_CHOOSER_RESULT_CODE = 128;
+    //拍照
+    private final static int FILE_CAMERA_RESULT_CODE = 129;
     private String signUrl;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,150 +58,213 @@ public class SignUpActivity extends Activity {
         setContentView(R.layout.sign_layout_webview);
         signUrl = getIntent().getStringExtra("sign_url");
         mWebView = findViewById(R.id.webview);
-        WebSettings settings = mWebView.getSettings();
 
-        settings.setJavaScriptEnabled(true);    //设置webview支持javascript
-//        settings.setJavaScriptCanOpenWindowsAutomatically(true);
-        settings.setLoadsImagesAutomatically(true);    //支持自动加载图片
-        settings.setUseWideViewPort(true);    //设置webview推荐使用的窗口，使html界面自适应屏幕
-        settings.setLoadWithOverviewMode(true);
-        settings.setSaveFormData(true);    //设置webview保存表单数据
-        settings.setSavePassword(true);    //设置webview保存密码
 
-//        int mDensity = DensityUtils.getDensityDpi(context);
-//        if (mDensity == 120) {
-//            settings.setDefaultZoom(WebSettings.ZoomDensity.CLOSE);
-//        } else if (mDensity == 160) {
-//            settings.setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);
-//        } else if (mDensity == 240) {
-//            settings.setDefaultZoom(WebSettings.ZoomDensity.FAR);
-//        }
-//        settings.setDefaultZoom(WebSettings.ZoomDensity.MEDIUM);    //设置中等像素密度，medium=160dpi
-        settings.setSupportZoom(true);    //支持缩放
-        settings.setSupportMultipleWindows(true);
-        settings.setAppCacheEnabled(true); //设置APP可以缓存
-        settings.setDatabaseEnabled(true);
-        settings.setDomStorageEnabled(true);//返回上个界面不刷新  允许本地缓存
-        //        settings.setCacheMode(WebSettings.LOAD_DEFAULT);// 设置缓存LOAD_DEFAULT   LOAD_CACHE_ONLY,LOAD_NO_CACHE
-        settings.setAllowFileAccess(true);// 设置可以访问文件
-        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);//不支持放大缩小
-        settings.setDisplayZoomControls(false);//不支持放大缩小
-        //      NORMAL：正常显示，没有渲染变化。
-        //      SINGLE_COLUMN：把所有内容放到WebView组件等宽的一列中。   //这个是强制的，把网页都挤变形了
-        //      NARROW_COLUMNS：可能的话，使所有列的宽度不超过屏幕宽度。 //好像是默认的
+        //开启JS调用逻辑
+        mWebView.getSettings().setDomStorageEnabled(true);
+        mWebView.getSettings().setJavaScriptEnabled(true);
 
-        mWebView.setLongClickable(true);
-        mWebView.setScrollbarFadingEnabled(true);
-        mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        mWebView.setDrawingCacheEnabled(true);
-        if (Build.VERSION.SDK_INT >= 23) {
-            askForPermission();
-        }
-    }
-
-    private void askForPermission() {
-        Log.d(TAG, "askForPermission()");
-        //检测权限
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "checkSelfPermission is not granted");
-            //如果权限没打开而用户之前又拒绝过权限，则弹窗解释
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.RECORD_AUDIO) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE) ||
-                    ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_PHONE_STATE)) {
-                if (builder == null) {
-                    Log.d(TAG, "shouldShowRequestPermissionRationale is true");
-                    builder = new AlertDialog.Builder(SignUpActivity.this);
-                }
-                builder.setTitle("温馨提示").setMessage("完成H5刷脸需要相应权限哦").setPositiveButton("去设置", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(SignUpActivity.this,
-                                new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
-                                PERMISSION_QUEST_FACE_VERIFY);
-                        if (dialog != null) {
-                            dialog.dismiss();
-                            dialog = null;
-                        }
-                    }
-                }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (dialog != null) {
-                            dialog.dismiss();
-                            dialog = null;
-                        }
-                        if (!SignUpActivity.this.isFinishing())
-                            SignUpActivity.this.finish();
-                    }
-                });
-                dialog = builder.show();
-            } else {
-                Log.d(TAG, "shouldShowRequestPermissionRationale is false");
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
-                        PERMISSION_QUEST_FACE_VERIFY);
+        //不通过外部浏览器打开
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            // For Android < 3.0
+            public void openFileChooser(ValueCallback<Uri> valueCallback) {
+                uploadMessage = valueCallback;
+                openImageChooserActivity();
             }
+
+            // For Android  >= 3.0
+            public void openFileChooser(ValueCallback valueCallback, String acceptType) {
+                uploadMessage = valueCallback;
+                openImageChooserActivity();
+            }
+
+            //For Android  >= 4.1
+            public void openFileChooser(ValueCallback<Uri> valueCallback, String acceptType, String capture) {
+                uploadMessage = valueCallback;
+                openImageChooserActivity();
+            }
+
+            // For Android >= 5.0
+            @Override
+            public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, WebChromeClient.FileChooserParams fileChooserParams) {
+                uploadMessageAboveL = filePathCallback;
+                openImageChooserActivity();
+                return true;
+            }
+        });
+        mWebView.setWebViewClient(new WebViewClient(){
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
+                    view.loadUrl(url);
+                    return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                handler.proceed();
+            }
+        });
+
+//        mWebView.addJavascriptInterface(new FaceVerifyInterface(this, mWebView), "scanface");
+
+        //区分app和H5调用刷脸的标记
+        String ua = mWebView.getSettings().getUserAgentString();
+        mWebView.getSettings().setUserAgentString(ua + "fdd_authentication_android_v2");
+        //区分app和H5调用刷脸的标记
+        String ua1 = mWebView.getSettings().getUserAgentString();
+        mWebView.getSettings().setUserAgentString(ua1 + "fdd_authentication");
+
+        mWebView.loadUrl(signUrl);
+
+    }
+
+    private void openImageChooserActivity() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_PERMISSION);
         } else {
-            mWebView.setWebViewClient(new WebViewClient());
-//            mWebView.setWebChromeClient(new H5FaceWebChromeClient(SignUpActivity.this));
-            WBH5FaceVerifySDK.getInstance().setWebViewSettings(mWebView, getApplicationContext());
-            mWebView.loadUrl(signUrl);
+
+//            ImagePicker.create(SignUpActivity.this).limit(1) // Activity or Fragment
+//                    .start(REQUEST_SELECT_IMAGES_CODE);
+            new MaterialDialog.Builder(this)
+                    .items(R.array.photo)
+                    .positiveText("取消")
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            if (uploadMessageAboveL != null) {
+                                uploadMessageAboveL.onReceiveValue(null);
+                                uploadMessageAboveL = null;
+                            }
+                            if (uploadMessage != null) {
+                                uploadMessage.onReceiveValue(null);
+                                uploadMessage = null;
+                            }
+                            dialog.dismiss();
+                        }
+                    })
+                    .cancelable(false)
+                    .canceledOnTouchOutside(false)
+                    .itemsCallback(new MaterialDialog.ListCallback() {
+                        @Override
+                        public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+//                            ImagePicker.create(SignUpActivity.this).limit(1) // Activity or Fragment
+//                                    .start(REQUEST_SELECT_IMAGES_CODE);
+
+                            if (position == 0) {
+                                takeCamera();
+                            } else if (position == 1) {
+                                takePhoto();
+                            }
+                        }
+                    }).show();
         }
     }
 
+    //选择图片
+    private void takePhoto() {
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        i.setType("image/*");
+        startActivityForResult(Intent.createChooser(i, "Image Chooser"), FILE_CHOOSER_RESULT_CODE);
+    }
+
+    //拍照
+    private void takeCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        String fileName = System.currentTimeMillis() + "upload.jpg";
+        cameraFielPath = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + fileName;
+        File outputImage = new File(cameraFielPath);
+        Uri photoURI = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileProvider", outputImage);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        startActivityForResult(intent, FILE_CAMERA_RESULT_CODE);
+    }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case PERMISSION_QUEST_FACE_VERIFY:
-                if (grantResults.length > 0) {
-                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        if (grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                            if (grantResults[2] == PackageManager.PERMISSION_GRANTED) {
-                                if (grantResults[3] == PackageManager.PERMISSION_GRANTED) {
-
-                                    mWebView.setWebViewClient(new WebViewClient());
-//                                    mWebView.setWebChromeClient(new H5FaceWebChromeClient(SignUpActivity.this));
-                                    WBH5FaceVerifySDK.getInstance().setWebViewSettings(mWebView, getApplicationContext());
-                                    mWebView.loadUrl(signUrl);
-
-                                } else {
-                                    askPermissionError();
-                                }
-                            } else {
-                                askPermissionError();
-                            }
-                        } else {
-                            askPermissionError();
-                        }
-                    } else {
-                        askPermissionError();
-                    }
+            case REQUEST_PERMISSION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    openImageChooserActivity();
+                } else {
+                    uploadMessageAboveL.onReceiveValue(null);
+                    Toast.makeText(this, "获取权限失败", Toast.LENGTH_LONG).show();
                 }
-                break;
         }
-    }
-
-    private void askPermissionError() {
-        if (dialog != null) {
-            dialog.dismiss();
-            dialog = null;
-        }
-        if (!isFinishing())
-            finish();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-//        if (WBH5FaceVerifySDK.getInstance().receiveH5FaceVerifyResult(requestCode, resultCode, data))
-//            Log.d("liuluchao","receiver h5 info");
-        return;
+        if (null == uploadMessage && null == uploadMessageAboveL) return;
+        if (resultCode != RESULT_OK) {//同上所说需要回调onReceiveValue方法防止下次无法响应js方法
+            if (uploadMessageAboveL != null) {
+                uploadMessageAboveL.onReceiveValue(null);
+                uploadMessageAboveL = null;
+            }
+            if (uploadMessage != null) {
+                uploadMessage.onReceiveValue(null);
+                uploadMessage = null;
+            }
+            return;
+        }
+        Uri result = null;
+        if (requestCode == FILE_CAMERA_RESULT_CODE) {
+            if (null != data && null != data.getData()) {
+                result = data.getData();
+            }
+            if (result == null) {
+                File outputImage = new File(cameraFielPath);
+                result = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileProvider", outputImage);
+            }
+            if (uploadMessageAboveL != null) {
+                uploadMessageAboveL.onReceiveValue(new Uri[]{result});
+                uploadMessageAboveL = null;
+            } else if (uploadMessage != null) {
+                uploadMessage.onReceiveValue(result);
+                uploadMessage = null;
+            }
+        } else if (requestCode == FILE_CHOOSER_RESULT_CODE) {
+            if (data != null) {
+                result = data.getData();
+            }
+            if (uploadMessageAboveL != null) {
+                onActivityResultAboveL(data);
+            } else if (uploadMessage != null) {
+                uploadMessage.onReceiveValue(result);
+                uploadMessage = null;
+            }
+        }
     }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void onActivityResultAboveL(Intent intent) {
+        Uri[] results = null;
+        if (intent != null) {
+            String dataString = intent.getDataString();
+            ClipData clipData = intent.getClipData();
+            if (clipData != null) {
+                results = new Uri[clipData.getItemCount()];
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    ClipData.Item item = clipData.getItemAt(i);
+                    results[i] = item.getUri();
+                }
+            }
+            if (dataString != null) {
+                results = new Uri[]{Uri.parse(dataString)};
+            }
+        }
+        uploadMessageAboveL.onReceiveValue(results);
+        uploadMessageAboveL = null;
+    }
+
+
 
 }

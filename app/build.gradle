@@ -15,7 +15,7 @@ android {
 
         ndk {
             //兼容的 cpu 类型
-            abiFilters 'armeabi','x86'
+            abiFilters 'armeabi','x86', 'armeabi-v7a',  'arm64-v8a'
         }
         manifestPlaceholders = [
                 JPUSH_PKGNAME : applicationId,
@@ -150,5 +150,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
 
     implementation 'org.greenrobot:eventbus:3.1.1'
+
+    implementation 'com.afollestad.material-dialogs:commons:0.9.4.2'
 
 }
