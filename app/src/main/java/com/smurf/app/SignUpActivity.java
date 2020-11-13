@@ -19,6 +19,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -52,13 +53,20 @@ public class SignUpActivity extends Activity {
     //拍照
     private final static int FILE_CAMERA_RESULT_CODE = 129;
     private String signUrl;
+    private ImageView back;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_layout_webview);
         signUrl = getIntent().getStringExtra("sign_url");
         mWebView = findViewById(R.id.webview);
-
+        back = findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
 
         //开启JS调用逻辑
         mWebView.getSettings().setDomStorageEnabled(true);
