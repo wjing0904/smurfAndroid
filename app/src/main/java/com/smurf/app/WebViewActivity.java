@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -62,6 +63,7 @@ import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
 public class WebViewActivity extends Activity implements IWebViewInterface, ILoginViewInterface {
     private static final String TAG = "WebViewActivity";
+    private static final int REQUEST_CODE = 0x0000;
 
     private static final String DECODED_CONTENT_KEY = "codedContent";
     private String webUrl=null;
@@ -167,6 +169,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
         mWebView.loadUrl(webUrl);
     }
 
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(TokenEvent event) {
         if (mWebView != null) {
@@ -247,6 +250,11 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
                 javaScriptPresenter.notifyCamer(getImgInputStream(images), images.get(0).getName());
 
         }
+
+        if(requestCode == REQUEST_CODE && resultCode ==3){
+            if(mWebView!= null)
+                mWebView.loadUrl("javascript:closeSign()");
+        }
     }
 
     private String getImgInputStream(List<Image> images) {
@@ -259,22 +267,25 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
 
     @Override
     public void notifyZxingValueToJs(String value) {
+        if(mWebView!= null)
         mWebView.loadUrl("javascript:getInviteInfo('" + value + "')");
     }
 
     @Override
     public void notifyImageSelectedValueToJs(String value) {
+        if(mWebView!= null)
         mWebView.loadUrl("javascript:androidUploadImg('" + value + "')");
     }
 
     @Override
     public void notifyImageName(String name) {
+        if(mWebView!=null)
         mWebView.loadUrl("javascript:imageName('" + name + "')");
     }
 
     @Override
     public void notifyLocation(String value) {
-        Log.d("test", value);
+        if(mWebView !=null)
         mWebView.loadUrl("javascript:localCity('" + value + "')");
     }
 
@@ -460,7 +471,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
             }
             Intent intent = new Intent(mContext, SignUpActivity.class);
             intent.putExtra("sign_url", signUrl);
-            mContext.startActivity(intent);
+            ((Activity)mContext).startActivityForResult(intent,REQUEST_CODE);
         }
 
         @JavascriptInterface
@@ -481,7 +492,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
         }
 
     }
-
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if(mWebView!= null){

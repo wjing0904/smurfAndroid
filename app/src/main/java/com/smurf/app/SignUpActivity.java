@@ -64,6 +64,8 @@ public class SignUpActivity extends Activity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent i = new Intent();
+                setResult(3, i);
                 finish();
             }
         });
@@ -128,6 +130,14 @@ public class SignUpActivity extends Activity {
 
         mWebView.loadUrl(signUrl);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent();
+        setResult(3, i);
+        finish();
     }
 
     private void openImageChooserActivity() {
