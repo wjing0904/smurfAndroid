@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <ImageView
+    <TextView
         android:id="@+id/back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,7 +18,10 @@
         android:paddingTop="@dimen/classroom_10dp"
         android:paddingBottom="@dimen/classroom_10dp"
         android:scaleType="fitCenter"
+        android:text="返回"
+        android:textSize="@dimen/classroom_18sp"
+        android:textColor="@color/possible_result_points"
         android:layout_gravity="right"
-        android:src="@drawable/main_icon_x" />
+         />
 
 </FrameLayout>

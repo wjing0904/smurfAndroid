@@ -20,6 +20,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -53,7 +54,7 @@ public class SignUpActivity extends Activity {
     //拍照
     private final static int FILE_CAMERA_RESULT_CODE = 129;
     private String signUrl;
-    private ImageView back;
+    private TextView back;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
