@@ -1,6 +1,10 @@
 package com.smurf.app;
 
 public class StaticURL {
+
+    public static final String DEBUG_BASE = "https://39.107.84.57:8095/";
+    public static final String RELEASE_BASE = "https://smurf.langongbao.com/";
+
     //登陆
     public static final String DEBUG_PHONE_LOGIN = "http://39.107.84.57:8095/#/phoneLogin";
     public static final String RELEASE_PHONE_LOGIN = "https://smurf.langongbao.com/#/phoneLogin";

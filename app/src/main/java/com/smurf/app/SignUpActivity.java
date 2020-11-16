@@ -106,12 +106,25 @@ public class SignUpActivity extends Activity {
         mWebView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
-                    view.loadUrl(url);
-                    return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
-                } else {
-                    return true;
+                String baseUrl = null;
+                if(BuildConfig.DEBUG){
+                    baseUrl = StaticURL.DEBUG_BASE;
+                }else{
+                    baseUrl = StaticURL.RELEASE_BASE;
                 }
+                if(url.startsWith(baseUrl)) {
+                    Intent i = new Intent();
+                    setResult(3, i);
+                    finish();
+                }else {
+                    if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
+                        view.loadUrl(url);
+                        return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
+                    } else {
+                        return true;
+                    }
+                }
+                return true;
             }
 
             @Override
