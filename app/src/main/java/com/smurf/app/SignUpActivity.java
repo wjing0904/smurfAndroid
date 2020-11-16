@@ -109,10 +109,10 @@ public class SignUpActivity extends Activity {
                 String baseUrlQy = null;
                 String baseUrl = null;
                 if(BuildConfig.DEBUG){
-                    baseUrl = StaticURL.DEBUG_BASE_QY;
+                    baseUrl = StaticURL.DEBUG_BASE;
                     baseUrlQy = StaticURL.DEBUG_BASE_QY;
                 }else{
-                    baseUrl = StaticURL.RELEASE_BASE_QY;
+                    baseUrl = StaticURL.RELEASE_BASE;
                     baseUrlQy = StaticURL.RELEASE_BASE_QY;
                 }
                 if(url.contains(baseUrl) && !url.equals(baseUrlQy)) {
