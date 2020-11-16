@@ -60,6 +60,7 @@ public class SignUpActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_layout_webview);
         signUrl = getIntent().getStringExtra("sign_url");
+//        signUrl = "http://39.107.84.57:8095/#/closeSign";
         mWebView = findViewById(R.id.webview);
         back = findViewById(R.id.back);
         back.setOnClickListener(new View.OnClickListener() {
@@ -115,7 +116,7 @@ public class SignUpActivity extends Activity {
                     baseUrl = StaticURL.RELEASE_BASE;
                     baseUrlQy = StaticURL.RELEASE_BASE_QY;
                 }
-                if(url.contains(baseUrl) && !url.equals(baseUrlQy)) {
+                if(url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
                     Intent i = new Intent();
                     setResult(3, i);
                     finish();
