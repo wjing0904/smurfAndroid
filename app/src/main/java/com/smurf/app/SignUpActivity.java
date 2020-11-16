@@ -108,11 +108,11 @@ public class SignUpActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 String baseUrl = null;
                 if(BuildConfig.DEBUG){
-                    baseUrl = StaticURL.DEBUG_BASE;
+                    baseUrl = StaticURL.DEBUG_BASE_QY;
                 }else{
-                    baseUrl = StaticURL.RELEASE_BASE;
+                    baseUrl = StaticURL.RELEASE_BASE_QY;
                 }
-                if(url.startsWith(baseUrl)) {
+                if(url.contains(baseUrl) && !url.equals(baseUrl)) {
                     Intent i = new Intent();
                     setResult(3, i);
                     finish();
