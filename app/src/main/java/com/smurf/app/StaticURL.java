@@ -2,6 +2,9 @@ package com.smurf.app;
 
 public class StaticURL {
 
+    public static final String DEBUG_BASE = "http://39.107.84.57:8095/";
+    public static final String RELEASE_BASE = "https://smurf.langongbao.com/";
+
     public static final String DEBUG_BASE_QY = "http://39.107.84.57:8095/#/closeSign";
     public static final String RELEASE_BASE_QY = "https://smurf.langongbao.com/#/closeSign";
 
