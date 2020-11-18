@@ -71,8 +71,6 @@ public class InstallAppPresenter {
                         upgradeDialog.dismiss();
                     break;
                 case MSG_DELAYTIME:
-//                    if (installAPPListener != null)
-//                        installAPPListener.updateNotify();
                     break;
             }
 
