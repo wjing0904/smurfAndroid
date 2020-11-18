@@ -87,6 +87,7 @@ public class MainActivity extends Activity {
                             Log.e(TAG, "onResult: loginError");
                             toFailedActivigy(code,token);
                         }
+                        finish();
                     }
                 });
             }
