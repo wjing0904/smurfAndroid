@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -86,10 +87,14 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         setContentView(R.layout.layout_webview);
 
         initView();
-        if (BuildConfig.DEBUG) {
-            webUrl = StaticURL.DEBUG_APP_URL;
-        } else {
-            webUrl = StaticURL.RELEASE_APP_URL;
+
+        webUrl = getIntent().getStringExtra("web_url");
+        if(TextUtils.isEmpty(webUrl)) {
+            if (BuildConfig.DEBUG) {
+                webUrl = StaticURL.DEBUG_APP_URL;
+            } else {
+                webUrl = StaticURL.RELEASE_APP_URL;
+            }
         }
         mWebView = (X5WebView) findViewById(R.id.webview);
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -145,10 +150,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (BuildConfig.DEBUG) {
-            webUrl = StaticURL.DEBUG_APP_URL;
-        } else {
-            webUrl = StaticURL.RELEASE_APP_URL;
+        webUrl = intent.getStringExtra("web_url");
+        if(TextUtils.isEmpty(webUrl)) {
+            if (BuildConfig.DEBUG) {
+                webUrl = StaticURL.DEBUG_APP_URL;
+            } else {
+                webUrl = StaticURL.RELEASE_APP_URL;
+            }
         }
         mWebView.loadUrl(webUrl);
     }
