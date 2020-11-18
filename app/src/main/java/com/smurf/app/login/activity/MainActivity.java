@@ -234,11 +234,13 @@ public class MainActivity extends Activity {
             msg = "请求超时";
             Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
 
-        }else if (code == 2016){
-            msg = "当前网络环境不支持认证";
-            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
-
-        }else if (code == 2010){
+        }
+//        else if (code == 2016){
+//            msg = "当前网络环境不支持认证";
+//            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+//
+//        }
+        else if (code == 2010){
             msg = "未开启读取手机状态权限";
             Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
 
