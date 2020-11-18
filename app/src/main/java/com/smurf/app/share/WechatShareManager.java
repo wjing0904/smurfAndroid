@@ -3,12 +3,15 @@ package com.smurf.app.share;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.smurf.app.R;
 import com.smurf.app.login.utils.BitmapUtils;
+import com.smurf.app.utils.FileUtils;
 import com.smurf.app.utils.SaveImageUtils;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
@@ -353,7 +356,13 @@ public class WechatShareManager {
             public void run() {
                 try {
                     Bitmap bmp = BitmapFactory.decodeStream(new URL(shareContent.getPictureUrl()).openStream());
-                    WXImageObject imgObj = new WXImageObject(bmp);
+                    WXImageObject imgObj = null;
+                    if(TextUtils.isEmpty(FileUtils.saveImageToLoacal(mContext,bmp))){
+                        imgObj = new WXImageObject(bmp);
+                    }else{
+                        imgObj = new WXImageObject();
+                        imgObj.setImagePath(FileUtils.saveImageToLoacal(mContext,bmp));
+                    }
                     WXMediaMessage msg = new WXMediaMessage();
                     msg.mediaObject = imgObj;
 
