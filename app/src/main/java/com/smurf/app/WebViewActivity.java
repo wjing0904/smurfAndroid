@@ -87,6 +87,9 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
 
     private FrameLayout fmLayout;
 
+    private boolean isOpenZxing;
+    private boolean isOpenSelected;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -203,10 +206,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             switch (requestCode) {
                 case REQUEST_CAMERA_CODE:
-                    javaScriptPresenter.openZxing();
+                    if(isOpenZxing)
+                        javaScriptPresenter.openZxing();
                     break;
                 case REQUEST_SELECT_IMAGES_CODE:
-                    javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
+                    if(isOpenSelected)
+                        javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
                     break;
                 default:
                     break;
@@ -343,6 +348,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
          */
         @JavascriptInterface
         public void goSCan() {
+            isOpenZxing = true;
             if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
             } else {
@@ -358,6 +364,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
          */
         @JavascriptInterface
         public void imageSelected(int picNum) {
+            isOpenSelected = true;
             if (javaScriptPresenter != null)
                 javaScriptPresenter.openImageSelected(picNum);
         }
@@ -531,5 +538,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
     protected void onDestroy() {
         super.onDestroy();
         EventBus.getDefault().unregister(this);
+        isOpenZxing = false;
+        isOpenSelected = false;
     }
 }
