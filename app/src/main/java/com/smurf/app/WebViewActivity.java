@@ -2,13 +2,11 @@ package com.smurf.app;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,10 +15,8 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -31,16 +27,14 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.event.TokenEvent;
 import com.smurf.app.event.VideoEvent;
+import com.smurf.app.event.WebViewEvent;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.login.activity.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
-import com.smurf.app.presenter.InstallAPPListener;
 import com.smurf.app.presenter.InstallAppPresenter;
 import com.smurf.app.presenter.JavaScriptPresenter;
-import com.smurf.app.presenter.SplashPresenter;
 import com.smurf.app.utils.SaveImageUtils;
 import com.smurf.app.utils.ShareUtil;
-import com.smurf.app.view.ILoginViewInterface;
 import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.webView.X5WebView;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
@@ -50,8 +44,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,12 +53,12 @@ import static com.smurf.app.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.StaticNum.REQUEST_LOCAL_CODE;
 import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
-public class WebViewActivity extends Activity implements IWebViewInterface, ILoginViewInterface {
+public class WebViewActivity extends Activity implements IWebViewInterface {
     private static final String TAG = "WebViewActivity";
     private static final int REQUEST_CODE = 0x0000;
 
     private static final String DECODED_CONTENT_KEY = "codedContent";
-    private String webUrl=null;
+    private String webUrl = null;
 
 
     private X5WebView mWebView;
@@ -75,15 +67,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
 
 
     private ImageView logoImg;
-    private TextView delayTime;
-    private SplashPresenter presenter;
     private InstallAppPresenter installAppPresenter;
     //先定义
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE" };
+            "android.permission.WRITE_EXTERNAL_STORAGE"};
 
     private FrameLayout fmLayout;
 
@@ -109,6 +99,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
                 return super.onConsoleMessage(consoleMessage);
             }
         });
+
         mWebView.getSettings();
         if (javaScriptPresenter == null) {
             javaScriptPresenter = new JavaScriptPresenter(this, this);
@@ -138,26 +129,16 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
 
     }
 
-    private void initView(){
+    private void initView() {
         logoImg = findViewById(R.id.logo_img);
         Glide.with(this).load(R.mipmap.logo_start).into(logoImg);
-        delayTime = findViewById(R.id.record_time_txt);
         fmLayout = findViewById(R.id.delay_layout);
         verifyStoragePermissions(this);
 
         //检查APP是否需要更新
-        if(installAppPresenter == null){
+        if (installAppPresenter == null) {
             installAppPresenter = new InstallAppPresenter(this);
         }
-        installAppPresenter.setInstallAppListener(new InstallAPPListener() {
-            @Override
-            public void updateNotify() {
-                if (presenter == null) {
-                    presenter = new SplashPresenter(WebViewActivity.this);
-                }
-                presenter.startTimeDelay();
-            }
-        });
         installAppPresenter.checkAppInstall();
     }
 
@@ -192,6 +173,13 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
         }
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void webViewPageFinished(WebViewEvent webViewEvent){
+        if(fmLayout!= null){
+            fmLayout.setVisibility(View.GONE);
+        }
+    }
     /**
      * 动态权限申请
      *
@@ -206,11 +194,11 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             switch (requestCode) {
                 case REQUEST_CAMERA_CODE:
-                    if(isOpenZxing)
+                    if (isOpenZxing)
                         javaScriptPresenter.openZxing();
                     break;
                 case REQUEST_SELECT_IMAGES_CODE:
-                    if(isOpenSelected)
+                    if (isOpenSelected)
                         javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
                     break;
                 default:
@@ -256,8 +244,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
 
         }
 
-        if(requestCode == REQUEST_CODE && resultCode ==3){
-            if(mWebView!= null)
+        if (requestCode == REQUEST_CODE && resultCode == 3) {
+            if (mWebView != null)
                 mWebView.loadUrl("javascript:closeSign()");
         }
     }
@@ -272,63 +260,37 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
 
     @Override
     public void notifyZxingValueToJs(String value) {
-        if(mWebView!= null)
-        mWebView.loadUrl("javascript:getInviteInfo('" + value + "')");
+        if (mWebView != null)
+            mWebView.loadUrl("javascript:getInviteInfo('" + value + "')");
     }
 
     @Override
     public void notifyImageSelectedValueToJs(String value) {
-        if(mWebView!= null)
-        mWebView.loadUrl("javascript:androidUploadImg('" + value + "')");
+        if (mWebView != null)
+            mWebView.loadUrl("javascript:androidUploadImg('" + value + "')");
     }
 
     @Override
     public void notifyImageName(String name) {
-        if(mWebView!=null)
-        mWebView.loadUrl("javascript:imageName('" + name + "')");
+        if (mWebView != null)
+            mWebView.loadUrl("javascript:imageName('" + name + "')");
     }
 
     @Override
     public void notifyLocation(String value) {
-        if(mWebView !=null)
-        mWebView.loadUrl("javascript:localCity('" + value + "')");
-    }
-
-    @Override
-    public void startTime(int time) {
-        if (delayTime != null)
-            delayTime.setText(time + "s");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (delayTime.getVisibility() == View.GONE && presenter != null) {
-            delayTime.setVisibility(View.VISIBLE);
-            presenter.resertTime();
-            presenter.startTimeDelay();
-        }
-    }
-
-    @Override
-    public void hiddenDelayView() {
-        if (delayTime != null)
-            delayTime.setVisibility(View.GONE);
-
-        if(fmLayout!= null){
-            fmLayout.setVisibility(View.GONE);
-        }
+        if (mWebView != null)
+            mWebView.loadUrl("javascript:localCity('" + value + "')");
     }
 
     //然后通过一个函数来申请
-    private  void verifyStoragePermissions(Activity activity) {
+    private void verifyStoragePermissions(Activity activity) {
         try {
             //检测是否有写的权限
             int permission = ActivityCompat.checkSelfPermission(activity,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if (permission != PackageManager.PERMISSION_GRANTED) {
                 // 没有写的权限，去申请写的权限，会弹出对话框
-                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE,REQUEST_EXTERNAL_STORAGE);
+                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -478,7 +440,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
             }
             Intent intent = new Intent(mContext, SignUpActivity.class);
             intent.putExtra("sign_url", signUrl);
-            ((Activity)mContext).startActivityForResult(intent,REQUEST_CODE);
+            ((Activity) mContext).startActivityForResult(intent, REQUEST_CODE);
         }
 
         @JavascriptInterface
@@ -488,20 +450,21 @@ public class WebViewActivity extends Activity implements IWebViewInterface, ILog
         }
 
         @JavascriptInterface
-        public void wxLogin(){
+        public void wxLogin() {
             WXLogin wxLogin = new WXLogin(mContext);
             wxLogin.login();
         }
 
         @JavascriptInterface
-        public void exitApp(){
+        public void exitApp() {
             ExitApp();
         }
 
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(mWebView!= null){
+        if (mWebView != null) {
             mWebView.loadUrl("javascript:back()");
         }
         return true;

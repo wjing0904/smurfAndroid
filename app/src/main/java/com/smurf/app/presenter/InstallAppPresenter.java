@@ -51,7 +51,6 @@ public class InstallAppPresenter {
     private Context mContext;
     private String versionName = "";
     private int versioncode;
-    private InstallAPPListener installAPPListener;
     private UpgradeDialog upgradeDialog;
 
     @SuppressLint("HandlerLeak")
@@ -68,12 +67,10 @@ public class InstallAppPresenter {
                 case MSG_UPDATE:
                     String apkPath = (String) msg.obj;
                     UpgradeUtils.getInstance().installAPK(mContext, apkPath);
-                    if (installAPPListener != null)
-                        installAPPListener.updateNotify();
                     break;
                 case MSG_DELAYTIME:
-                    if (installAPPListener != null)
-                        installAPPListener.updateNotify();
+//                    if (installAPPListener != null)
+//                        installAPPListener.updateNotify();
                     break;
             }
 
@@ -83,10 +80,6 @@ public class InstallAppPresenter {
 
     public InstallAppPresenter(Context context) {
         this.mContext = context;
-    }
-
-    public void setInstallAppListener(InstallAPPListener installAppListener) {
-        this.installAPPListener = installAppListener;
     }
 
     /**

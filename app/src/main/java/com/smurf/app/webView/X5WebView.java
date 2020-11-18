@@ -6,15 +6,21 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.AttributeSet;
 
+import com.smurf.app.event.VideoEvent;
+import com.smurf.app.event.WebViewEvent;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
 import com.tencent.smtt.sdk.WebView;
 import com.tencent.smtt.sdk.WebViewClient;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class X5WebView extends WebView {
+    private boolean mIsFinished;
+
     private WebViewClient client = new WebViewClient() {
         /**
          * 防止加载网页时调起系统浏览器
@@ -40,6 +46,13 @@ public class X5WebView extends WebView {
 
             view.loadUrl(url);
             return true;
+        }
+
+        @Override
+        public void onPageFinished(WebView webView, String s) {
+            super.onPageFinished(webView, s);
+            WebViewEvent webViewEvent = new WebViewEvent();
+            EventBus.getDefault().post(webViewEvent);
         }
     };
 
@@ -80,5 +93,4 @@ public class X5WebView extends WebView {
         super(arg0);
         setBackgroundColor(85621);
     }
-
 }
