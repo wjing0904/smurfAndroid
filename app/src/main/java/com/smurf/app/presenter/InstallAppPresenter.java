@@ -67,6 +67,8 @@ public class InstallAppPresenter {
                 case MSG_UPDATE:
                     String apkPath = (String) msg.obj;
                     UpgradeUtils.getInstance().installAPK(mContext, apkPath);
+                    if(upgradeDialog!=null)
+                        upgradeDialog.dismiss();
                     break;
                 case MSG_DELAYTIME:
 //                    if (installAPPListener != null)
