@@ -23,11 +23,6 @@
             android:name=".login.activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait" >
-            <!-- 设置最先启动的程序,要启动哪个Activity就把下面的代码复制到指定的位置 -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <activity android:name=".login.activity.NativeVerifyActivity"
@@ -39,7 +34,12 @@
             android:name=".WebViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"/>
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity android:name=".SignUpActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
