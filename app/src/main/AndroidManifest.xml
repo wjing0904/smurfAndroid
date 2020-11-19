@@ -129,9 +129,10 @@
         </activity>
         <!-- Optional 微信分享回调,wxapi必须在包名路径下，否则回调不成功-->
         <activity
-            android:name=".login.WXEntryActivity"
+            android:name=".wxapi.WXEntryActivity"
             android:exported="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"
+            android:screenOrientation="portrait"/>
 
         <!-- Required -->
         <meta-data

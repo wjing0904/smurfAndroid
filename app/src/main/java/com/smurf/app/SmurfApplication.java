@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.adhub.ads.AdHubs;
+import com.smurf.app.wxapi.WXEntity;
 import com.tencent.smtt.sdk.QbSdk;
 
 import cn.jiguang.share.android.api.JShareInterface;
@@ -38,7 +39,7 @@ public class SmurfApplication  extends Application {
 
         JShareInterface.setDebugMode(true);
         PlatformConfig platformConfig = new PlatformConfig()
-                .setWechat("wx1bfb50c54805d042", "e5ba6b7e326639c6970199cf068f4cd5")
+                .setWechat(WXEntity.WECHAT_APP_ID, WXEntity.APP_SECRET)
                 .setQQ("101789350", "8bd761ec8be03a0c75477ad1d4eb2a03")
                 .setSinaWeibo("2906641376", "b495eedd2ac836895eb06c971e521073", "https://www.jiguang.cn");
         JShareInterface.init(this, platformConfig);

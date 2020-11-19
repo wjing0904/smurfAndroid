@@ -13,6 +13,7 @@ import com.smurf.app.R;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.utils.FileUtils;
 import com.smurf.app.utils.SaveImageUtils;
+import com.smurf.app.wxapi.WXEntity;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
@@ -32,7 +33,6 @@ import java.nio.ByteBuffer;
 
 public class WechatShareManager {
     private static final int THUMB_SIZE = 150;
-    private static final String WECHAT_APP_ID = "wx1bfb50c54805d042";
     public static final int WECHAT_SHARE_WAY_TEXT = 1;   //文字
     public static final int WECHAT_SHARE_WAY_PICTURE = 2; //图片
     public static final int WECHAT_SHARE_WAY_WEBPAGE = 3;  //链接
@@ -69,9 +69,9 @@ public class WechatShareManager {
 
     private void initWechatShare(Context context) {
         if (mWXApi == null) {
-            mWXApi = WXAPIFactory.createWXAPI(context, WECHAT_APP_ID);
+            mWXApi = WXAPIFactory.createWXAPI(context, WXEntity.WECHAT_APP_ID);
         }
-        mWXApi.registerApp(WECHAT_APP_ID);
+        mWXApi.registerApp(WXEntity.WECHAT_APP_ID);
     }
 
     public void shareByWebchat(ShareContent shareContent, int shareType) {
@@ -357,16 +357,17 @@ public class WechatShareManager {
                 try {
                     Bitmap bmp = BitmapFactory.decodeStream(new URL(shareContent.getPictureUrl()).openStream());
                     WXImageObject imgObj = null;
-                    if(TextUtils.isEmpty(FileUtils.saveImageToLoacal(mContext,bmp))){
+                    if(TextUtils.isEmpty(FileUtils.saveImageToLocal(bmp))){
                         imgObj = new WXImageObject(bmp);
                     }else{
                         imgObj = new WXImageObject();
-                        imgObj.setImagePath(FileUtils.saveImageToLoacal(mContext,bmp));
+                        imgObj.setImagePath(FileUtils.saveImageToLocal(bmp));
                     }
                     WXMediaMessage msg = new WXMediaMessage();
                     msg.mediaObject = imgObj;
 
                     Bitmap thumbBmp = Bitmap.createScaledBitmap(bmp, 120, 120, true);
+                    bmp.recycle();
                     msg.thumbData = BitmapUtils.bmpToByteArray(thumbBmp, true);
                     //压缩缩略图到32kb
                     if (msg.thumbData != null && msg.thumbData.length > '耀') {        //微信sdk里面判断的大小

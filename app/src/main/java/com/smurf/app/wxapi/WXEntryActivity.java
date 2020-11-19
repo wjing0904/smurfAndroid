@@ -1,0 +1,180 @@
+/*
+ * 官网地站:http://www.mob.com
+ * 技术支持QQ: 4006852216
+ * 官方微信:ShareSDK   （如果发布新版本的话，我们将会第一时间通过微信将版本更新内容推送给您。如果使用过程中有任何问题，也可以通过微信与我们取得联系，我们将会在24小时内给予回复）
+ *
+ * Copyright (c) 2013年 mob.com. All rights reserved.
+ */
+
+package com.smurf.app.wxapi;
+
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.WindowManager;
+import android.widget.ProgressBar;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.smurf.app.event.TokenEvent;
+import com.tencent.mm.opensdk.modelbase.BaseReq;
+import com.tencent.mm.opensdk.modelbase.BaseResp;
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+
+import org.greenrobot.eventbus.EventBus;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+
+import cn.jiguang.share.wechat.WeChatHandleActivity;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+/** 微信客户端回调activity示例 */
+public class WXEntryActivity extends AppCompatActivity implements IWXAPIEventHandler {
+    private IWXAPI iwxapi;
+    private String unionid;
+    private String openid;
+    private ProgressBar progressBar;
+    private WXEntryActivity mContext;
+    private ProgressDialog mProgressDialog;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().hide();
+        // 隐藏状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //接收到分享以及登录的intent传递handleIntent方法，处理结果
+        iwxapi = WXAPIFactory.createWXAPI(this, WXEntity.WECHAT_APP_ID, false);
+        iwxapi.handleIntent(getIntent(), this);
+
+    }
+
+    private void createProgressDialog() {
+        mContext=this;
+        mProgressDialog=new ProgressDialog(mContext);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);//转盘
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.setTitle("提示");
+        mProgressDialog.setMessage("登录中，请稍后");
+        mProgressDialog.show();
+    }
+
+    @Override
+    public void onReq(BaseReq baseReq) {
+
+    }
+
+    //请求回调结果处理
+    @Override
+    public void onResp(BaseResp baseResp) {
+        //登录回调
+        switch (baseResp.errCode) {
+            case BaseResp.ErrCode.ERR_OK:
+                String code = ((SendAuth.Resp) baseResp).code;
+                getAccessToken(code); //用户同意授权
+                break;
+            case BaseResp.ErrCode.ERR_AUTH_DENIED://用户拒绝授权
+                finish();
+                break;
+            case BaseResp.ErrCode.ERR_USER_CANCEL://用户取消
+                finish();
+                break;
+            default:
+                finish();
+                break;
+        }
+    }
+
+    private void getAccessToken(String code) {
+        createProgressDialog();
+        //获取授权
+        StringBuffer loginUrl = new StringBuffer();
+        loginUrl.append("https://api.weixin.qq.com/sns/oauth2/access_token")
+                .append("?appid=")
+                .append(WXEntity.WECHAT_APP_ID)
+                .append("&secret=")
+                .append(WXEntity.APP_SECRET)
+                .append("&code=")
+                .append(code)
+                .append("&grant_type=authorization_code");
+        Log.d("urlurl", loginUrl.toString());
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url(loginUrl.toString())
+                .get()//默认就是GET请求，可以不写
+                .build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mProgressDialog.dismiss();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseInfo= response.body().string();
+                String access = null;
+                String openId = null;
+                try {
+                    JSONObject jsonObject = new JSONObject(responseInfo);
+                    access = jsonObject.getString("access_token");
+                    openId = jsonObject.getString("openid");
+                    // TODO 微信授权 token 发送给服务端
+                    TokenEvent codeEvent = new TokenEvent();
+                    codeEvent.setCode(access);
+                    codeEvent.setType(1);
+                    EventBus.getDefault().post(codeEvent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                getUserInfo(access, openId);
+            }
+        });
+
+
+    }
+
+    private void getUserInfo(String access, String openid) {
+        String getUserInfoUrl = "https://api.weixin.qq.com/sns/userinfo?access_token=" + access + "&openid=" + openid;
+
+        OkHttpClient okHttpClient = new OkHttpClient();
+        final Request request = new Request.Builder()
+                .url(getUserInfoUrl)
+                .get()//默认就是GET请求，可以不写
+                .build();
+        Call call = okHttpClient.newCall(request);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                mProgressDialog.dismiss();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                String responseInfo= response.body().string();
+                SharedPreferences.Editor editor= getSharedPreferences("userInfo", MODE_PRIVATE).edit();
+                editor.putString("responseInfo", responseInfo);
+                editor.commit();
+                finish();
+                mProgressDialog.dismiss();
+            }
+        });
+    }
+}

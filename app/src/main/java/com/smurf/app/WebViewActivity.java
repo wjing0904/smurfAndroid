@@ -30,7 +30,7 @@ import com.smurf.app.event.TokenEvent;
 import com.smurf.app.event.VideoEvent;
 import com.smurf.app.event.WebViewEvent;
 import com.smurf.app.login.activity.MainActivity;
-import com.smurf.app.login.activity.WXLogin;
+import com.smurf.app.wxapi.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.InstallAppPresenter;
 import com.smurf.app.presenter.JavaScriptPresenter;
@@ -459,8 +459,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         @JavascriptInterface
         public void wxLogin() {
-            WXLogin wxLogin = new WXLogin(mContext);
-            wxLogin.login();
+//            WXLogin wxLogin = new WXLogin(mContext);
+//            wxLogin.login();
         }
 
         @JavascriptInterface
