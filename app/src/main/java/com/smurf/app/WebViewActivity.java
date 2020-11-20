@@ -30,6 +30,7 @@ import com.smurf.app.event.TokenEvent;
 import com.smurf.app.event.VideoEvent;
 import com.smurf.app.event.WebViewEvent;
 import com.smurf.app.login.activity.MainActivity;
+import com.smurf.app.utils.ThreadUtils;
 import com.smurf.app.wxapi.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
 import com.smurf.app.presenter.InstallAppPresenter;
@@ -435,23 +436,28 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          */
         @JavascriptInterface
         public void signUp(String signUrl) {
-            if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(signUrl));
-                startActivity(intent);
-                return;
-            }
+            ThreadUtils.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(signUrl));
+                        startActivity(intent);
+                        return;
+                    }
 
-            if (signUrl.contains("https://wx.tenpay.com")) {
-                Map<String, String> extraHeaders = new HashMap<>();
-                extraHeaders.put("Referer", "http://smurf.langongbao.com");
-                mWebView.loadUrl(signUrl, extraHeaders);
-                return;
-            }
-            Intent intent = new Intent(mContext, SignUpActivity.class);
-            intent.putExtra("sign_url", signUrl);
-            ((Activity) mContext).startActivityForResult(intent, REQUEST_CODE);
+                    if (signUrl.contains("https://wx.tenpay.com")) {
+                        Map<String, String> extraHeaders = new HashMap<>();
+                        extraHeaders.put("Referer", "http://smurf.langongbao.com");
+                        mWebView.loadUrl(signUrl, extraHeaders);
+                        return;
+                    }
+                    Intent intent = new Intent(mContext, SignUpActivity.class);
+                    intent.putExtra("sign_url", signUrl);
+                    ((Activity) mContext).startActivityForResult(intent, REQUEST_CODE);
+                }
+            });
         }
 
         @JavascriptInterface
