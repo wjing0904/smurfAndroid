@@ -167,12 +167,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         if (mWebView != null) {
             mWebView.loadUrl("javascript:toOnePhoneLogin('" + event.getCode() + "')");
             mWebView.loadUrl("javascript:toWxLogin('" + event.getType() + "')");
-            if (BuildConfig.DEBUG) {
-                webUrl = StaticURL.DEBUG_APP_URL;
-            } else {
-                webUrl = StaticURL.RELEASE_APP_URL;
-            }
-            mWebView.loadUrl(webUrl);
         }
     }
 
