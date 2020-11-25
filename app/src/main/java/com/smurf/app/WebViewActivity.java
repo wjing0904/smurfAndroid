@@ -88,14 +88,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         setContentView(R.layout.layout_webview);
 
         initView();
-        if(TextUtils.isEmpty(webUrl)) {
-            webUrl = getIntent().getStringExtra("web_url");
-            if (TextUtils.isEmpty(webUrl)) {
-                if (BuildConfig.DEBUG) {
-                    webUrl = StaticURL.DEBUG_APP_URL;
-                } else {
-                    webUrl = StaticURL.RELEASE_APP_URL;
-                }
+        webUrl = getIntent().getStringExtra("web_url");
+        if (TextUtils.isEmpty(webUrl)) {
+            if (BuildConfig.DEBUG) {
+                webUrl = StaticURL.DEBUG_APP_URL;
+            } else {
+                webUrl = StaticURL.RELEASE_APP_URL;
             }
         }
         mWebView = (X5WebView) findViewById(R.id.webview);
@@ -152,14 +150,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if(TextUtils.isEmpty(webUrl)) {
-            webUrl = intent.getStringExtra("web_url");
-            if (TextUtils.isEmpty(webUrl)) {
-                if (BuildConfig.DEBUG) {
-                    webUrl = StaticURL.DEBUG_APP_URL;
-                } else {
-                    webUrl = StaticURL.RELEASE_APP_URL;
-                }
+        webUrl = intent.getStringExtra("web_url");
+        if (TextUtils.isEmpty(webUrl)) {
+            if (BuildConfig.DEBUG) {
+                webUrl = StaticURL.DEBUG_APP_URL;
+            } else {
+                webUrl = StaticURL.RELEASE_APP_URL;
             }
         }
         mWebView.loadUrl(webUrl);
@@ -187,11 +183,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void webViewPageFinished(WebViewEvent webViewEvent){
-        if(fmLayout!= null){
+    public void webViewPageFinished(WebViewEvent webViewEvent) {
+        if (fmLayout != null) {
             fmLayout.setVisibility(View.GONE);
         }
     }
+
     /**
      * 动态权限申请
      *
