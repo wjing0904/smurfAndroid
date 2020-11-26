@@ -48,7 +48,7 @@ public class FaceVerifyInterface {
     private String nonce = UUID.randomUUID().toString().trim().replaceAll("-", "");
 
     // TODO: 腾讯云派发的licence，需要根据自己的包名向腾讯云申请，文档地址：https://cloud.tencent.com/document/product/1007/35870
-    private final String WB_LICENSE = "";
+    private final String WB_LICENSE = "B3AbHNyjfYOoX7TgpmDcmJfSHprZ8+5yOPRfQaGdlA19kqLeN8xy+LJz03pDD+2aTMG+xMDJYUHoUYPRn3tEdglSlkLKgbsrYc1HfA71bhg6h63VufBSUxXC1ibJG0nqHkUl00ZHWTDlmXHNpYhSx712QWUmwnUymrV3YCfK/q84ubY59q4K57fY9Pw4OFkcgkFWRpMSFaJXUBiOtvU+KZ4v+a5OgP8UCmOjAFGGSxriNEf9d6t6geOfIewNuuwv4g2Vdh5OpSelK3SwSpBpYAw975lxTbHhsx+cV0el01YppTtoB8OBPpORHjCyqlRWatOdB71Un2XSE4IJg3kHEA==";
 
     private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
