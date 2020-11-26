@@ -50,6 +50,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     private ProgressBar progressBar;
     private WXEntryActivity mContext;
     private ProgressDialog mProgressDialog;
+    private String code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
         //登录回调
         switch (baseResp.errCode) {
             case BaseResp.ErrCode.ERR_OK:
-                String code = ((SendAuth.Resp) baseResp).code;
+                code = ((SendAuth.Resp) baseResp).code;
                 getAccessToken(code); //用户同意授权
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://用户拒绝授权
@@ -170,7 +171,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                         WxUserBean wxUserBean = new WxUserBean();
                         wxUserBean.icon = jsonObject.getString("headimgurl");
                         wxUserBean.nickName = jsonObject.getString("nickname");
-                        wxUserBean.openId = openid;
+                        wxUserBean.openId = code;
 
                         Intent intent = new Intent(WXEntryActivity.this,WxResultActivity.class);
                         intent.putExtra("wx_userInfo",wxUserBean);
