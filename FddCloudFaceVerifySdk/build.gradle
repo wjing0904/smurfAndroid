@@ -1,0 +1,57 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
+
+    defaultConfig {
+        minSdkVersion 17
+        targetSdkVersion 30
+        versionCode 1
+        versionName "1.0.0"
+
+        ndk {
+            // 设置支持的SO库架构 可以按照app需要进行设置
+            // sdk默认有'armeabi', 'armeabi-v7a',  'arm64-v8a'三个平台
+            abiFilters 'armeabi', 'armeabi-v7a',  'arm64-v8a'
+        }
+    }
+
+/*    flavorDimensions "env"
+    productFlavors {
+        sit {
+            dimension "env"
+        }
+        pro {
+            dimension "env"
+        }
+    }*/
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'fddsdk-proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'fddsdk-proguard-rules.pro'
+        }
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs' //this way we can find the .aar file in libs folder
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.afollestad.material-dialogs:commons:0.9.4.2'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    //1. 云刷脸SDK
+    implementation(name: 'WbCloudFaceLiveSdk-v3.3.0-604a4e21', ext: 'aar')
+    //2. 云common SDK
+    implementation(name: 'WbCloudNormal-v4.1.0-fea58c5', ext: 'aar')
+}

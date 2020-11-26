@@ -31,6 +31,7 @@ import com.smurf.app.event.VideoEvent;
 import com.smurf.app.event.WebViewEvent;
 import com.smurf.app.event.WxEvent;
 import com.smurf.app.login.activity.MainActivity;
+import com.smurf.app.signup.SignUpFaceVerify;
 import com.smurf.app.utils.ThreadUtils;
 import com.smurf.app.wxapi.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
@@ -462,9 +463,11 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                         mWebView.loadUrl(signUrl, extraHeaders);
                         return;
                     }
-                    Intent intent = new Intent(mContext, SignUpActivity.class);
-                    intent.putExtra("sign_url", signUrl);
-                    ((Activity) mContext).startActivityForResult(intent, REQUEST_CODE);
+
+                    SignUpFaceVerify.getInstance().openFaceVerifySdk(mContext,signUrl);
+//                    Intent intent = new Intent(mContext, SignUpActivity.class);
+//                    intent.putExtra("sign_url", signUrl);
+//                    ((Activity) mContext).startActivityForResult(intent, REQUEST_CODE);
                 }
             });
         }

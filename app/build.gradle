@@ -80,16 +80,20 @@ android {
 
     //修改输出文件名称
     applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def outputFile = output.outputFile
-            if (outputFile != null && outputFile.name.endsWith('.apk')) {
-                // 输出apk名称为appname-1.0-release-xxxx-xx-xx.apk
-                if (variant.buildType.name.equals('release')) {
-                    output.outputFileName = "smurf-${defaultConfig.versionName}-release-${releaseTime()}.apk"
-                } else {
-                    output.outputFileName = "smurf-${defaultConfig.versionName}-debug-${releaseTime()}.apk"
-                }
-            }
+
+//        variant.outputs.each { output ->
+//            def outputFile = output.outputFile
+//            if (outputFile != null && outputFile.name.endsWith('.apk')) {
+//                // 输出apk名称为appname-1.0-release-xxxx-xx-xx.apk
+//                if (variant.buildType.name.equals('release')) {
+//                    output.outputFileName = "smurf-${defaultConfig.versionName}-release-${releaseTime()}.apk"
+//                } else {
+//                    output.outputFileName = "smurf-${defaultConfig.versionName}-debug-${releaseTime()}.apk"
+//                }
+//            }
+//        }
+        variant.outputs.all {
+            outputFileName = "smurf-${variant.versionCode}-${variant.versionName}-${releaseTime()}.apk"
         }
     }
     dexOptions() {
@@ -152,5 +156,12 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     implementation 'com.afollestad.material-dialogs:commons:0.9.4.2'
+
+    implementation project(path: ':FddCloudFaceVerifySdk')
+
+    //1. 云刷脸SDK
+    implementation(name: 'WbCloudFaceLiveSdk-v3.3.0-604a4e21', ext: 'aar')
+    //2. 云common SDK
+    implementation(name: 'WbCloudNormal-v4.1.0-fea58c5', ext: 'aar')
 
 }

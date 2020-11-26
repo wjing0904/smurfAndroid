@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation(name: 'WbCloudNormal-v4.1.0-fea58c5', ext: 'aar')
+}
+repositories {
+    flatDir {
+        dirs 'libs' //this way we can find the .aar file in libs folder
+    }
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"
