@@ -93,12 +93,28 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient(){
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
-                    view.loadUrl(url);
-                    return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
-                } else {
-                    return true;
+                String baseUrlQy = null;
+                String baseUrl = null;
+                if(BuildConfig.DEBUG){
+                    baseUrl = StaticURL.DEBUG_BASE;
+                    baseUrlQy = StaticURL.DEBUG_BASE_QY;
+                }else{
+                    baseUrl = StaticURL.RELEASE_BASE;
+                    baseUrlQy = StaticURL.RELEASE_BASE_QY;
                 }
+                if(url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
+                    Intent i = new Intent();
+                    setResult(3, i);
+                    finish();
+                }else {
+                    if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
+                        view.loadUrl(url);
+                        return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
+                    } else {
+                        return true;
+                    }
+                }
+                return true;
             }
 
             @Override
