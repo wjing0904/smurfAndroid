@@ -20,6 +20,7 @@ public class WxResultActivity extends Activity implements View.OnClickListener{
     private TextView usetName;
     private TextView sureBtn;
     private WxUserBean wxUserBean;
+    private TextView closeBtn;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +35,8 @@ public class WxResultActivity extends Activity implements View.OnClickListener{
         this.usetName = findViewById(R.id.user_name);
         sureBtn = findViewById(R.id.user_sure);
         sureBtn.setOnClickListener(this);
+        closeBtn = findViewById(R.id.back);
+        closeBtn.setOnClickListener(this);
     }
 
     private void initData(){
@@ -43,10 +46,12 @@ public class WxResultActivity extends Activity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        // TODO 微信授权 token 发送给服务端
-        WxEvent wxEvent = new WxEvent();
-        wxEvent.token = wxUserBean.openId;
-        EventBus.getDefault().post(wxEvent);
+        if(view.getId() == R.id.user_sure) {
+            // TODO 微信授权 token 发送给服务端
+            WxEvent wxEvent = new WxEvent();
+            wxEvent.token = wxUserBean.openId;
+            EventBus.getDefault().post(wxEvent);
+        }
         finish();
     }
 }

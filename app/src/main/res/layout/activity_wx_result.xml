@@ -3,6 +3,20 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <TextView
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="@dimen/classroom_10dp"
+        android:paddingTop="@dimen/classroom_10dp"
+        android:paddingBottom="@dimen/classroom_10dp"
+        android:scaleType="fitCenter"
+        android:text="关闭"
+        android:textSize="@dimen/classroom_18sp"
+        android:textColor="@android:color/black"
+        android:layout_gravity="right"
+        />
+
     <ImageView
         android:layout_width="@dimen/classroom_100dp"
         android:layout_height="@dimen/classroom_100dp"
@@ -56,4 +70,6 @@
         android:layout_marginLeft="@dimen/classroom_20dp"
         android:layout_marginRight="@dimen/classroom_20dp">
     </TextView>
+
+
 </LinearLayout>
