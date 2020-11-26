@@ -465,8 +465,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         @JavascriptInterface
         public void wxLogin() {
-//            WXLogin wxLogin = new WXLogin(mContext);
-//            wxLogin.login();
+            WXLogin wxLogin = new WXLogin(mContext);
+            wxLogin.login();
         }
 
         @JavascriptInterface

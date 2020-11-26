@@ -42,7 +42,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /** 微信客户端回调activity示例 */
-public class WXEntryActivity extends AppCompatActivity implements IWXAPIEventHandler {
+public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
     private IWXAPI iwxapi;
     private String unionid;
     private String openid;
@@ -53,7 +53,7 @@ public class WXEntryActivity extends AppCompatActivity implements IWXAPIEventHan
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         // 隐藏状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -136,15 +136,16 @@ public class WXEntryActivity extends AppCompatActivity implements IWXAPIEventHan
                     access = jsonObject.getString("access_token");
                     openId = jsonObject.getString("openid");
                     // TODO 微信授权 token 发送给服务端
-                    TokenEvent codeEvent = new TokenEvent();
-                    codeEvent.setCode(access);
-                    codeEvent.setType(1);
-                    EventBus.getDefault().post(codeEvent);
+                    TokenEvent todeEvent = new TokenEvent();
+                    todeEvent.setCode(access);
+                    todeEvent.setType(1);
+                    EventBus.getDefault().post(todeEvent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
-                getUserInfo(access, openId);
+                finish();
+                mProgressDialog.dismiss();
+//                getUserInfo(access, openId);
             }
         });
 
@@ -172,8 +173,7 @@ public class WXEntryActivity extends AppCompatActivity implements IWXAPIEventHan
                 SharedPreferences.Editor editor= getSharedPreferences("userInfo", MODE_PRIVATE).edit();
                 editor.putString("responseInfo", responseInfo);
                 editor.commit();
-                finish();
-                mProgressDialog.dismiss();
+
             }
         });
     }
