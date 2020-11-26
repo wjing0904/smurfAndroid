@@ -27,6 +27,7 @@ import androidx.core.content.FileProvider;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.fadada.faceverifysdk.BuildConfig;
 import com.fadada.faceverifysdk.R;
 import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
 
@@ -35,6 +36,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class FaceVerifyHostActivity extends AppCompatActivity {
+    public static final String DEBUG_BASE = "http://39.107.84.57:8095/";
+    public static final String RELEASE_BASE = "https://smurf.langongbao.com/";
+
+    public static final String DEBUG_BASE_QY = "http://39.107.84.57:8095/#/closeSign";
+    public static final String RELEASE_BASE_QY = "https://smurf.langongbao.com/#/closeSign";
+
+
     final static int REQUEST_PERMISSION = 1;
 
     private WebView webView;
@@ -96,11 +104,11 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                 String baseUrlQy = null;
                 String baseUrl = null;
                 if(BuildConfig.DEBUG){
-                    baseUrl = StaticURL.DEBUG_BASE;
-                    baseUrlQy = StaticURL.DEBUG_BASE_QY;
+                    baseUrl = DEBUG_BASE;
+                    baseUrlQy = DEBUG_BASE_QY;
                 }else{
-                    baseUrl = StaticURL.RELEASE_BASE;
-                    baseUrlQy = StaticURL.RELEASE_BASE_QY;
+                    baseUrl = RELEASE_BASE;
+                    baseUrlQy = RELEASE_BASE_QY;
                 }
                 if(url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
                     Intent i = new Intent();
