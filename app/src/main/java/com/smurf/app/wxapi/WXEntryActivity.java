@@ -92,6 +92,7 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                 WxEvent wxEvent = new WxEvent();
                 wxEvent.token = code;
                 EventBus.getDefault().post(wxEvent);
+                finish();
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://用户拒绝授权
                 finish();
