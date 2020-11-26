@@ -25,6 +25,12 @@
             android:screenOrientation="portrait" >
         </activity>
 
+        <activity
+            android:name=".wxapi.WxResultActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait" >
+        </activity>
+
         <activity android:name=".login.activity.NativeVerifyActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="portrait"

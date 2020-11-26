@@ -136,16 +136,10 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     JSONObject jsonObject = new JSONObject(responseInfo);
                     access = jsonObject.getString("access_token");
                     openId = jsonObject.getString("openid");
-                    // TODO 微信授权 token 发送给服务端
-                    WxEvent wxEvent = new WxEvent();
-                    wxEvent.token = access;
-                    EventBus.getDefault().post(wxEvent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                finish();
-                mProgressDialog.dismiss();
-//                getUserInfo(access, openId);
+                getUserInfo(access, openId);
             }
         });
 
@@ -170,10 +164,23 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String responseInfo= response.body().string();
-                SharedPreferences.Editor editor= getSharedPreferences("userInfo", MODE_PRIVATE).edit();
-                editor.putString("responseInfo", responseInfo);
-                editor.commit();
+                if (!responseInfo.isEmpty()){
+                    try {
+                        JSONObject jsonObject = new JSONObject(responseInfo);
+                        WxUserBean wxUserBean = new WxUserBean();
+                        wxUserBean.icon = jsonObject.getString("headimgurl");
+                        wxUserBean.nickName = jsonObject.getString("nickname");
+                        wxUserBean.openId = openid;
 
+                        Intent intent = new Intent(WXEntryActivity.this,WxResultActivity.class);
+                        intent.putExtra("wx_userInfo",wxUserBean);
+                        startActivity(intent);
+                        mProgressDialog.dismiss();
+                        finish();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         });
     }
