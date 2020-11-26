@@ -29,6 +29,7 @@ import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.event.TokenEvent;
 import com.smurf.app.event.VideoEvent;
 import com.smurf.app.event.WebViewEvent;
+import com.smurf.app.event.WxEvent;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.utils.ThreadUtils;
 import com.smurf.app.wxapi.WXLogin;
@@ -161,14 +162,25 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         mWebView.loadUrl(webUrl);
     }
 
-
+    /**
+     *
+     * @param event
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(TokenEvent event) {
         if (mWebView != null) {
             mWebView.loadUrl("javascript:toOnePhoneLogin('" + event.getCode() + "')");
-            mWebView.loadUrl("javascript:toWxLogin('" + event.getType() + "')");
         }
     }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRecordTimeEvent(WxEvent event){
+        if (mWebView != null) {
+            mWebView.loadUrl("javascript:toWxLogin('" + event.token + "')");
+        }
+    }
+
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(VideoEvent event) {

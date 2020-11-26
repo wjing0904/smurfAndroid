@@ -23,6 +23,7 @@ import com.smurf.app.event.TokenEvent;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
+import com.smurf.app.wxapi.WXLogin;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -150,7 +151,9 @@ public class MainActivity extends Activity {
         btnWechat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                JShareInterface.authorize(Wechat.Name, mAuthListener);
+//                JShareInterface.authorize(Wechat.Name, mAuthListener);
+                WXLogin wxLogin = new WXLogin(MainActivity.this);
+                wxLogin.login();
             }
         });
 
@@ -159,7 +162,7 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         btnParam.setMargins(25,0,25,0);
 
-//        layoutLoginGroup.addView(btnWechat,btnParam);
+        layoutLoginGroup.addView(btnWechat,btnParam);
         uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
             @Override
             public void onClicked(Context context, View view) {
@@ -219,7 +222,6 @@ public class MainActivity extends Activity {
     private void toSuccessActivity(int action, String token,int type) {
         TokenEvent codeEvent = new TokenEvent();
         codeEvent.setCode(token);
-        codeEvent.setType(type);
         EventBus.getDefault().post(codeEvent);
         finish();
 
@@ -292,53 +294,53 @@ public class MainActivity extends Activity {
         }
     }
 
-    private AuthListener mAuthListener = new AuthListener() {
-        @Override
-        public void onComplete(Platform platform, int action, BaseResponseInfo data) {
-            Logger.dd(TAG, "onComplete:" + platform + ",action:" + action + ",data:" + data);
-            String toastMsg = null;
-            switch (action) {
-                case Platform.ACTION_AUTHORIZING:
-                    if (data instanceof AccessTokenInfo) {        //授权信息
-                        JVerificationInterface.dismissLoginAuthActivity();
-                        String token = ((AccessTokenInfo) data).getToken();//token
-                        long expiration = ((AccessTokenInfo) data).getExpiresIn();//token有效时间，时间戳
-                        String refresh_token = ((AccessTokenInfo) data).getRefeshToken();//refresh_token
-                        String openid = ((AccessTokenInfo) data).getOpenid();//openid
-                        //授权原始数据，开发者可自行处理
-                        String originData = data.getOriginData();
-                        toastMsg = "授权成功:" + data.toString();
-                        Logger.dd(TAG, "openid:" + openid + ",token:" + token + ",expiration:" + expiration + ",refresh_token:" + refresh_token);
-                        Logger.dd(TAG, "originData:" + originData);
-                        toSuccessActivity(Constants.ACTION_THIRD_AUTHORIZED_SUCCESS, token,1);
-                        Log.e(TAG, "onResult: loginSuccess");
-                    }
-                    break;
-            }
-            JShareInterface.removeAuthorize(platform.getName(),null);
-        }
-
-        @Override
-        public void onError(Platform platform, int action, int errorCode, Throwable error) {
-            Logger.dd(TAG, "onError:" + platform + ",action:" + action + ",error:" + error);
-            switch (action) {
-                case Platform.ACTION_AUTHORIZING:
-                    JVerificationInterface.dismissLoginAuthActivity();
-                    Log.e(TAG, "onResult: loginError:"+errorCode);
-                    toFailedActivityThird(errorCode, "授权失败" + (error != null ? error.getMessage() : "") + "---" + errorCode);
-                    break;
-            }
-        }
-
-        @Override
-        public void onCancel(Platform platform, int action) {
-            Logger.dd(TAG, "onCancel:" + platform + ",action:" + action);
-            String toastMsg = null;
-            switch (action) {
-                case Platform.ACTION_AUTHORIZING:
-                    toastMsg = "取消授权";
-                    break;
-            }
-        }
-    };
+//    private AuthListener mAuthListener = new AuthListener() {
+//        @Override
+//        public void onComplete(Platform platform, int action, BaseResponseInfo data) {
+//            Logger.dd(TAG, "onComplete:" + platform + ",action:" + action + ",data:" + data);
+//            String toastMsg = null;
+//            switch (action) {
+//                case Platform.ACTION_AUTHORIZING:
+//                    if (data instanceof AccessTokenInfo) {        //授权信息
+//                        JVerificationInterface.dismissLoginAuthActivity();
+//                        String token = ((AccessTokenInfo) data).getToken();//token
+//                        long expiration = ((AccessTokenInfo) data).getExpiresIn();//token有效时间，时间戳
+//                        String refresh_token = ((AccessTokenInfo) data).getRefeshToken();//refresh_token
+//                        String openid = ((AccessTokenInfo) data).getOpenid();//openid
+//                        //授权原始数据，开发者可自行处理
+//                        String originData = data.getOriginData();
+//                        toastMsg = "授权成功:" + data.toString();
+//                        Logger.dd(TAG, "openid:" + openid + ",token:" + token + ",expiration:" + expiration + ",refresh_token:" + refresh_token);
+//                        Logger.dd(TAG, "originData:" + originData);
+//                        toSuccessActivity(Constants.ACTION_THIRD_AUTHORIZED_SUCCESS, token,1);
+//                        Log.e(TAG, "onResult: loginSuccess");
+//                    }
+//                    break;
+//            }
+//            JShareInterface.removeAuthorize(platform.getName(),null);
+//        }
+//
+//        @Override
+//        public void onError(Platform platform, int action, int errorCode, Throwable error) {
+//            Logger.dd(TAG, "onError:" + platform + ",action:" + action + ",error:" + error);
+//            switch (action) {
+//                case Platform.ACTION_AUTHORIZING:
+//                    JVerificationInterface.dismissLoginAuthActivity();
+//                    Log.e(TAG, "onResult: loginError:"+errorCode);
+//                    toFailedActivityThird(errorCode, "授权失败" + (error != null ? error.getMessage() : "") + "---" + errorCode);
+//                    break;
+//            }
+//        }
+//
+//        @Override
+//        public void onCancel(Platform platform, int action) {
+//            Logger.dd(TAG, "onCancel:" + platform + ",action:" + action);
+//            String toastMsg = null;
+//            switch (action) {
+//                case Platform.ACTION_AUTHORIZING:
+//                    toastMsg = "取消授权";
+//                    break;
+//            }
+//        }
+//    };
 }

@@ -21,6 +21,7 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.smurf.app.event.TokenEvent;
+import com.smurf.app.event.WxEvent;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
@@ -136,10 +137,9 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
                     access = jsonObject.getString("access_token");
                     openId = jsonObject.getString("openid");
                     // TODO 微信授权 token 发送给服务端
-                    TokenEvent todeEvent = new TokenEvent();
-                    todeEvent.setCode(access);
-                    todeEvent.setType(1);
-                    EventBus.getDefault().post(todeEvent);
+                    WxEvent wxEvent = new WxEvent();
+                    wxEvent.token = access;
+                    EventBus.getDefault().post(wxEvent);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
