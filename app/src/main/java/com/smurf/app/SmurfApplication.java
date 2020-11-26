@@ -39,7 +39,7 @@ public class SmurfApplication  extends Application {
 
         JShareInterface.setDebugMode(true);
         PlatformConfig platformConfig = new PlatformConfig()
-                .setWechat(WXEntity.WECHAT_APP_ID, WXEntity.APP_SECRET)
+                .setWechat("101789350", "8bd761ec8be03a0c75477ad1d4eb2a03")
                 .setQQ("101789350", "8bd761ec8be03a0c75477ad1d4eb2a03")
                 .setSinaWeibo("2906641376", "b495eedd2ac836895eb06c971e521073", "https://www.jiguang.cn");
         JShareInterface.init(this, platformConfig);
