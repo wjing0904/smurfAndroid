@@ -64,6 +64,8 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     //拍照
     private final static int FILE_CAMERA_RESULT_CODE = 129;
 
+    private String h5Url;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,13 +77,11 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent();
-                setResult(3, i);
-                finish();
+                webBack();
             }
         });
         Bundle bundle = getIntent().getExtras();
-        String h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
+        h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
 
         //开启JS调用逻辑
         webView.getSettings().setDomStorageEnabled(true);
@@ -118,28 +118,15 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                String baseUrlQy = null;
-                String baseUrl = null;
-                if (BuildConfig.DEBUG) {
-                    baseUrl = DEBUG_BASE;
-                    baseUrlQy = DEBUG_BASE_QY;
+
+                if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
+                    view.loadUrl(url);
+                    return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
                 } else {
-                    baseUrl = RELEASE_BASE;
-                    baseUrlQy = RELEASE_BASE_QY;
+                    return true;
                 }
-                if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
-                    Intent i = new Intent();
-                    setResult(3, i);
-                    finish();
-                } else {
-                    if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
-                        view.loadUrl(url);
-                        return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
-                    } else {
-                        return true;
-                    }
-                }
-                return true;
+
+//                return true;
             }
 
             @Override
@@ -303,8 +290,28 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        webBack();
+    }
+
+    private void webBack(){
+
         Intent i = new Intent();
         setResult(3, i);
         finish();
+
+//        String baseUrlQy = null;
+//        String baseUrl = null;
+//        if (BuildConfig.DEBUG) {
+//            baseUrl = DEBUG_BASE;
+//            baseUrlQy = DEBUG_BASE_QY;
+//        } else {
+//            baseUrl = RELEASE_BASE;
+//            baseUrlQy = RELEASE_BASE_QY;
+//        }
+//        if (h5Url.startsWith(baseUrl) && !h5Url.startsWith(baseUrlQy)) {
+//
+//        }else{
+//            finish();
+//        }
     }
 }
