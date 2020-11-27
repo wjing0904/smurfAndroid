@@ -64,8 +64,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     //拍照
     private final static int FILE_CAMERA_RESULT_CODE = 129;
 
-    private String h5Url;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,7 +79,7 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
             }
         });
         Bundle bundle = getIntent().getExtras();
-        h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
+        String h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
 
         //开启JS调用逻辑
         webView.getSettings().setDomStorageEnabled(true);
