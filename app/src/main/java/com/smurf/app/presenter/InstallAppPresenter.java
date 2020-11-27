@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -14,7 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
-import com.smurf.app.StaticURL;
+import com.smurf.app.base.StaticURL;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
 import com.smurf.app.upgrade.UpgradeUtils;
@@ -35,7 +34,6 @@ import java.text.DecimalFormat;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;

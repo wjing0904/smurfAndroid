@@ -4,22 +4,13 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.webkit.ConsoleMessage;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-
-
-import com.esafirm.imagepicker.features.ImagePicker;
-
-import java.io.File;
-
-import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
 
 public class H5FaceWebChromeClient extends WebChromeClient {

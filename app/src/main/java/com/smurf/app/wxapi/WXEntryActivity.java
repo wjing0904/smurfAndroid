@@ -11,17 +11,11 @@ package com.smurf.app.wxapi;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.smurf.app.event.TokenEvent;
-import com.smurf.app.event.WxEvent;
+import com.smurf.app.base.event.WxEvent;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
@@ -30,17 +24,6 @@ import com.tencent.mm.opensdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import org.greenrobot.eventbus.EventBus;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-
-import cn.jiguang.share.wechat.WeChatHandleActivity;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /** 微信客户端回调activity示例 */
 public class WXEntryActivity extends Activity implements IWXAPIEventHandler {

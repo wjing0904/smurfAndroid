@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.AttributeSet;
 
-import com.smurf.app.event.VideoEvent;
-import com.smurf.app.event.WebViewEvent;
+import com.smurf.app.base.event.WebViewEvent;
 import com.tencent.smtt.sdk.WebSettings;
 import com.tencent.smtt.sdk.WebSettings.LayoutAlgorithm;
 import com.tencent.smtt.sdk.WebView;

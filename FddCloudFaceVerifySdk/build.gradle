@@ -54,4 +54,7 @@ dependencies {
     implementation(name: 'WbCloudFaceLiveSdk-v3.3.0-604a4e21', ext: 'aar')
     //2. 云common SDK
     implementation(name: 'WbCloudNormal-v4.1.0-fea58c5', ext: 'aar')
+
+    api project(':base')
+
 }

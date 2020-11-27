@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,9 +16,8 @@ import android.widget.Toast;
 
 import com.smurf.app.BuildConfig;
 import com.smurf.app.R;
-import com.smurf.app.StaticURL;
+import com.smurf.app.base.StaticURL;
 import com.smurf.app.WebViewActivity;
-import com.smurf.app.event.TokenEvent;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
@@ -27,17 +25,13 @@ import com.smurf.app.wxapi.WXLogin;
 
 import org.greenrobot.eventbus.EventBus;
 
-import cn.jiguang.share.android.api.AuthListener;
-import cn.jiguang.share.android.api.JShareInterface;
-import cn.jiguang.share.android.api.Platform;
-import cn.jiguang.share.android.model.AccessTokenInfo;
-import cn.jiguang.share.android.model.BaseResponseInfo;
-import cn.jiguang.share.android.utils.Logger;
-import cn.jiguang.share.wechat.Wechat;
 import cn.jiguang.verifysdk.api.JVerificationInterface;
 import cn.jiguang.verifysdk.api.JVerifyUIClickCallback;
 import cn.jiguang.verifysdk.api.JVerifyUIConfig;
 import cn.jiguang.verifysdk.api.VerifyListener;
+
+import com.smurf.app.base.event.*;
+
 
 public class MainActivity extends Activity {
 

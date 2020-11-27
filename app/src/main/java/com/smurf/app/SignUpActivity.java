@@ -3,7 +3,6 @@ package com.smurf.app;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,7 +18,6 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +27,9 @@ import androidx.core.content.FileProvider;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.esafirm.imagepicker.features.ImagePicker;
+import com.smurf.app.base.StaticURL;
 
 import java.io.File;
-
-import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
 /**
  * 签约&& 认证

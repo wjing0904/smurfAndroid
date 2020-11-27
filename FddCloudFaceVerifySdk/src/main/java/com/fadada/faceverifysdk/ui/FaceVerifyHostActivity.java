@@ -18,6 +18,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,23 +30,29 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.fadada.faceverifysdk.BuildConfig;
 import com.fadada.faceverifysdk.R;
+import com.fadada.faceverifysdk.bean.Sign;
 import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static com.smurf.app.base.StaticURL.DEBUG_BASE;
+import static com.smurf.app.base.StaticURL.DEBUG_BASE_QY;
+import static com.smurf.app.base.StaticURL.RELEASE_BASE;
+import static com.smurf.app.base.StaticURL.RELEASE_BASE_QY;
+
+import com.smurf.app.base.event.*;
+
 public class FaceVerifyHostActivity extends AppCompatActivity {
-    public static final String DEBUG_BASE = "http://39.107.84.57:8095/";
-    public static final String RELEASE_BASE = "https://smurf.langongbao.com/";
-
-    public static final String DEBUG_BASE_QY = "http://39.107.84.57:8095/#/closeSign";
-    public static final String RELEASE_BASE_QY = "https://smurf.langongbao.com/#/closeSign";
-
 
     final static int REQUEST_PERMISSION = 1;
 
     private WebView webView;
+
+    private TextView back;
     //拍照图片路径
     private String cameraFielPath;
     //5.0以下使用
@@ -62,7 +69,17 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fddcloudface);
 
-        webView = (WebView)findViewById(R.id.wv_host);
+        webView = (WebView) findViewById(R.id.wv_host);
+
+        back = findViewById(R.id.back);
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SignEvent signEvent = new SignEvent();
+                EventBus.getDefault().post(signEvent);
+                finish();
+            }
+        });
         Bundle bundle = getIntent().getExtras();
         String h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
 
@@ -98,23 +115,23 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                 return true;
             }
         });
-        webView.setWebViewClient(new WebViewClient(){
+        webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 String baseUrlQy = null;
                 String baseUrl = null;
-                if(BuildConfig.DEBUG){
+                if (BuildConfig.DEBUG) {
                     baseUrl = DEBUG_BASE;
                     baseUrlQy = DEBUG_BASE_QY;
-                }else{
+                } else {
                     baseUrl = RELEASE_BASE;
                     baseUrlQy = RELEASE_BASE_QY;
                 }
-                if(url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
-                    Intent i = new Intent();
-                    setResult(3, i);
+                if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
+                    SignEvent signEvent = new SignEvent();
+                    EventBus.getDefault().post(signEvent);
                     finish();
-                }else {
+                } else {
                     if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
                         view.loadUrl(url);
                         return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
@@ -281,5 +298,13 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         }
         uploadMessageAboveL.onReceiveValue(results);
         uploadMessageAboveL = null;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        SignEvent signEvent = new SignEvent();
+        EventBus.getDefault().post(signEvent);
+        finish();
     }
 }

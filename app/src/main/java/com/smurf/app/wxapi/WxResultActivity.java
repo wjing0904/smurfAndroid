@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.bumptech.glide.Glide;
 import com.smurf.app.R;
-import com.smurf.app.event.WxEvent;
+import com.smurf.app.base.event.WxEvent;
 
 import org.greenrobot.eventbus.EventBus;
 

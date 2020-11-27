@@ -26,10 +26,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
-import com.smurf.app.event.TokenEvent;
-import com.smurf.app.event.VideoEvent;
-import com.smurf.app.event.WebViewEvent;
-import com.smurf.app.event.WxEvent;
+import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.signup.SignUpFaceVerify;
 import com.smurf.app.utils.ThreadUtils;
@@ -53,9 +50,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.smurf.app.StaticNum.REQUEST_CAMERA_CODE;
-import static com.smurf.app.StaticNum.REQUEST_LOCAL_CODE;
-import static com.smurf.app.StaticNum.REQUEST_SELECT_IMAGES_CODE;
+import com.smurf.app.base.event.*;
+
+import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_LOCAL_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
 public class WebViewActivity extends Activity implements IWebViewInterface {
     private static final String TAG = "WebViewActivity";
@@ -202,6 +201,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void signBack(SignEvent signEvent){
+        if (mWebView != null)
+            mWebView.loadUrl("javascript:closeSign()");
+    }
+
     /**
      * 动态权限申请
      *
@@ -266,10 +271,10 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         }
 
-        if (requestCode == REQUEST_CODE && resultCode == 3) {
-            if (mWebView != null)
-                mWebView.loadUrl("javascript:closeSign()");
-        }
+//        if (requestCode == REQUEST_CODE && resultCode == 3) {
+//            if (mWebView != null)
+//                mWebView.loadUrl("javascript:closeSign()");
+//        }
     }
 
     private String getImgInputStream(List<Image> images) {
@@ -465,9 +470,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                     }
 
                     SignUpFaceVerify.getInstance().openFaceVerifySdk(mContext,signUrl);
-//                    Intent intent = new Intent(mContext, SignUpActivity.class);
-//                    intent.putExtra("sign_url", signUrl);
-//                    ((Activity) mContext).startActivityForResult(intent, REQUEST_CODE);
                 }
             });
         }

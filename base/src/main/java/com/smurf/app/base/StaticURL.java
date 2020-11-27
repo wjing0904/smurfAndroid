@@ -1,4 +1,4 @@
-package com.smurf.app;
+package com.smurf.app.base;
 
 public class StaticURL {
 

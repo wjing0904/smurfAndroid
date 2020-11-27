@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.adhub.ads.RewardedVideoAd;
 import com.adhub.ads.RewardedVideoAdListener;
-import com.smurf.app.event.VideoEvent;
+import com.smurf.app.base.event.VideoEvent;
 
 import org.greenrobot.eventbus.EventBus;
 
