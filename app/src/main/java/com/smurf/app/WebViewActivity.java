@@ -271,10 +271,10 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
         }
 
-//        if (requestCode == REQUEST_CODE && resultCode == 3) {
-//            if (mWebView != null)
-//                mWebView.loadUrl("javascript:closeSign()");
-//        }
+        if (resultCode == 3) {
+            if (mWebView != null)
+                mWebView.loadUrl("javascript:closeSign()");
+        }
     }
 
     private String getImgInputStream(List<Image> images) {

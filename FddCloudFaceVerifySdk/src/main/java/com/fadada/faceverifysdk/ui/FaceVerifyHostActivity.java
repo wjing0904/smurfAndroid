@@ -75,8 +75,8 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SignEvent signEvent = new SignEvent();
-                EventBus.getDefault().post(signEvent);
+                Intent i = new Intent();
+                setResult(3, i);
                 finish();
             }
         });
@@ -128,8 +128,8 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                     baseUrlQy = RELEASE_BASE_QY;
                 }
                 if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
-                    SignEvent signEvent = new SignEvent();
-                    EventBus.getDefault().post(signEvent);
+                    Intent i = new Intent();
+                    setResult(3, i);
                     finish();
                 } else {
                     if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
@@ -303,8 +303,8 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        SignEvent signEvent = new SignEvent();
-        EventBus.getDefault().post(signEvent);
+        Intent i = new Intent();
+        setResult(3, i);
         finish();
     }
 }

@@ -1,5 +1,6 @@
 package com.fadada.faceverifysdk;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,7 +33,8 @@ public class FddFaceVerifySdk {
         verifyResultListener = listener;
         Intent intent = new Intent(context, FaceVerifyHostActivity.class);
         intent.putExtras(data);
-        context.startActivity(intent);
+//        context.startActivity(intent);
+        ((Activity)context).startActivityForResult(intent,3);
     }
 
     public FddFaceVerifyResultListener getVerifyResultListener() {
