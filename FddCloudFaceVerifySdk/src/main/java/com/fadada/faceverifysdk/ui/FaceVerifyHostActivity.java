@@ -71,15 +71,16 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
 
         webView = (WebView) findViewById(R.id.wv_host);
 
-        back = findViewById(R.id.back);
+
+        Bundle bundle = getIntent().getExtras();
+        String h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
+        back = findViewById(R.id.web_back);
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 webBack();
             }
         });
-        Bundle bundle = getIntent().getExtras();
-        String h5Url = bundle.getString(FddCloudFaceConstant.VERIFY_URL);
 
         //开启JS调用逻辑
         webView.getSettings().setDomStorageEnabled(true);
@@ -116,6 +117,18 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                String baseUrlQy = null;
+                String baseUrl = null;
+                if (BuildConfig.DEBUG) {
+                    baseUrl = DEBUG_BASE;
+                    baseUrlQy = DEBUG_BASE_QY;
+                } else {
+                    baseUrl = RELEASE_BASE;
+                    baseUrlQy = RELEASE_BASE_QY;
+                }
+                if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
+                    webBack();
+                }
 
                 if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
                     view.loadUrl(url);
@@ -123,7 +136,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                 } else {
                     return true;
                 }
-
 //                return true;
             }
 
