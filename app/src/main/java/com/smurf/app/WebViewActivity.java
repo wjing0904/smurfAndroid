@@ -29,6 +29,7 @@ import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.activity.MainActivity;
 import com.smurf.app.signup.SignUpFaceVerify;
+import com.smurf.app.utils.DispUtil;
 import com.smurf.app.utils.ThreadUtils;
 import com.smurf.app.wxapi.WXLogin;
 import com.smurf.app.login.utils.BitmapUtils;
@@ -89,6 +90,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         setContentView(R.layout.layout_webview);
 
         initView();
+        DispUtil.disabledDisplayDpiChange(this.getResources());
         webUrl = getIntent().getStringExtra("web_url");
         if (TextUtils.isEmpty(webUrl)) {
             if (BuildConfig.DEBUG) {
