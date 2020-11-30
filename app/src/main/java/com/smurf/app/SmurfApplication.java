@@ -1,6 +1,7 @@
 package com.smurf.app;
 
 import android.app.Application;
+import android.content.res.Resources;
 import android.util.Log;
 
 import com.adhub.ads.AdHubs;
@@ -60,5 +61,14 @@ public class SmurfApplication  extends Application {
         //TODO 申请广告的APP ID
         AdHubs.init(this, APPID);
 
+    }
+    public Resources getResources() {//禁止app字体大小跟随系统字体大小调节
+        Resources resources = super.getResources();
+        if (resources != null && resources.getConfiguration().fontScale != 1.0f) {
+            android.content.res.Configuration configuration = resources.getConfiguration();
+            configuration.fontScale = 1.0f;
+            resources.updateConfiguration(configuration, resources.getDisplayMetrics());
+        }
+        return resources;
     }
 }

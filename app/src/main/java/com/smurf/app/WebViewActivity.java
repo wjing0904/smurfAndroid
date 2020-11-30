@@ -90,7 +90,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         setContentView(R.layout.layout_webview);
 
         initView();
-        DispUtil.disabledDisplayDpiChange(this.getResources());
+//        DispUtil.disabledDisplayDpiChange(this.getResources());
         webUrl = getIntent().getStringExtra("web_url");
         if (TextUtils.isEmpty(webUrl)) {
             if (BuildConfig.DEBUG) {
