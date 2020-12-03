@@ -54,7 +54,7 @@ public class SaveImageUtils {
         }
         // 首先保存图片
 //        File appDir = new File(BaseApplication.app.getTmpDir(), "ywq");
-        File appDir = new File(context.getCacheDir().getPath());
+        File appDir = new File(FileUtils.getAppPath());
         if (!appDir.exists()) {
             appDir.mkdir();
         }
@@ -77,15 +77,15 @@ public class SaveImageUtils {
         }
 
         // 最后通知图库更新
-        try {
-            MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), fileName, null);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), fileName, null);
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
         Intent intent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
         Uri uri = Uri.fromFile(file);
         intent.setData(uri);
         context.sendBroadcast(intent);
-        Toast.makeText(context, "保存成功了!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "保存成功，位于蓝晶灵专属相册!", Toast.LENGTH_SHORT).show();
     }
 }

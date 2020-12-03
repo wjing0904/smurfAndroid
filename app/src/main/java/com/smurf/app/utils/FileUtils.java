@@ -13,7 +13,7 @@ public class FileUtils {
     private static final String SD_PATH = Environment.getExternalStorageDirectory().getPath();
     private static final String DATA_PATH = Environment.getDataDirectory().getPath();
     private static final String SD_STATE = Environment.getExternalStorageState();
-    public static final String NAME = "smurf";
+    public static final String NAME = "蓝晶灵专属相册";
 
     public static boolean existSDCard() {
         if (android.os.Environment.getExternalStorageState().equals(

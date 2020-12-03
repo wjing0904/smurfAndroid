@@ -139,9 +139,6 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:26.1.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
-    implementation 'com.android.support:support-v4:26.1.0'
-    implementation 'com.android.support:recyclerview-v7:26.1.0'
-    implementation 'com.squareup.picasso:picasso:2.5.2'
 
     implementation(name: 'msa_mdid_1.0.13', ext: 'aar')
 
@@ -163,5 +160,8 @@ dependencies {
     implementation(name: 'WbCloudFaceLiveSdk-v3.3.0-604a4e21', ext: 'aar')
     //2. 云common SDK
     implementation(name: 'WbCloudNormal-v4.1.0-fea58c5', ext: 'aar')
+
+    implementation 'cn.bingoogolapple:bga-banner:3.0.0@aar'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
 }

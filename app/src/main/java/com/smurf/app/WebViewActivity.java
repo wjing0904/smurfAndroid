@@ -398,16 +398,17 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          * 图片保存
          */
         @JavascriptInterface
-        public void openAndSaveImg(int type, String url) {
+        public void openAndSaveImg(int type,String strArr[],int index) {
             if (type == 0) {
                 Intent intent = new Intent(mContext, ImageActivity.class);
-                intent.putExtra("img_url", url);
+                intent.putExtra("img_url", strArr);
+                intent.putExtra("postion",index);
                 mContext.startActivity(intent);
             }
             if (type == 1) {
                 Glide.with(WebViewActivity.this)
                         .asBitmap()
-                        .load(url)
+                        .load(strArr[index])
                         .into(new SimpleTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
