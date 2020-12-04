@@ -53,18 +53,11 @@ public class ImageActivity extends Activity {
             public void fillBannerItem(BGABanner banner, ImageView itemView, String model, int position) {
                 Glide.with(ImageActivity.this)
                         .load(model)
-                        .centerCrop()
                         .dontAnimate()
                         .into(itemView);
             }
         });
-//        Log.e("TAG", "onCreate: "+imgUrl);
         init();
-
-//        Glide.with(this).load(imgUrl).into(imageView);
-
-
-
     }
 
     private void init() {
@@ -125,7 +118,7 @@ public class ImageActivity extends Activity {
     private void saveCroppedImage(Bitmap bmp) {
 //        SaveImageUtils.saveImageToGallery(ImageActivity.this, bmp);
         SaveImageUtils.saveImageToGallerys(ImageActivity.this, bmp);
-        finish();
+//        finish();
     }
 
 }

@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/banner_guide_content"
+        android:scaleType="fitCenter"
         android:layout_centerInParent="true"
         app:banner_pageChangeDuration="1000"
         app:banner_pointAutoPlayAble="false"

@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -97,6 +98,47 @@ public class BitmapUtils {
         }
         return output.toByteArray();
     }
+//    public static String toBase64(String path){
+//
+//    }
+    public static String fileToBase64(String path) {
+        if (TextUtils.isEmpty(path)){
+            return null;
+        }
+
+        FileInputStream fis = null;
+        int byteSize = 0;
+        try {
+            fis = new FileInputStream(path);
+            byteSize = fis.available();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int size = byteSize /1048576;
+        Bitmap bitmap  = BitmapFactory.decodeStream(fis);
+        if (size >= 1) {
+            // 当图片大于5兆时，进行尺寸压缩(做个压缩处理，转化Base64字符串会快一些)
+            bitmap = getScaleBitmap(bitmap);
+        }
+
+        String bitmapStr = "";
+        if (bitmap != null) {
+            try {
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                if (size >=1) {
+                    // 当图片大于5兆时，进行质量压缩
+                    int multiple = size / 1;
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100 / multiple, outputStream);
+                } else {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                }
+                bitmapStr = Base64.encodeToString(outputStream.toByteArray(),Base64.DEFAULT);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+        }
+        return bitmapStr;
+    }
     public static String imageToBase64(String path) {
         if (TextUtils.isEmpty(path)) {
             return null;
@@ -127,6 +169,40 @@ public class BitmapUtils {
         return result;
     }
 
+
+
+
+    public static Bitmap getScaleBitmap(Bitmap bitmap) {
+        if (bitmap == null) {
+            return null;
+        }
+        //将大于1080px的图片转化为1080px的大小，这里可以根据业务做修改
+        final int minSize = 1080;
+        int bitmapWidth = bitmap.getWidth();
+        int bitmapHeight = bitmap.getHeight();
+        int scaleWidth;
+        int scaleHeight;
+        int tempSize = Math.min(bitmapWidth, bitmapHeight);
+        float scaleFactor = (float) minSize / (float) tempSize;
+        //判断最大的长或宽
+        if (tempSize == bitmapWidth) {
+            if (tempSize > minSize) {
+                scaleWidth = minSize;
+                scaleHeight = (int) (bitmapHeight * scaleFactor);
+            } else {
+                return bitmap;
+            }
+        } else {
+            if (tempSize > minSize) {
+                scaleHeight = minSize;
+                scaleWidth = (int) (bitmapWidth * scaleFactor);
+            } else {
+                return bitmap;
+            }
+        }
+        Bitmap scaleBitmap = Bitmap.createScaledBitmap(bitmap, scaleWidth, scaleHeight, true);
+        return scaleBitmap;
+    }
     public static void comPressImg(String path) {
         int degree = getBitmapDegree(path);
         int maxWidth = 200, maxHeight = 200;//定义目标图片的最大宽高，若原图高于这个数值，直接赋值为以上的数值
