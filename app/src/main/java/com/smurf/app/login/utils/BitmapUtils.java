@@ -115,7 +115,11 @@ public class BitmapUtils {
             e.printStackTrace();
         }
         int size = byteSize /1048576;
-        Bitmap bitmap  = BitmapFactory.decodeStream(fis);
+//        Bitmap bitmap  = BitmapFactory.decodeStream(fis);
+
+        int degree = getBitmapDegree(path);
+        Bitmap bitmap = rotateBitmapByDegree(BitmapFactory.decodeFile(path),degree);
+
         if (size >= 1) {
             // 当图片大于5兆时，进行尺寸压缩(做个压缩处理，转化Base64字符串会快一些)
             bitmap = getScaleBitmap(bitmap);
