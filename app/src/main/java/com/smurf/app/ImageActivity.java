@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
+import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.smurf.app.login.activity.MainActivity;
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import cn.bingoogolapple.bgabanner.BGABanner;
 
@@ -33,6 +35,7 @@ public class ImageActivity extends Activity {
     private String[] imgUrls;
     private BGABanner bgaBanner;
     private int postion;
+    private ImageView backIV;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class ImageActivity extends Activity {
         setContentView(R.layout.image_activity);
         bgaBanner = (BGABanner) findViewById(R.id.banner_guide_content);
         imageView = (ImageView) findViewById(R.id.image);
+        backIV = (ImageView) findViewById(R.id.back_iv);
         imgUrls = getIntent().getStringArrayExtra("img_url");
         postion = getIntent().getIntExtra("postion",0);
         bgaBanner.setData(Arrays.asList(imgUrls), Arrays.asList("", "", ""));
@@ -64,28 +68,57 @@ public class ImageActivity extends Activity {
     }
 
     private void init() {
-        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
+//        imageView.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
 //                builder = new AlertDialog.Builder(ImageActivity.this);
 //                builder.setItems(new String[]{getResources().getString(R.string.save_picture)}, new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {
-                ImageView bannerItemView =(ImageView)bgaBanner.getItemView(bgaBanner.getCurrentItem());
-                saveCroppedImage(((BitmapDrawable) bannerItemView.getDrawable()).getBitmap());
+
 //                    }
 //                });
 //                builder.show();
-                return true;
-            }
-        });
-
-//        imageView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                builder.dismiss();
+//                return true;
 //            }
 //        });
+        List<? extends View> bgaBannerViews = bgaBanner.getViews();
+        for (int i = 0; i < bgaBannerViews.size(); i++) {
+            View view = bgaBannerViews.get(i);
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    builder = new AlertDialog.Builder(ImageActivity.this);
+                    builder.setItems(new String[]{getResources().getString(R.string.save_picture)}, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ImageView bannerItemView = (ImageView) bgaBanner.getItemView(bgaBanner.getCurrentItem());
+                            saveCroppedImage(((BitmapDrawable) bannerItemView.getDrawable()).getBitmap());
+                        }
+                    });
+                    builder.show();
+                    return false;
+                }
+            });
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            });
+        }
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ImageView bannerItemView =(ImageView)bgaBanner.getItemView(bgaBanner.getCurrentItem());
+                saveCroppedImage(((BitmapDrawable) bannerItemView.getDrawable()).getBitmap());
+            }
+        });
+        backIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     //保存图片

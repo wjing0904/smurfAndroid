@@ -282,8 +282,9 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private String getImgInputStream(List<Image> images) {
         StringBuffer imgInputs = new StringBuffer();
-        BitmapUtils.comPressImg(images.get(0).getPath());
+//        BitmapUtils.comPressImg(images.get(0).getPath());
         imgInputs.append(BitmapUtils.imageToBase64(images.get(0).getPath())).append("|");
+        Log.e(TAG, "getImgInputStream: "+BitmapUtils.imageToBase64(images.get(0).getPath()));
         return imgInputs.toString().substring(0, imgInputs.toString().length() - 1);
     }
 

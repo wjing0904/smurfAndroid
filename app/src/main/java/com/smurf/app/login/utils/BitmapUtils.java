@@ -97,7 +97,6 @@ public class BitmapUtils {
         }
         return output.toByteArray();
     }
-
     public static String imageToBase64(String path) {
         if (TextUtils.isEmpty(path)) {
             return null;
