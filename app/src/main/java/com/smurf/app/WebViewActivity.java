@@ -403,7 +403,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                 Intent intent = new Intent(mContext, ImageActivity.class);
                 intent.putExtra("img_url", strArr);
                 intent.putExtra("postion",index);
-                ((Activity)mContext).startActivityForResult(intent,9);
+                mContext.startActivity(intent);
             }
             if (type == 1) {
                 Glide.with(WebViewActivity.this)
