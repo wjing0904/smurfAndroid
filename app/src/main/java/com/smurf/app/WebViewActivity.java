@@ -93,7 +93,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         initView();
 //        DispUtil.disabledDisplayDpiChange(this.getResources());
         webUrl = getIntent().getStringExtra("web_url");
-        Log.d("liuluchao","onCreate" + webUrl);
         if (TextUtils.isEmpty(webUrl)) {
             if (BuildConfig.DEBUG) {
                 webUrl = StaticURL.DEBUG_APP_URL;
@@ -156,10 +155,14 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         webUrl = intent.getStringExtra("web_url");
-        Log.d("liuluchao","onNewIntent" + webUrl);
-        if (!TextUtils.isEmpty(webUrl)) {
-            mWebView.loadUrl(webUrl);
+        if (TextUtils.isEmpty(webUrl)) {
+            if (BuildConfig.DEBUG) {
+                webUrl = StaticURL.DEBUG_APP_URL;
+            } else {
+                webUrl = StaticURL.RELEASE_APP_URL;
+            }
         }
+        mWebView.loadUrl(webUrl);
     }
 
     /**
@@ -556,12 +559,10 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.d("liuluchao","onPause");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d("liuluchao","onResume");
     }
 }
