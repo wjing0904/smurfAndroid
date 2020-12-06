@@ -110,6 +110,8 @@ public class ImageActivity extends Activity {
         backIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent();
+                setResult(9,intent);
                 finish();
             }
         });

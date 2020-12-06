@@ -275,6 +275,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             if (mWebView != null)
                 mWebView.loadUrl("javascript:closeSign()");
         }
+
+//        if(requestCode == 9 && resultCode ==9){
+////            if(mWebView!= null){
+////                mWebView.goBack();
+////            }
+//        }
     }
 
     private String getImgInputStream(List<Image> images) {
@@ -400,7 +406,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                 Intent intent = new Intent(mContext, ImageActivity.class);
                 intent.putExtra("img_url", strArr);
                 intent.putExtra("postion",index);
-                mContext.startActivity(intent);
+                ((Activity)mContext).startActivityForResult(intent,9);
             }
             if (type == 1) {
                 Glide.with(WebViewActivity.this)
@@ -545,5 +551,17 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             resources.updateConfiguration(configuration, resources.getDisplayMetrics());
         }
         return resources;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d("liuluchao","onPause");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("liuluchao","onResume");
     }
 }
