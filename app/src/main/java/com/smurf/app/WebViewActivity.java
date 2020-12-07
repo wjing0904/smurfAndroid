@@ -418,7 +418,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                         .into(new SimpleTarget<Bitmap>() {
                             @Override
                             public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
-                                SaveImageUtils.saveImageToGallery(WebViewActivity.this, resource);
+//                                SaveImageUtils.saveImageToGallery(WebViewActivity.this, resource);
                                 SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);
                             }
                         });
