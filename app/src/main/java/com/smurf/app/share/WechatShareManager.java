@@ -266,9 +266,7 @@ public class WechatShareManager {
      * 获取网页分享对象
      */
     public ShareContent getShareContentWebpag(String title, String content, String url) {
-        if (mShareContentWebpag == null) {
-            mShareContentWebpag = new ShareContentWebpage(title, content, url, R.drawable.wx_webp_logo);
-        }
+        mShareContentWebpag = new ShareContentWebpage(title, content, url, R.drawable.wx_webp_logo);
         return (ShareContentWebpage) mShareContentWebpag;
     }
 
@@ -393,6 +391,7 @@ public class WechatShareManager {
         webpage.webpageUrl = shareContent.getURL();
         WXMediaMessage msg = new WXMediaMessage(webpage);
         msg.title = shareContent.getTitle();
+
         msg.description = shareContent.getContent();
 
         Bitmap thumb = BitmapFactory.decodeResource(mContext.getResources(), shareContent.getPictureResource());
@@ -405,6 +404,7 @@ public class WechatShareManager {
         req.transaction = buildTransaction("webpage");
         req.message = msg;
         req.scene = shareType;
+
         mWXApi.sendReq(req);
     }
 

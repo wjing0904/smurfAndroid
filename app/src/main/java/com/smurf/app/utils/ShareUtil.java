@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 
 import com.smurf.app.R;
 import com.smurf.app.share.WechatShareManager;
@@ -62,7 +63,8 @@ public class ShareUtil {
 
     public void shareWebPage(int shareType, String uri, String title,String description) {
         if(shareType ==0){
-            WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,"",uri);
+            Log.e("TAG", "shareWebPage: 2"+uri+" "+shareType);
+            WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,description,uri);
             mShareManager.shareByWebchat(mShareContentWebPaget, WechatShareManager.WECHAT_SHARE_TYPE_TALK);
         }
         if(shareType ==1){
