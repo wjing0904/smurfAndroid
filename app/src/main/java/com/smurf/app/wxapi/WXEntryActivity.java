@@ -11,11 +11,13 @@ package com.smurf.app.wxapi;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import com.smurf.app.base.event.WxEvent;
+import com.smurf.app.login.utils.ToastUtil;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelmsg.SendAuth;
@@ -25,8 +27,10 @@ import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
 import org.greenrobot.eventbus.EventBus;
 
+import cn.jiguang.share.wechat.WeChatHandleActivity;
+
 /** 微信客户端回调activity示例 */
-public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
+public class WXEntryActivity extends WeChatHandleActivity implements IWXAPIEventHandler {
     private IWXAPI iwxapi;
     private String unionid;
     private String openid;
@@ -48,6 +52,12 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
 
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        iwxapi.handleIntent(intent, this);
+    }
     private void createProgressDialog() {
         mContext=this;
         mProgressDialog=new ProgressDialog(mContext);
@@ -61,7 +71,6 @@ public class WXEntryActivity extends Activity implements IWXAPIEventHandler {
 
     @Override
     public void onReq(BaseReq baseReq) {
-
     }
 
     //请求回调结果处理

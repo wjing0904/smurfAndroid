@@ -17,10 +17,12 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -29,6 +31,7 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.activity.MainActivity;
+import com.smurf.app.login.utils.ToastUtil;
 import com.smurf.app.signup.SignUpFaceVerify;
 import com.smurf.app.utils.DispUtil;
 import com.smurf.app.utils.ThreadUtils;
@@ -53,6 +56,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.smurf.app.base.event.*;
+
+import cn.bingoogolapple.bgabanner.BGABanner;
+import cn.bingoogolapple.bgabanner.BGALocalImageSize;
 
 import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_LOCAL_CODE;
@@ -84,6 +90,8 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private boolean isOpenZxing;
     private boolean isOpenSelected;
+    private BGABanner mLogoBB;
+    private TextView startTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +109,50 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
         mWebView = (X5WebView) findViewById(R.id.webview);
+        startTV = (TextView) findViewById(R.id.start_tv);
+        mLogoBB = (BGABanner) findViewById(R.id.logo_bb);
+        // Bitmap 的宽高在 maxWidth maxHeight 和 minWidth minHeight 之间
+        BGALocalImageSize localImageSize = new BGALocalImageSize(720, 1280, 320, 640);
+        // 设置数据源
+
+        mLogoBB.setData(localImageSize, ImageView.ScaleType.CENTER_CROP,
+                R.drawable.start_one,
+                R.drawable.start_two,
+                R.drawable.start_three);
+        mLogoBB.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position==2){
+                    startTV.setVisibility(View.VISIBLE);
+                }else {
+                    startTV.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        mLogoBB.setDelegate(new BGABanner.Delegate<ImageView, String>() {
+            @Override
+            public void onBannerItemClick(BGABanner banner, ImageView itemView, String model, int position) {
+
+
+            }
+        });
+        startTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fmLayout.setVisibility(View.GONE);
+                startTV.setVisibility(View.GONE);
+            }
+        });
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
@@ -178,7 +230,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(WxEvent event){
-        if (mWebView != null) {
+        if (mWebView != null&&event.token!=null) {
             mWebView.loadUrl("javascript:toWxLogin('" + event.token + "')");
         }
     }
@@ -440,7 +492,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             } else {
                 Toast.makeText(mContext, "您还没有安装微信，请先安装微信客户端", Toast.LENGTH_SHORT).show();
             }
-
             switch (shareType) {
                 case 0:
                     ShareUtil.getInstance(WebViewActivity.this).shareText(type, text);

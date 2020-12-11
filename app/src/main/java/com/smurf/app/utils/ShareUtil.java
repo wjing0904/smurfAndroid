@@ -63,7 +63,6 @@ public class ShareUtil {
 
     public void shareWebPage(int shareType, String uri, String title,String description) {
         if(shareType ==0){
-            Log.e("TAG", "shareWebPage: 2"+uri+" "+shareType);
             WechatShareManager.ShareContentWebpage mShareContentWebPaget = (WechatShareManager.ShareContentWebpage) mShareManager.getShareContentWebpag(title,description,uri);
             mShareManager.shareByWebchat(mShareContentWebPaget, WechatShareManager.WECHAT_SHARE_TYPE_TALK);
         }
