@@ -115,7 +115,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         BGALocalImageSize localImageSize = new BGALocalImageSize(720, 1280, 320, 640);
         // 设置数据源
 
-        mLogoBB.setData(localImageSize, ImageView.ScaleType.CENTER_CROP,
+        mLogoBB.setData(localImageSize, ImageView.ScaleType.FIT_XY,
                 R.drawable.start_one,
                 R.drawable.start_two,
                 R.drawable.start_three);

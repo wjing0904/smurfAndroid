@@ -23,12 +23,13 @@
                 android:id="@+id/logo_img"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:visibility="gone"
                 android:scaleType="fitXY" />
 
             <cn.bingoogolapple.bgabanner.BGABanner
                 android:id="@+id/logo_bb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 app:banner_pageChangeDuration="1000"
                 app:banner_pointAutoPlayAble="false"
                 app:banner_pointContainerBackground="@android:color/transparent"
@@ -47,5 +48,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
         android:visibility="gone"
-        android:text="立即进入"/>
+        android:text="立即体验"/>
 </RelativeLayout>
