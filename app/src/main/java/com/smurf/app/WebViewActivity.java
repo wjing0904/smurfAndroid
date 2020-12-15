@@ -236,7 +236,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     }
 
 
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(VideoEvent event) {
         if (mWebView != null) {
@@ -556,7 +555,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (event.getKeyCode() == 25) {
+        if (event.getKeyCode() == 25||event.getKeyCode()==24) {
             return false;
         }
         if (mWebView != null) {
