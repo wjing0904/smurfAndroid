@@ -556,6 +556,9 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getKeyCode() == 25) {
+            return false;
+        }
         if (mWebView != null) {
             mWebView.loadUrl("javascript:back()");
         }
