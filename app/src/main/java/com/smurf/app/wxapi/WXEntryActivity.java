@@ -13,6 +13,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.ProgressBar;
 
@@ -81,6 +82,7 @@ public class WXEntryActivity extends WeChatHandleActivity implements IWXAPIEvent
             case BaseResp.ErrCode.ERR_OK:
                 code = ((SendAuth.Resp) baseResp).code;
 //                getAccessToken(code); //用户同意授权
+                Log.e("TAG", "onResp: "+code);
                 WxEvent wxEvent = new WxEvent();
                 wxEvent.token = code;
                 EventBus.getDefault().post(wxEvent);

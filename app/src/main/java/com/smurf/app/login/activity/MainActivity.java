@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -66,6 +67,13 @@ public class MainActivity extends Activity {
     }
 
     private void initShowLoginPage(){
+        JVerificationInterface.getToken(this, new VerifyListener() {
+            @Override
+            public void onResult(int i, String s, String s1) {
+                Log.e(TAG, "onResult: .getToken"+i +" "+s+" "+s1);
+            }
+        });
+        JVerificationInterface.clearPreLoginCache();
         JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(),null);
         JVerificationInterface.loginAuth(this, new VerifyListener() {
             @Override
@@ -121,7 +129,9 @@ public class MainActivity extends Activity {
         layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         layoutParamPhoneLogin.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         TextView tvPhoneLogin = new TextView(this);
-        tvPhoneLogin.setText("其他手机号登录");
+        tvPhoneLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
+        tvPhoneLogin.setTextColor(android.graphics.Color.RED);
+        tvPhoneLogin.setText("手机号登陆");
         tvPhoneLogin.setLayoutParams(layoutParamPhoneLogin);
         uiConfigBuilder.addCustomView(tvPhoneLogin, false, new JVerifyUIClickCallback() {
             @Override
@@ -215,6 +225,7 @@ public class MainActivity extends Activity {
 
     private void toSuccessActivity(int action, String token,int type) {
         TokenEvent codeEvent = new TokenEvent();
+        Log.e(TAG, "toSuccessActivity: 12343"+token);
         codeEvent.setCode(token);
         EventBus.getDefault().post(codeEvent);
         finish();

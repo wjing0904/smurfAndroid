@@ -10,6 +10,10 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -20,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
@@ -51,9 +56,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.smurf.app.base.event.*;
 
@@ -92,6 +100,32 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     private boolean isOpenSelected;
     private BGABanner mLogoBB;
     private TextView startTV;
+    private ArrayList<Integer> imageData;
+    private TextView mSkipTV;
+    private CountDownTimer timer;
+    // handler+postDelayed 方式，反复发送延时消息
+    private int mTime=3;
+    private Timer mTimer;
+    private Handler getHandler() {
+        return new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                mSkipTV.setText("跳过"+mTime);
+                Log.e(TAG, "handleMessage: "+mTime);
+                mTime--;
+                if (mTime == -1) {
+//                    mCheckBN.setEnabled(true);
+//                    mCheckBN.setText("获取验证码");
+                    mTimer.cancel();
+                    mTimer = null;
+                    fmLayout.setVisibility(View.GONE);
+                    startTV.setVisibility(View.GONE);
+                    mSkipTV.setVisibility(View.GONE);
+                }
+            }
+        };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,14 +145,42 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         mWebView = (X5WebView) findViewById(R.id.webview);
         startTV = (TextView) findViewById(R.id.start_tv);
         mLogoBB = (BGABanner) findViewById(R.id.logo_bb);
+        mSkipTV = (TextView) findViewById(R.id.tv_skip);
+        mSkipTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fmLayout.setVisibility(View.GONE);
+                startTV.setVisibility(View.GONE);
+                mSkipTV.setVisibility(View.GONE);
+                mTimer.cancel();
+            }
+        });
         // Bitmap 的宽高在 maxWidth maxHeight 和 minWidth minHeight 之间
-        BGALocalImageSize localImageSize = new BGALocalImageSize(720, 1280, 320, 640);
         // 设置数据源
+        countDownTimer();
+        imageData = new ArrayList<Integer>();
+        imageData.add(R.drawable.start_one);
+        imageData.add(R.drawable.start_two);
+        imageData.add(R.drawable.start_three);
 
-        mLogoBB.setData(localImageSize, ImageView.ScaleType.FIT_XY,
-                R.drawable.start_one,
-                R.drawable.start_two,
-                R.drawable.start_three);
+
+        mLogoBB.setData(imageData, Arrays.asList("", "", ""));
+        mLogoBB.setAdapter(new BGABanner.Adapter<ImageView, Integer>() {
+            @Override
+            public void fillBannerItem(BGABanner banner, ImageView itemView, Integer model, int position) {
+                Glide.with(WebViewActivity.this)
+                        .load(model)
+                        .dontAnimate()
+                        .into(itemView);
+            }
+        });
+//        mLogoBB.setEnterSkipViewIdAndDelegate(0, R.id.start_tv, new BGABanner.GuideDelegate() {
+//            @Override
+//            public void onClickEnterOrSkip() {
+////                startActivity(new Intent(GuideActivity.this, MainActivity.class));
+////                finish();
+//            }
+//        });
         mLogoBB.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -139,18 +201,15 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
             }
         });
-        mLogoBB.setDelegate(new BGABanner.Delegate<ImageView, String>() {
-            @Override
-            public void onBannerItemClick(BGABanner banner, ImageView itemView, String model, int position) {
-
-
-            }
-        });
         startTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fmLayout.setVisibility(View.GONE);
                 startTV.setVisibility(View.GONE);
+                mSkipTV.setVisibility(View.GONE);
+                timer.cancel();
+
+
             }
         });
         mWebView.setWebChromeClient(new WebChromeClient() {
@@ -218,19 +277,19 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     }
 
     /**
-     *
      * @param event
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRecordTimeEvent(TokenEvent event) {
+    public void onRecordTimeEvent1(TokenEvent event) {
+        Log.e(TAG, "onRecordTimeEvent: fdsfdsa" + event.getCode());
         if (mWebView != null) {
             mWebView.loadUrl("javascript:toOnePhoneLogin('" + event.getCode() + "')");
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRecordTimeEvent(WxEvent event){
-        if (mWebView != null&&event.token!=null) {
+    public void onRecordTimeEvent(WxEvent event) {
+        if (mWebView != null) {
             mWebView.loadUrl("javascript:toWxLogin('" + event.token + "')");
         }
     }
@@ -256,7 +315,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void signBack(SignEvent signEvent){
+    public void signBack(SignEvent signEvent) {
         if (mWebView != null)
             mWebView.loadUrl("javascript:closeSign()");
     }
@@ -455,12 +514,12 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
          * 图片保存
          */
         @JavascriptInterface
-        public void openAndSaveImg(int type,String strArr[],int index) {
+        public void openAndSaveImg(int type, String strArr[], int index) {
             if (type == 0) {
                 Intent intent = new Intent(mContext, ImageActivity.class);
                 intent.putExtra("img_url", strArr);
-                intent.putExtra("postion",index);
-                ((Activity)mContext).startActivityForResult(intent,9);
+                intent.putExtra("postion", index);
+                ((Activity) mContext).startActivityForResult(intent, 9);
             }
             if (type == 1) {
                 Glide.with(WebViewActivity.this)
@@ -529,7 +588,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
                         return;
                     }
 
-                    SignUpFaceVerify.getInstance().openFaceVerifySdk(mContext,signUrl);
+                    SignUpFaceVerify.getInstance().openFaceVerifySdk(mContext, signUrl);
                 }
             });
         }
@@ -598,6 +657,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         isOpenZxing = false;
         isOpenSelected = false;
     }
+
     @Override
     public Resources getResources() {//禁止app字体大小跟随系统字体大小调节
         Resources resources = super.getResources();
@@ -618,4 +678,19 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     protected void onResume() {
         super.onResume();
     }
+
+    public void countDownTimer() {
+        Handler handler = getHandler();
+        mTimer = null;
+        mTimer = new Timer();
+        mTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+//                Looper.prepare();
+                handler.sendEmptyMessage(1);
+//                Looper.loop();
+            }
+        }, 0, 1000);
+    }
+
 }

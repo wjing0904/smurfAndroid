@@ -1,6 +1,7 @@
 package com.smurf.app.wxapi;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.tencent.mm.opensdk.modelmsg.SendAuth;

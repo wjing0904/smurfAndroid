@@ -50,8 +50,8 @@ public class X5WebView extends WebView {
         @Override
         public void onPageFinished(WebView webView, String s) {
             super.onPageFinished(webView, s);
-//            WebViewEvent webViewEvent = new WebViewEvent();
-//            EventBus.getDefault().post(webViewEvent);
+            WebViewEvent webViewEvent = new WebViewEvent();
+            EventBus.getDefault().post(webViewEvent);
         }
     };
 

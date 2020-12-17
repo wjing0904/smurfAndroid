@@ -31,12 +31,12 @@ public class SmurfApplication  extends Application {
         JVerificationInterface.init(this, new RequestCallback<String>() {
             @Override
             public void onResult(int code, String result) {
-                Log.d("MainActivity", "[init] code = " + code + " result = " + result);
+                Log.d("MainActivity fdsafdsf", "[init] code = " + code + " result = " + result);
             }
         });
 
-        JVerificationInterface.setDebugMode(true);
-        JVerificationInterface.init(this);
+//        JVerificationInterface.setDebugMode(true);
+//        JVerificationInterface.init(this);
 
         JShareInterface.setDebugMode(true);
         PlatformConfig platformConfig = new PlatformConfig()

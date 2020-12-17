@@ -41,12 +41,33 @@
     <TextView
         android:id="@+id/start_tv"
         android:textSize="16sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
         android:background="@drawable/start_bg"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:gravity="center"
         android:visibility="gone"
+        android:textColor="#ffffff"
         android:text="立即体验"/>
+    <TextView
+        android:id="@+id/tv_skip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/start_bg"
+        android:layout_margin="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:gravity="center"
+        android:textColor="#ffffff"
+        android:paddingRight="20dp"
+        android:clickable="false"
+        android:textSize="11sp"
+        android:text="跳过 5" />
+
 </RelativeLayout>
