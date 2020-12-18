@@ -90,6 +90,7 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
     //先定义
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
+
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
@@ -98,34 +99,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
 
     private boolean isOpenZxing;
     private boolean isOpenSelected;
-    private BGABanner mLogoBB;
-    private TextView startTV;
-    private ArrayList<Integer> imageData;
-    private TextView mSkipTV;
-    private CountDownTimer timer;
-    // handler+postDelayed 方式，反复发送延时消息
-    private int mTime=3;
-    private Timer mTimer;
-    private Handler getHandler() {
-        return new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                mSkipTV.setText("跳过"+mTime);
-                Log.e(TAG, "handleMessage: "+mTime);
-                mTime--;
-                if (mTime == -1) {
-//                    mCheckBN.setEnabled(true);
-//                    mCheckBN.setText("获取验证码");
-                    mTimer.cancel();
-                    mTimer = null;
-                    fmLayout.setVisibility(View.GONE);
-                    startTV.setVisibility(View.GONE);
-                    mSkipTV.setVisibility(View.GONE);
-                }
-            }
-        };
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,75 +116,6 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
             }
         }
         mWebView = (X5WebView) findViewById(R.id.webview);
-        startTV = (TextView) findViewById(R.id.start_tv);
-        mLogoBB = (BGABanner) findViewById(R.id.logo_bb);
-        mSkipTV = (TextView) findViewById(R.id.tv_skip);
-        mSkipTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fmLayout.setVisibility(View.GONE);
-                startTV.setVisibility(View.GONE);
-                mSkipTV.setVisibility(View.GONE);
-                mTimer.cancel();
-            }
-        });
-        // Bitmap 的宽高在 maxWidth maxHeight 和 minWidth minHeight 之间
-        // 设置数据源
-        countDownTimer();
-        imageData = new ArrayList<Integer>();
-        imageData.add(R.drawable.start_one);
-        imageData.add(R.drawable.start_two);
-        imageData.add(R.drawable.start_three);
-
-
-        mLogoBB.setData(imageData, Arrays.asList("", "", ""));
-        mLogoBB.setAdapter(new BGABanner.Adapter<ImageView, Integer>() {
-            @Override
-            public void fillBannerItem(BGABanner banner, ImageView itemView, Integer model, int position) {
-                Glide.with(WebViewActivity.this)
-                        .load(model)
-                        .dontAnimate()
-                        .into(itemView);
-            }
-        });
-//        mLogoBB.setEnterSkipViewIdAndDelegate(0, R.id.start_tv, new BGABanner.GuideDelegate() {
-//            @Override
-//            public void onClickEnterOrSkip() {
-////                startActivity(new Intent(GuideActivity.this, MainActivity.class));
-////                finish();
-//            }
-//        });
-        mLogoBB.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position==2){
-                    startTV.setVisibility(View.VISIBLE);
-                }else {
-                    startTV.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        startTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fmLayout.setVisibility(View.GONE);
-                startTV.setVisibility(View.GONE);
-                mSkipTV.setVisibility(View.GONE);
-                timer.cancel();
-
-
-            }
-        });
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
@@ -679,18 +583,5 @@ public class WebViewActivity extends Activity implements IWebViewInterface {
         super.onResume();
     }
 
-    public void countDownTimer() {
-        Handler handler = getHandler();
-        mTimer = null;
-        mTimer = new Timer();
-        mTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-//                Looper.prepare();
-                handler.sendEmptyMessage(1);
-//                Looper.loop();
-            }
-        }, 0, 1000);
-    }
 
 }
