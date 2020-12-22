@@ -5,14 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.smurf.app.R;
 import com.smurf.app.WebViewActivity;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.utils.ScreenUtils;
-
-import java.nio.channels.WritableByteChannel;
 
 
 public class NativeVerifyActivity extends Activity implements View.OnClickListener {

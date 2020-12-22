@@ -9,17 +9,68 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <FrameLayout
-            android:id="@+id/delay_layout"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layout_splash"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-            <ImageView
-                android:id="@+id/logo_img"
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/viewpager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitXY" />
+                android:layout_height="match_parent"></androidx.viewpager.widget.ViewPager>
 
-        </FrameLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                android:layout_marginBottom="@dimen/classroom_30dp"
+                android:orientation="horizontal">
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                    <ImageView
+                        android:id="@+id/img_1_select"
+                        android:layout_width="@dimen/classroom_20dp"
+                        android:layout_height="@dimen/classroom_10dp"
+                        android:background="@drawable/shape_dot_select"/>
+                    <ImageView
+                        android:id="@+id/img_1_normal"
+                        android:layout_width="@dimen/classroom_10dp"
+                        android:layout_height="@dimen/classroom_10dp"
+                        android:background="@drawable/shape_dot_normal"/>
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/classroom_10dp">
+                    <ImageView
+                        android:id="@+id/img_2_select"
+                        android:layout_width="@dimen/classroom_20dp"
+                        android:layout_height="@dimen/classroom_10dp"
+                        android:background="@drawable/shape_dot_select"/>
+                    <ImageView
+                        android:id="@+id/img_2_normal"
+                        android:layout_width="@dimen/classroom_10dp"
+                        android:layout_height="@dimen/classroom_10dp"
+                        android:background="@drawable/shape_dot_normal"/>
+                </RelativeLayout>
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/classroom_10dp">
+                    <ImageView
+                        android:id="@+id/img_3_select"
+                        android:layout_width="@dimen/classroom_20dp"
+                        android:layout_height="@dimen/classroom_10dp"
+                        android:background="@drawable/shape_dot_select"/>
+                    <ImageView
+                        android:id="@+id/img_3_normal"
+                        android:layout_width="@dimen/classroom_10dp"
+                        android:layout_height="@dimen/classroom_10dp"
+                        android:background="@drawable/shape_dot_normal"/>
+                </RelativeLayout>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

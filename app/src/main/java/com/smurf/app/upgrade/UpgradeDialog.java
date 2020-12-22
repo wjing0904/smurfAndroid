@@ -2,7 +2,9 @@ package com.smurf.app.upgrade;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -57,9 +59,12 @@ public class UpgradeDialog extends Dialog implements View.OnClickListener {
         }
 
         if (versionCodeTxt != null) {
-            versionCodeTxt.setText(versionName);
+            versionCodeTxt.setText(couponBean.getData().getVno()+"");
+//            Log.i("Tag", +"");
+//            Log.i("Tag", couponBean.getData().getExplain()+"");
+//            Log.i("Tag", couponBean.getData().getUrl()+"");
         }
-        setProgress("立即升级");
+        setProgress("升级");
     }
 
     @Override

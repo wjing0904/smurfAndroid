@@ -17,8 +17,8 @@ import android.widget.Toast;
 
 import com.smurf.app.BuildConfig;
 import com.smurf.app.R;
-import com.smurf.app.base.StaticURL;
 import com.smurf.app.WebViewActivity;
+import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;

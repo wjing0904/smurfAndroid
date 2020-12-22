@@ -1,5 +1,6 @@
 package com.smurf.app.presenter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -59,6 +60,7 @@ public class JavaScriptPresenter {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void toggleGPS() {
         Intent gpsIntent = new Intent();
         gpsIntent.setClassName("com.android.settings", "com.android.settings.widget.SettingsAppWidgetProvider");
@@ -78,8 +80,9 @@ public class JavaScriptPresenter {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void getLocation() {
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        @SuppressLint("MissingPermission") Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location != null && webViewInterface != null) {
             webViewInterface.notifyLocation(location.getLatitude() + "," + location.getLongitude());
         } else {

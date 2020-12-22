@@ -2,14 +2,20 @@ package com.smurf.app.presenter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
@@ -20,6 +26,7 @@ import com.smurf.app.upgrade.UpgradeUtils;
 import com.smurf.app.utils.FileUtils;
 import com.smurf.app.utils.ThreadUtils;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -42,10 +49,11 @@ import okhttp3.Response;
 
 public class InstallAppPresenter {
 
-    private static final int MSG_UPDATE = 0;
-    private static final int MSG_PROGRESS = 1;
-    private static final int MSG_DELAYTIME = 2;
 
+    private static final int MSG_PROGRESS = 1;
+    private static final int MSG_INSTALL = 2;
+    private static final int NOT_DOWN = 3;
+    private String apkName;
     private Context mContext;
     private String versionName = "";
     private int versioncode;
@@ -58,22 +66,21 @@ public class InstallAppPresenter {
             super.handleMessage(msg);
             switch (msg.what) {
                 case MSG_PROGRESS:
-                    String num = (String) msg.obj;
+                    // 设置进度条
+                    upgradeDialog.setProgress(mProgress + "%");
+                    break;
+                case MSG_INSTALL:
+                    // 隐藏当前下载对话框
                     if (upgradeDialog != null)
-                        upgradeDialog.setProgress(num);
-                    break;
-                case MSG_UPDATE:
-                    String apkPath = (String) msg.obj;
-                    UpgradeUtils.getInstance().installAPK(mContext, apkPath);
-                    if(upgradeDialog!=null)
                         upgradeDialog.dismiss();
-                    break;
-                case MSG_DELAYTIME:
-                    break;
+
+                    openFile(new File(mSavePath+"/"+apkName));
             }
 
         }
     };
+    private int mProgress;
+    private String mSavePath;
 
 
     public InstallAppPresenter(Context context) {
@@ -101,9 +108,9 @@ public class InstallAppPresenter {
                 RequestBody requestBody = RequestBody.create(JSON, String.valueOf(json));
                 //3 . 构建Request,将FormBody作为Post方法的参数传入
                 String url = null;
-                if(BuildConfig.DEBUG){
+                if (BuildConfig.DEBUG) {
                     url = StaticURL.DEBUG_APK_INSTALL_URL;
-                }else{
+                } else {
                     url = StaticURL.RELEASE_APK_INSTALL_URL;
                 }
                 Request request = new Request.Builder()
@@ -120,21 +127,21 @@ public class InstallAppPresenter {
                                 Toast.makeText(mContext, "网路异常，请检查网络", Toast.LENGTH_SHORT).show();
                             }
                         });
-                        handler.sendEmptyMessage(MSG_DELAYTIME);
+                        handler.sendEmptyMessage(NOT_DOWN);
                         return;
                     }
 
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         if (response == null) {
-                            handler.sendEmptyMessage(MSG_DELAYTIME);
+                            handler.sendEmptyMessage(NOT_DOWN);
                             return;
                         }
-
                         try {
                             Gson gson = new Gson();
                             CouponBean couponBean = gson.fromJson(response.body().string(), CouponBean.class);
-                            if (couponBean.isSuccess() && couponBean.getCode() == 0 && couponBean.getData().isInstallApp()) {
+                            String versionCode = getAppVersionCode(mContext);
+                            if (couponBean.isSuccess() && couponBean.getCode() == 0 && couponBean.getData().isInstallApp() && !versionCode.equals(couponBean.getData().getVno())) {
                                 //弹窗，升级
                                 ThreadUtils.runOnUiThread(new Runnable() {
                                     @Override
@@ -145,19 +152,22 @@ public class InstallAppPresenter {
                                             @Override
                                             public void upgradeForce(String installUrl) {
                                                 //下载并通知升级
-                                                downApk(installUrl);
+                                                downloadAPK(installUrl);
                                             }
                                         });
                                         upgradeDialog.show();
+                                        upgradeDialog.setCanceledOnTouchOutside(false);//可选，点击dialog其它地方dismiss无效
+                                        upgradeDialog.setCancelable(false);//可选,点击返回键无效
+
                                     }
                                 });
 
                             } else {
-                                handler.sendEmptyMessage(MSG_DELAYTIME);
+                                handler.sendEmptyMessage(NOT_DOWN);
                                 return;
                             }
                         } catch (Exception e) {
-                            handler.sendEmptyMessage(MSG_DELAYTIME);
+                            handler.sendEmptyMessage(NOT_DOWN);
                         }
                     }
                 });
@@ -166,77 +176,80 @@ public class InstallAppPresenter {
         thread.start();
     }
 
-
-    private void downApk(String loadApkUrl) {
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                InputStream is = null;
-                FileOutputStream fos = null;
-                File apkFile = null;
-                try {
-                    // 获得存储卡的路径
-                    String sdpath = FileUtils.getAppPath() + "/";
-                    String mSavePath = sdpath + "download";
-                    URL url = new URL(loadApkUrl);
-                    // 创建连接
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.connect();
-                    // 获取文件大小
-                    int length = conn.getContentLength();
-                    // 创建输入流
-                    is = conn.getInputStream();
-
-                    File file = new File(mSavePath);
-                    // 判断文件目录是否存在
-                    if (!file.exists()) {
-                        file.mkdir();
-                    }
-                    apkFile = new File(mSavePath, "smurf");
-                    fos = new FileOutputStream(apkFile);
-                    float count = 0;
-                    DecimalFormat df = new DecimalFormat("#.##");
-                    // 缓存
-                    byte buf[] = new byte[1024];
-                    // 写入到文件中
-                    int numread;
-                    while((numread=is.read(buf)) !=-1){
-                        fos.write(buf, 0, numread);
-                        count += numread;
-                        Message message = handler.obtainMessage();
-                        message.what = MSG_PROGRESS;
-                        message.obj = String.valueOf(df.format((count / length)*100) + "%");
-                        handler.sendMessage(message);
-                    }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (fos != null) {
-                        try {
-                            fos.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-                Message message = handler.obtainMessage();
-                message.what = MSG_UPDATE;
-                message.obj = apkFile.getAbsolutePath();
-                handler.sendMessage(message);
+    public static String getAppVersionCode(Context context) {
+        long appVersionCode = 0;
+        try {
+            PackageInfo packageInfo = context.getApplicationContext()
+                    .getPackageManager()
+                    .getPackageInfo(context.getPackageName(), 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                appVersionCode = packageInfo.getLongVersionCode();
+            } else {
+                appVersionCode = packageInfo.versionCode;
             }
-        });
-        thread.start();
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e("", e.getMessage());
+        }
+        return appVersionCode + "";
     }
 
+    /**
+     * 下载APk
+     */
+    private void downloadAPK(final String loadApkUrl) {
+        new Thread(new Runnable() {
+
+
+
+            @Override
+            public void run() {
+                File apkFile = null;
+                try {
+                    if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+
+                        String sdPath = Environment.getExternalStorageDirectory() + "/";
+
+                        //文件保存路径
+                        mSavePath = sdPath + "Download";
+
+                        File dir = new File(mSavePath);
+                        if (!dir.exists()) {
+                            dir.mkdir();
+                        }
+
+                        apkName = "smurf_" + getAppVersionCode(mContext) + ".apk";
+
+                        // 下载文件
+                        HttpURLConnection conn = (HttpURLConnection) new URL(loadApkUrl).openConnection();
+                        conn.connect();
+                        InputStream is = conn.getInputStream();
+                        int length = conn.getContentLength();
+                        apkFile = new File(mSavePath, apkName);
+                        FileOutputStream fos = new FileOutputStream(apkFile);
+                        int count = 0;
+                        int len = -1;
+
+                        byte[] buffer = new byte[1024];
+                        while ((len = is.read(buffer)) != -1) {
+                            fos.write(buffer, 0, len);
+//                            numread = is.read(buffer);
+                            count += len;
+                            mProgress = (int) ((((float) count / length) * 100));
+                            // 更新进度条
+                            handler.sendEmptyMessage(MSG_PROGRESS);
+
+
+                        }
+                        fos.close();
+                        is.close();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                handler.sendEmptyMessage(MSG_INSTALL);
+            }
+        }).start();
+    }
 
     /**
      * 返回当前程序版本名  build.gradle里的
@@ -255,5 +268,32 @@ public class InstallAppPresenter {
             Log.e("VersionInfo", "Exception", e);
         }
         return versionName;
+    }
+
+    //打开APK程序代码
+    private void openFile(File file) {
+        Log.e("OpenFile", file.getName());
+
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        Uri uri;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri contentUri = FileProvider.getUriForFile(mContext,
+                    mContext.getApplicationContext().getPackageName() + ".fileProvider",
+                    file);
+            intent.setDataAndType(contentUri, "application/vnd.android.package-archive");
+        } else {
+            uri = Uri.fromFile(file);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        }
+        mContext.startActivity(intent);
+//        这个必须添加，不然无法提示打开应用操作
+        android.os.Process.killProcess(android.os.Process.myPid());
+
     }
 }
