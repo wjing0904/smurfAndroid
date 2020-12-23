@@ -8,21 +8,23 @@
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
+        android:scaleType="fitXY"
+        />
 
     <TextView
         android:id="@+id/txt_time"
-        android:layout_width="@dimen/classroom_40dp"
-        android:layout_height="@dimen/classroom_40dp"
+        android:layout_width="@dimen/classroom_50dp"
+        android:layout_height="@dimen/classroom_30dp"
         android:layout_marginTop="@dimen/classroom_10dp"
         android:layout_marginRight="@dimen/classroom_10dp"
         android:background="@drawable/start_bg"
         android:gravity="center"
+
         android:text="跳过3"
-        android:textColor="@color/viewfinder_laser"
+        android:textSize="@dimen/classroom_10dp"
+        android:textColor="@color/result_text"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
 
         android:id="@+id/start_tv"

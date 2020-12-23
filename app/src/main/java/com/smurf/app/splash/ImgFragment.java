@@ -41,6 +41,13 @@ public class ImgFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_splash,null);
         return view;
     }
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser && txtView != null && txtView.getVisibility() == View.VISIBLE){
+            startTime();
+        }
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -66,7 +73,6 @@ public class ImgFragment extends Fragment {
                     openWebActivity();
                 }
             });
-            startTime();
         }
         if(start_tv.getVisibility() == View.VISIBLE){
             start_tv.setOnClickListener(new View.OnClickListener() {
@@ -95,7 +101,7 @@ public class ImgFragment extends Fragment {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if(time > 0 && isRunning){
+                if(time > 1 && isRunning){
                     time --;
                     txtView.post(new Runnable() {
                         @Override
