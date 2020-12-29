@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: :adpoymer-4.2.6:@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-adpoymer-4.2.6.aar/c2564a7bd6e5d9ea836a78e9fd629a0a/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-adpoymer-4.2.6.aar/c2564a7bd6e5d9ea836a78e9fd629a0a/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-adpoymer-4.2.6.aar/c2564a7bd6e5d9ea836a78e9fd629a0a/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

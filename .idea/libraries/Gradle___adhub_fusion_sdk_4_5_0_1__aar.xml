@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: :adhub_fusion_sdk_4.5.0.1:@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-adhub_fusion_sdk_4.5.0.1.aar/6e6d4368afdf5a59687927a5a78ab7b7/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-adhub_fusion_sdk_4.5.0.1.aar/6e6d4368afdf5a59687927a5a78ab7b7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-adhub_fusion_sdk_4.5.0.1.aar/6e6d4368afdf5a59687927a5a78ab7b7/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

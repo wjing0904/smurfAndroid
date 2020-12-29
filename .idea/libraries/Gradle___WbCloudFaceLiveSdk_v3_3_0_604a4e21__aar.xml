@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: :WbCloudFaceLiveSdk-v3.3.0-604a4e21:@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-WbCloudFaceLiveSdk-v3.3.0-604a4e21.aar/0e2b0e6020f338c841e0a7fd0857045b/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-WbCloudFaceLiveSdk-v3.3.0-604a4e21.aar/0e2b0e6020f338c841e0a7fd0857045b/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-WbCloudFaceLiveSdk-v3.3.0-604a4e21.aar/0e2b0e6020f338c841e0a7fd0857045b/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-WbCloudFaceLiveSdk-v3.3.0-604a4e21.aar/0e2b0e6020f338c841e0a7fd0857045b/jars/libs/cloudfaceverifysdk.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: :WbCloudNormal-v4.1.0-fea58c5:@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/WbCloudNormal-v4.1.0-fea58c5.aar/7c3683b7733e071efeef61869b3bb264/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/WbCloudNormal-v4.1.0-fea58c5.aar/7c3683b7733e071efeef61869b3bb264/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/WbCloudNormal-v4.1.0-fea58c5.aar/7c3683b7733e071efeef61869b3bb264/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

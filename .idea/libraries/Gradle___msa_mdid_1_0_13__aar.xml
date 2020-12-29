@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: :msa_mdid_1.0.13:@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-msa_mdid_1.0.13.aar/1ff72822d08c7a3a58637d76af29be93/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-msa_mdid_1.0.13.aar/1ff72822d08c7a3a58637d76af29be93/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-1/files-1.1/jetified-msa_mdid_1.0.13.aar/1ff72822d08c7a3a58637d76af29be93/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/FddCloudFaceVerifySdk/FddCloudFaceVerifySdk.iml" filepath="$PROJECT_DIR$/.idea/modules/FddCloudFaceVerifySdk/FddCloudFaceVerifySdk.iml" group="SmurfAndroid/FddCloudFaceVerifySdk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SmurfAndroid.iml" filepath="$PROJECT_DIR$/.idea/modules/SmurfAndroid.iml" group="SmurfAndroid" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="SmurfAndroid/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/base/base.iml" filepath="$PROJECT_DIR$/.idea/modules/base/base.iml" group="SmurfAndroid/base" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/lib/lib.iml" filepath="$PROJECT_DIR$/.idea/modules/lib/lib.iml" group="SmurfAndroid/lib" />
+    </modules>
+  </component>
+</project>
