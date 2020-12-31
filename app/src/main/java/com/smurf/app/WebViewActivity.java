@@ -64,6 +64,7 @@ import com.smurf.app.base.event.*;
 import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_LOCAL_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
+import static com.smurf.app.base.StaticURL.DEBUG_PHONE_LOGIN;
 
 public class WebViewActivity extends AppCompatActivity implements IWebViewInterface {
     private static final String TAG = "WebViewActivity";
@@ -302,6 +303,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         if (resultCode == 3) {
             if (mWebView != null)
                 mWebView.loadUrl("javascript:closeSign()");
+        }
+
+        if(resultCode == 4){
+            if(mWebView!= null){
+                mWebView.loadUrl(DEBUG_PHONE_LOGIN);
+            }
         }
 
 //        if(requestCode == 9 && resultCode ==9){

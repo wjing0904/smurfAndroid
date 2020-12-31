@@ -44,6 +44,7 @@ import static com.smurf.app.base.StaticURL.RELEASE_BASE;
 import static com.smurf.app.base.StaticURL.RELEASE_BASE_QY;
 
 import com.smurf.app.base.BuildConfig;
+import com.smurf.app.base.StaticURL;
 import com.smurf.app.base.event.*;
 
 public class FaceVerifyHostActivity extends AppCompatActivity {
@@ -128,6 +129,20 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                 }
                 if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
                     webBack();
+                }
+                if(BuildConfig.DEBUG){
+                    if(url.startsWith(StaticURL.DEBUG_PHONE_LOGIN)){
+                        Intent i = new Intent();
+                        setResult(4,i);
+                        finish();
+                    }
+
+                }else{
+                    if(url.startsWith(StaticURL.RELEASE_PHONE_LOGIN)){
+                        Intent i = new Intent();
+                        setResult(4,i);
+                        finish();
+                    }
                 }
 
                 if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
