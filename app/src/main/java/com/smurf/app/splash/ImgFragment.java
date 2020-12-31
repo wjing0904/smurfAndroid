@@ -23,8 +23,9 @@ public class ImgFragment extends Fragment {
     private int index;
 
     private int time = 3;
-    private boolean isRunning = true;
     private TextView start_tv;
+
+    private TimeRunnable runnable;
 
     public static ImgFragment getInstance(String url,int index){
         ImgFragment fragment = new ImgFragment();
@@ -46,6 +47,11 @@ public class ImgFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser && txtView != null && txtView.getVisibility() == View.VISIBLE){
             startTime();
+        }else{
+            if(runnable != null){
+                handler.removeCallbacks(runnable);
+            }
+            time = 3;
         }
     }
 
@@ -65,7 +71,6 @@ public class ImgFragment extends Fragment {
         }else if(index == 3){
             img.setImageResource(R.drawable.start_three);
         }
-        isRunning = true;
         if(txtView.getVisibility() == View.VISIBLE){
             txtView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -88,34 +93,16 @@ public class ImgFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        time = 3;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        isRunning = false;
     }
 
     private void startTime(){
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if(time > 1 && isRunning){
-                    time --;
-                    txtView.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            txtView.setText("跳过"+String.valueOf(time));
-                        }
-                    });
-                    handler.postDelayed(this,1000);
-                }else{
-                    //自动跳过
-                    openWebActivity();
-                }
-            }
-        };
+        runnable = new TimeRunnable();
+        txtView.setText("跳过"+String.valueOf(time));
         handler.postDelayed(runnable,1000);
     }
 
@@ -128,6 +115,25 @@ public class ImgFragment extends Fragment {
 //        Intent intent = new Intent(getContext(), WebViewActivity.class);
 //        startActivity(intent);
         ((WebViewActivity)getActivity()).splashOver();
+    }
+
+    class TimeRunnable implements Runnable{
+        @Override
+        public void run() {
+            if(time > 1){
+                time --;
+                txtView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        txtView.setText("跳过"+String.valueOf(time));
+                    }
+                });
+                handler.postDelayed(this,1000);
+            }else{
+                //自动跳过
+                openWebActivity();
+            }
+        }
     }
 
 }
