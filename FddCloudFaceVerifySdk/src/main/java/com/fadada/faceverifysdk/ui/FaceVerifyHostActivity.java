@@ -28,7 +28,6 @@ import androidx.core.content.FileProvider;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.fadada.faceverifysdk.BuildConfig;
 import com.fadada.faceverifysdk.R;
 import com.fadada.faceverifysdk.bean.Sign;
 import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
@@ -44,6 +43,7 @@ import static com.smurf.app.base.StaticURL.DEBUG_BASE_QY;
 import static com.smurf.app.base.StaticURL.RELEASE_BASE;
 import static com.smurf.app.base.StaticURL.RELEASE_BASE_QY;
 
+import com.smurf.app.base.BuildConfig;
 import com.smurf.app.base.event.*;
 
 public class FaceVerifyHostActivity extends AppCompatActivity {

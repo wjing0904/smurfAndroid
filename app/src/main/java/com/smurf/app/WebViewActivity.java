@@ -61,8 +61,6 @@ import java.util.Map;
 
 import com.smurf.app.base.event.*;
 
-import cn.bingoogolapple.bgabanner.BuildConfig;
-
 import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_LOCAL_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
