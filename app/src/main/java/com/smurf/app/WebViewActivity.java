@@ -310,7 +310,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 
         if(resultCode == 4){
             if(mWebView!= null){
-                mWebView.loadUrl(DEBUG_PHONE_LOGIN);
+                mWebView.loadUrl("javascript:openLogin()");
             }
         }
 
