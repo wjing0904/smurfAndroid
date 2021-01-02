@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.ProgressBar;
 
 import com.smurf.app.base.event.WxEvent;
+import com.smurf.app.base.wx.WXEntity;
 import com.smurf.app.login.utils.ToastUtil;
 import com.tencent.mm.opensdk.modelbase.BaseReq;
 import com.tencent.mm.opensdk.modelbase.BaseResp;

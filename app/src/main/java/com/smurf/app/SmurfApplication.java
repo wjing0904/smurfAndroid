@@ -5,7 +5,6 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import com.adhub.ads.AdHubs;
-import com.smurf.app.wxapi.WXEntity;
 import com.tencent.smtt.sdk.QbSdk;
 
 import cn.jiguang.share.android.api.JShareInterface;

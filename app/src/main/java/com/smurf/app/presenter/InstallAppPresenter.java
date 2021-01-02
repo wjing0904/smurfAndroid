@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,10 +22,8 @@ import com.smurf.app.base.StaticURL;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
 import com.smurf.app.upgrade.UpgradeUtils;
-import com.smurf.app.utils.FileUtils;
-import com.smurf.app.utils.ThreadUtils;
+import com.smurf.app.base.utils.ThreadUtils;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,9 +32,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
 
 import okhttp3.Call;
 import okhttp3.Callback;

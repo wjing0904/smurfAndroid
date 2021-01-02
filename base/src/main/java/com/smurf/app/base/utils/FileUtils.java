@@ -1,4 +1,4 @@
-package com.smurf.app.utils;
+package com.smurf.app.base.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;

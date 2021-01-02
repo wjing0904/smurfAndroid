@@ -1,4 +1,4 @@
-package com.smurf.app.login.utils;
+package com.smurf.app.base.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;

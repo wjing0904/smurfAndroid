@@ -1,35 +1,22 @@
-package com.smurf.app.share;
+package com.smurf.app.base.wx;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
-import android.widget.SimpleAdapter;
-import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.Target;
-import com.smurf.app.R;
-import com.smurf.app.login.utils.BitmapUtils;
-import com.smurf.app.utils.FileUtils;
-import com.smurf.app.utils.SaveImageUtils;
-import com.smurf.app.wxapi.WXEntity;
+import com.smurf.app.base.R;
+import com.smurf.app.base.utils.BitmapUtils;
+import com.smurf.app.base.utils.FileUtils;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXImageObject;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXTextObject;
-import com.tencent.mm.opensdk.modelmsg.WXVideoObject;
 import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.ByteBuffer;
 
 public class WechatShareManager {
     private static final int THUMB_SIZE = 150;

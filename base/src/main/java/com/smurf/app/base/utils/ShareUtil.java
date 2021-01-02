@@ -1,23 +1,11 @@
-package com.smurf.app.utils;
+package com.smurf.app.base.utils;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.util.Log;
 
-import com.smurf.app.R;
-import com.smurf.app.share.WechatShareManager;
+import com.smurf.app.base.wx.WechatShareManager;
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.opensdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.opensdk.modelmsg.WXWebpageObject;
-
-import java.io.ByteArrayOutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-
-import static android.util.Patterns.EMAIL_ADDRESS;
 
 public class ShareUtil {
     private static volatile ShareUtil mInstance;
