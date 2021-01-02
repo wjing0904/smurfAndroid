@@ -427,7 +427,8 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
 
                     if (signUrl.contains("https://wx.tenpay.com")) {
                         Map<String, String> extraHeaders = new HashMap<>();
-                        extraHeaders.put("Referer", "http://smurf.langongbao.com");
+//                        extraHeaders.put("Referer", "http://smurf.langongbao.com");
+                        extraHeaders.put("Referer", "http://shop.langongbao.com");
                         webView.loadUrl(signUrl, extraHeaders);
                         return;
                     }
