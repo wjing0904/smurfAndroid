@@ -132,14 +132,17 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 String baseUrlQy = null;
                 String baseUrl = null;
+                String phoneLogin = null;
                 if (BuildConfig.DEBUG) {
                     baseUrl = DEBUG_BASE;
                     baseUrlQy = DEBUG_BASE_QY;
+                    phoneLogin = StaticURL.DEBUG_PHONE_LOGIN;
                 } else {
                     baseUrl = RELEASE_BASE;
                     baseUrlQy = RELEASE_BASE_QY;
+                    phoneLogin = StaticURL.RELEASE_PHONE_LOGIN;
                 }
-                if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy)) {
+                if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy) && !url.startsWith(phoneLogin)) {
                     webBack();
                 }
                 if(BuildConfig.DEBUG){
