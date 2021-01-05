@@ -413,7 +413,7 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
          * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
          */
         @JavascriptInterface
-        public void signUp(final String signUrl) {
+        public void payShop(final String signUrl) {
             ThreadUtils.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
