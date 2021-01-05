@@ -157,6 +157,24 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                     }
                 }
 
+                try {
+                    if (url.startsWith("weixin://") || url.startsWith("alipays://")) {
+                        Intent intent = new Intent();
+                        intent.setAction(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
+                if (url.contains("https://wx.tenpay.com")) {
+                    Map<String, String> extraHeaders = new HashMap<>();
+                    extraHeaders.put("Referer", "http://shop.langongbao.com");
+                    view.loadUrl(url, extraHeaders);
+                    return true;
+                }
+
                 if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
                     view.loadUrl(url);
                     return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
@@ -409,32 +427,32 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
             }
         }
 
-        /**
-         * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
-         */
-        @JavascriptInterface
-        public void payShop(final String signUrl) {
-            ThreadUtils.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(signUrl));
-                        startActivity(intent);
-                        return;
-                    }
-
-                    if (signUrl.contains("https://wx.tenpay.com")) {
-                        Map<String, String> extraHeaders = new HashMap<>();
-//                        extraHeaders.put("Referer", "http://smurf.langongbao.com");
-                        extraHeaders.put("Referer", "http://shop.langongbao.com");
-                        webView.loadUrl(signUrl, extraHeaders);
-                        return;
-                    }
-                }
-            });
-        }
+//        /**
+//         * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
+//         */
+//        @JavascriptInterface
+//        public void payShop(final String signUrl) {
+//            ThreadUtils.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
+//                        Intent intent = new Intent();
+//                        intent.setAction(Intent.ACTION_VIEW);
+//                        intent.setData(Uri.parse(signUrl));
+//                        startActivity(intent);
+//                        return;
+//                    }
+//
+//                    if (signUrl.contains("https://wx.tenpay.com")) {
+//                        Map<String, String> extraHeaders = new HashMap<>();
+////                        extraHeaders.put("Referer", "http://smurf.langongbao.com");
+//                        extraHeaders.put("Referer", "http://shop.langongbao.com");
+//                        webView.loadUrl(signUrl, extraHeaders);
+//                        return;
+//                    }
+//                }
+//            });
+//        }
     }
 
 }
