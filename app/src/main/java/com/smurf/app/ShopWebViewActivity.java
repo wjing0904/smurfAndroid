@@ -22,6 +22,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
+import com.smurf.app.base.BuildConfig;
+import com.smurf.app.base.StaticURL;
 import com.smurf.app.base.utils.ShareUtil;
 
 import java.util.HashMap;
@@ -82,7 +84,20 @@ public class ShopWebViewActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                if(BuildConfig.DEBUG){
+                    if(url.startsWith(StaticURL.DEBUG_PHONE_LOGIN)){
+                        Intent i = new Intent();
+                        setResult(4,i);
+                        finish();
+                    }
 
+                }else{
+                    if(url.startsWith(StaticURL.RELEASE_PHONE_LOGIN)){
+                        Intent i = new Intent();
+                        setResult(4,i);
+                        finish();
+                    }
+                }
                 try {
                     if (url.startsWith("weixin://") || url.startsWith("alipays://")) {
                         Intent intent = new Intent();
@@ -155,8 +170,8 @@ public class ShopWebViewActivity extends AppCompatActivity {
     }
 
     private void exitPage() {
-        Intent i = new Intent();
-        setResult(4, i);
+//        Intent i = new Intent();
+//        setResult(4, i);
         finish();
     }
 

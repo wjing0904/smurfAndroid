@@ -145,20 +145,7 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                 if (url.startsWith(baseUrl) && !url.startsWith(baseUrlQy) && !url.startsWith(phoneLogin)) {
                     webBack();
                 }
-                if(BuildConfig.DEBUG){
-                    if(url.startsWith(StaticURL.DEBUG_PHONE_LOGIN)){
-                        Intent i = new Intent();
-                        setResult(4,i);
-                        finish();
-                    }
 
-                }else{
-                    if(url.startsWith(StaticURL.RELEASE_PHONE_LOGIN)){
-                        Intent i = new Intent();
-                        setResult(4,i);
-                        finish();
-                    }
-                }
                 if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
                     view.loadUrl(url);
                     return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
