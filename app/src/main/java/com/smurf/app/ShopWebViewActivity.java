@@ -200,7 +200,7 @@ public class ShopWebViewActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
-        public void exitApp() {
+        public void exitShopPage() {
             exitShopPage();
         }
 
