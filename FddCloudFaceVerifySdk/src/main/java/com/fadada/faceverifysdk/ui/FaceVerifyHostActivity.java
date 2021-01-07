@@ -159,25 +159,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                         finish();
                     }
                 }
-
-                try {
-                    if (url.startsWith("weixin://") || url.startsWith("alipays://")) {
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        intent.setData(Uri.parse(url));
-                        startActivity(intent);
-                        return true;
-                    }
-                } catch (Exception e) {
-                    return false;
-                }
-                if (url.contains("https://wx.tenpay.com")) {
-                    Map<String, String> extraHeaders = new HashMap<>();
-                    extraHeaders.put("Referer", "http://shop.langongbao.com");
-                    view.loadUrl(url, extraHeaders);
-                    return true;
-                }
-
                 if (url.startsWith("http://") || url.startsWith("https://")) { //加载的url是http/https协议地址
                     view.loadUrl(url);
                     return false; //返回false表示此url默认由系统处理,url未加载完成，会继续往下走
@@ -202,9 +183,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         String ua1 = webView.getSettings().getUserAgentString();
         webView.getSettings().setUserAgentString(ua1 + "fdd_authentication");
 
-
-        JavaScriptInterface javascriptInterface = new JavaScriptInterface(this);
-        webView.addJavascriptInterface(javascriptInterface, "JSInterface");
         webView.loadUrl(h5Url);
     }
 
@@ -373,88 +351,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
 //
 //        }else{
 //            finish();
-//        }
-    }
-
-    /**
-     * 判断 用户是否安装微信客户端
-     */
-    public static boolean isWeixinAvilible(Context context) {
-        final PackageManager packageManager = context.getPackageManager();// 获取packagemanager
-        List<PackageInfo> pinfo = packageManager.getInstalledPackages(0);// 获取所有已安装程序的包信息
-        if (pinfo != null) {
-            for (int i = 0; i < pinfo.size(); i++) {
-                String pn = pinfo.get(i).packageName;
-                if (pn.equals("com.tencent.mm")) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    class JavaScriptInterface {
-        private Context mContext;
-
-        public JavaScriptInterface(Context context) {
-            this.mContext = context;
-        }
-
-        /**
-         * 分享功能
-         * type 0:朋友 1；朋友圈
-         * shareType 0：分享文本内容，1：分享单张图片，2：网页分享
-         * 分享文本内容：分享内容  text
-         * 分享图片 imageUrl
-         * 分享网页 ：title 标题，description 描述信息 webpageUrl 网页链接
-         */
-        @JavascriptInterface
-        public void share(int type, int shareType, String title, String text, String imgUri, String description, String webpageUrl) {
-            if (isWeixinAvilible(mContext)) {
-
-            } else {
-                Toast.makeText(mContext, "您还没有安装微信，请先安装微信客户端", Toast.LENGTH_SHORT).show();
-            }
-            switch (shareType) {
-                case 0:
-                    ShareUtil.getInstance(FaceVerifyHostActivity.this).shareText(type, text);
-                    break;
-                case 1:
-                    ShareUtil.getInstance(FaceVerifyHostActivity.this).shareImage(type, imgUri);
-                    break;
-                case 2:
-                    ShareUtil.getInstance(FaceVerifyHostActivity.this).shareWebPage(type, webpageUrl, title, description);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-//        /**
-//         * js调用原生 已签约 && 认证 && 打开第三方链接 && 打开h5
-//         */
-//        @JavascriptInterface
-//        public void payShop(final String signUrl) {
-//            ThreadUtils.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    if (signUrl.startsWith("weixin://") || signUrl.startsWith("alipays://")) {
-//                        Intent intent = new Intent();
-//                        intent.setAction(Intent.ACTION_VIEW);
-//                        intent.setData(Uri.parse(signUrl));
-//                        startActivity(intent);
-//                        return;
-//                    }
-//
-//                    if (signUrl.contains("https://wx.tenpay.com")) {
-//                        Map<String, String> extraHeaders = new HashMap<>();
-////                        extraHeaders.put("Referer", "http://smurf.langongbao.com");
-//                        extraHeaders.put("Referer", "http://shop.langongbao.com");
-//                        webView.loadUrl(signUrl, extraHeaders);
-//                        return;
-//                    }
-//                }
-//            });
 //        }
     }
 

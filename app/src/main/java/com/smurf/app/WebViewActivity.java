@@ -34,6 +34,8 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
+import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
+import com.fadada.faceverifysdk.ui.FaceVerifyHostActivity;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.base.event.SignEvent;
 import com.smurf.app.base.event.TokenEvent;
@@ -518,6 +520,15 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                     SignUpFaceVerify.getInstance().openFaceVerifySdk(mContext, signUrl);
                 }
             });
+        }
+
+        @JavascriptInterface
+        public void shopSign(String url){
+            Bundle bundle = new Bundle();
+            bundle.putString(FddCloudFaceConstant.VERIFY_URL, url);
+            Intent intent = new Intent(WebViewActivity.this, ShopWebViewActivity.class);
+            intent.putExtras(bundle);
+            startActivityForResult(intent,4);
         }
 
         @JavascriptInterface
