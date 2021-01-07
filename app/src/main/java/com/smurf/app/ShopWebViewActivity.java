@@ -154,7 +154,7 @@ public class ShopWebViewActivity extends AppCompatActivity {
         return true;
     }
 
-    private void exitShopPage() {
+    private void exitPage() {
         Intent i = new Intent();
         setResult(4, i);
         finish();
@@ -201,7 +201,7 @@ public class ShopWebViewActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void exitShopPage() {
-            exitShopPage();
+            exitPage();
         }
 
     }
