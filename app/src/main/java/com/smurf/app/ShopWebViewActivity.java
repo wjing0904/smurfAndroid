@@ -152,6 +152,7 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
         //区分app和H5调用刷脸的标记
         String ua = webView.getSettings().getUserAgentString();
         webView.getSettings().setUserAgentString(ua+";  SMURF_APP /");
+        webView.getSettings().setTextZoom(100);
 
         ShopWebViewActivity.JavaScriptInterface javascriptInterface = new ShopWebViewActivity.JavaScriptInterface(this);
         webView.addJavascriptInterface(javascriptInterface, "JSInterface");
