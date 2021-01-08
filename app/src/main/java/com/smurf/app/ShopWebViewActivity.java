@@ -56,6 +56,7 @@ public class ShopWebViewActivity extends AppCompatActivity {
                 }
             }
         });
+        back.setVisibility(View.GONE);
 
         //开启JS调用逻辑
         webView.getSettings().setDomStorageEnabled(true);
@@ -217,6 +218,16 @@ public class ShopWebViewActivity extends AppCompatActivity {
         @JavascriptInterface
         public void exitShopPage() {
             exitPage();
+        }
+
+        @JavascriptInterface
+        public void openAppointPage(String url){
+            Bundle bundle = new Bundle();
+            bundle.putString("openAppointPage", url);
+            Intent intent = new Intent();
+            intent.putExtras(bundle);
+            setResult(5,intent);
+            finish();
         }
 
     }

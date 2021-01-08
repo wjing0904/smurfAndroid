@@ -316,6 +316,14 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             }
         }
 
+        if(resultCode ==5){
+            Bundle bundle = data.getExtras();
+            String url = bundle.getString("openAppointPage");
+            if(mWebView!= null){
+                mWebView.loadUrl("javascript:openPage('" + url + "')");
+            }
+        }
+
 //        if(requestCode == 9 && resultCode ==9){
 ////            if(mWebView!= null){
 ////                mWebView.goBack();
