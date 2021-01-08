@@ -21,21 +21,34 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.model.Image;
 import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
 import com.smurf.app.base.BuildConfig;
 import com.smurf.app.base.StaticURL;
+import com.smurf.app.base.utils.BitmapUtils;
 import com.smurf.app.base.utils.ShareUtil;
+import com.smurf.app.presenter.JavaScriptPresenter;
+import com.smurf.app.view.IWebViewInterface;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 
-public class ShopWebViewActivity extends AppCompatActivity {
+
+public class ShopWebViewActivity extends AppCompatActivity implements IWebViewInterface {
 
     private WebView webView;
 
     private TextView back;
+
+    private JavaScriptPresenter javaScriptPresenter;
+
+    private boolean isOpenSelected;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -132,6 +145,10 @@ public class ShopWebViewActivity extends AppCompatActivity {
             }
         });
 
+        if (javaScriptPresenter == null) {
+            javaScriptPresenter = new JavaScriptPresenter(this, this);
+        }
+
         //区分app和H5调用刷脸的标记
         String ua = webView.getSettings().getUserAgentString();
         webView.getSettings().setUserAgentString(ua+";  SMURF_APP /");
@@ -141,6 +158,42 @@ public class ShopWebViewActivity extends AppCompatActivity {
         webView.loadUrl(h5Url);
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            switch (requestCode) {
+                case REQUEST_SELECT_IMAGES_CODE:
+                    if (isOpenSelected)
+                        javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机哦！", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        //多图选择
+        if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
+            List<Image> images = ImagePicker.getImages(data);
+            if (javaScriptPresenter != null)
+                javaScriptPresenter.notifyCamer(getImgInputStream(images), images.get(0).getName());
+
+        }
+    }
+
+    private String getImgInputStream(List<Image> images) {
+        StringBuffer imgInputs = new StringBuffer();
+//        BitmapUtils.comPressImg(images.get(0).getPath());
+        imgInputs.append(BitmapUtils.fileToBase64(images.get(0).getPath())).append("|");
+        return imgInputs.toString().substring(0, imgInputs.toString().length() - 1);
+    }
 
     /**
      * 判断 用户是否安装微信客户端
@@ -176,6 +229,27 @@ public class ShopWebViewActivity extends AppCompatActivity {
         finish();
     }
 
+    @Override
+    public void notifyZxingValueToJs(String value) {
+
+    }
+
+    @Override
+    public void notifyImageSelectedValueToJs(String value) {
+        if (webView != null)
+            webView.loadUrl("javascript:androidUploadImg('" + value + "')");
+    }
+
+    @Override
+    public void notifyImageName(String name) {
+        if (webView != null)
+            webView.loadUrl("javascript:imageName('" + name + "')");
+    }
+
+    @Override
+    public void notifyLocation(String value) {
+
+    }
 
 
     class JavaScriptInterface {
@@ -229,6 +303,19 @@ public class ShopWebViewActivity extends AppCompatActivity {
             setResult(5,intent);
             finish();
         }
+
+        /**
+         * js调用原生图片选择
+         *
+         * @param picNum
+         */
+        @JavascriptInterface
+        public void imageSelected(int picNum) {
+            isOpenSelected = true;
+            if (javaScriptPresenter != null)
+                javaScriptPresenter.openImageSelected(picNum);
+        }
+
 
     }
 
