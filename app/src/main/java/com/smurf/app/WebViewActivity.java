@@ -211,6 +211,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRecordTimeEvent(WxEvent event) {
         if (mWebView != null) {
+            Log.d("smurf","wxLogin token = " + event.token);
             mWebView.loadUrl("javascript:toWxLogin('" + event.token + "')");
         }
     }

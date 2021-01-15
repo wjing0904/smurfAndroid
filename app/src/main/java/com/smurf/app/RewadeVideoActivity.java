@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
@@ -46,6 +47,8 @@ public class RewadeVideoActivity extends Activity {
              */
             @Override
             public void onRewardedVideoAdFailedToLoad(int i) {
+                Log.d("smurf","onRewardedVideoAdFailedToLoad =" + i);
+
                 dismissLoadingDialog();
                 VideoEvent videoEvent = new VideoEvent();
                 videoEvent.isVideoEnd = true;
@@ -59,6 +62,8 @@ public class RewadeVideoActivity extends Activity {
              */
             @Override
             public void onRewardedVideoAdLoaded() {
+                Log.d("smurf","onRewardedVideoAdLoaded");
+
                 dismissLoadingDialog();
                 //展示广告
                 if(mRewardedVideoAd.isLoaded()){
@@ -81,6 +86,8 @@ public class RewadeVideoActivity extends Activity {
              */
             @Override
             public void onRewardedVideoAdClosed() {
+                Log.d("smurf","onRewardedVideoAdClosed");
+
                 dismissLoadingDialog();
                 VideoEvent videoEvent = new VideoEvent();
                 videoEvent.isVideoEnd = true;

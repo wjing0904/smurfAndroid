@@ -45,12 +45,19 @@ public class WXEntryActivity extends WeChatHandleActivity implements IWXAPIEvent
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        getSupportActionBar().hide();
+        Log.d("smurf","onCreate() ");
+
         // 隐藏状态栏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        Log.d("smurf","onCreate() 111 ");
         //接收到分享以及登录的intent传递handleIntent方法，处理结果
         iwxapi = WXAPIFactory.createWXAPI(this, WXEntity.WECHAT_APP_ID, false);
+
+        Log.d("smurf","onCreate() iwxapi ");
         iwxapi.handleIntent(getIntent(), this);
+
+        Log.d("smurf","onCreate() handleIntent ");
 
     }
 
@@ -81,21 +88,28 @@ public class WXEntryActivity extends WeChatHandleActivity implements IWXAPIEvent
         //登录回调
         switch (baseResp.errCode) {
             case BaseResp.ErrCode.ERR_OK:
+                Log.d("smurf","BaseResp.ErrCode.ERR_OK ");
+
                 code = ((SendAuth.Resp) baseResp).code;
 //                getAccessToken(code); //用户同意授权
-                Log.e("TAG", "onResp: "+code);
+                Log.e("smurf", "onResp: "+code);
                 WxEvent wxEvent = new WxEvent();
                 wxEvent.token = code;
                 EventBus.getDefault().post(wxEvent);
+                Log.d("smurf","EventBus.getDefault().post(wxEvent)");
                 finish();
+                Log.d("smurf","finish ");
                 break;
             case BaseResp.ErrCode.ERR_AUTH_DENIED://用户拒绝授权
+                Log.d("smurf","BaseResp.ErrCode.ERR_AUTH_DENIED");
                 finish();
                 break;
             case BaseResp.ErrCode.ERR_USER_CANCEL://用户取消
+                Log.d("smurf","BaseResp.ErrCode.ERR_USER_CANCEL");
                 finish();
                 break;
             default:
+                Log.d("smurf","default");
                 finish();
                 break;
         }
