@@ -2,6 +2,7 @@ package com.smurf.app.presenter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -11,6 +12,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -152,7 +154,15 @@ public class InstallAppPresenter {
                                         });
                                         upgradeDialog.show();
                                         upgradeDialog.setCanceledOnTouchOutside(false);//可选，点击dialog其它地方dismiss无效
-                                        upgradeDialog.setCancelable(false);//可选,点击返回键无效
+                                        upgradeDialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+                                            @Override
+                                            public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+                                                if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+                                                    System.exit(0);
+                                                }
+                                                return false;
+                                            }
+                                        });
 
                                     }
                                 });
