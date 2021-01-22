@@ -51,15 +51,19 @@ public class MainActivity extends Activity {
 
     @SuppressLint("WrongConstant")
     private void initPermission() {
+        Log.d("smurf","request storage, phone");
         PermissionUtils.permission(PermissionConstants.STORAGE,PermissionConstants.PHONE)
         .callback(new PermissionUtils.SimpleCallback() {
             @Override
             public void onGranted() {
+                Log.d("smurf","request storage, phone allow");
                 initShowLoginPage();
             }
 
             @Override
             public void onDenied() {
+                Log.d("smurf","request storage, phone denied");
+
                 Toast.makeText(MainActivity.this,"未开启读取手机状态权限",Toast.LENGTH_SHORT).show();
 
             }
