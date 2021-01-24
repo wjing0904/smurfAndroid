@@ -119,7 +119,7 @@ dependencies {
 
     //implementation 'cn.jiguang.sdk:jcore:2.1.2'  // 此处以JCore 2.1.2 版本为例。
 
-    implementation 'cn.jiguang.sdk:jcore:2.1.2'
+//    implementation 'cn.jiguang.sdk:jcore:2.1.2'
 
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
