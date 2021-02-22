@@ -2,7 +2,9 @@ package com.smurf.app;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -10,6 +12,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -47,6 +50,7 @@ import com.smurf.app.presenter.InstallAppPresenter;
 import com.smurf.app.signup.SignUpFaceVerify;
 import com.smurf.app.splash.ImgFragment;
 import com.smurf.app.base.utils.ThreadUtils;
+import com.smurf.app.utils.SharedPreferencesHelper;
 import com.smurf.app.wxapi.WXLogin;
 import com.smurf.app.base.utils.BitmapUtils;
 import com.smurf.app.presenter.JavaScriptPresenter;
@@ -67,9 +71,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_DIALOG_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_EXTERNAL_STORAGE;
 import static com.smurf.app.base.StaticNum.REQUEST_LOCAL_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
-import static com.smurf.app.base.StaticURL.DEBUG_PHONE_LOGIN;
 
 public class WebViewActivity extends AppCompatActivity implements IWebViewInterface {
     private static final String TAG = "WebViewActivity";
@@ -86,9 +91,6 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 
     private ImageView logoImg;
     private InstallAppPresenter installAppPresenter;
-    //先定义
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-
 
     private static String[] PERMISSIONS_STORAGE = {
             "android.permission.READ_EXTERNAL_STORAGE",
@@ -106,15 +108,21 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
     private ImageView img1_normal,img1_select,img2_normal,img2_select,img3_normal,img3_select;
 
     private List<Fragment> fragments;
+    private Context mContext;
 
+    private SharedPreferencesHelper sharedPreferencesHelper;
+
+    private boolean isPermiss;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = this;
         setContentView(R.layout.layout_webview);
         layoutSplash = findViewById(R.id.layout_splash);
-
+        sharedPreferencesHelper = new SharedPreferencesHelper(
+                this, "smurf");
         //啓動效果
         initFragment();
         initSplashView();
@@ -146,23 +154,23 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         mWebView.loadUrl(webUrl);
         mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
 
-        String[] permissions = new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.INTERNET};
-        List<String> permissionList = new ArrayList<>();
-        for (int i = 0; i < permissions.length; i++) {
-            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
-                permissionList.add(permissions[i]);
-            }
-        }
-        if (permissionList.size() <= 0) {
-            if (javaScriptPresenter != null) {
-                javaScriptPresenter.getLocal();
-            }
-        } else {
-            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
-        }
+//        String[] permissions = new String[]{
+//                Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION,
+//                Manifest.permission.INTERNET};
+//        List<String> permissionList = new ArrayList<>();
+//        for (int i = 0; i < permissions.length; i++) {
+//            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+//                permissionList.add(permissions[i]);
+//            }
+//        }
+//        if (permissionList.size() <= 0) {
+//            if (javaScriptPresenter != null) {
+//                javaScriptPresenter.getLocal();
+//            }
+//        } else {
+//            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
+//        }
         EventBus.getDefault().register(this);
 
     }
@@ -171,11 +179,56 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         //logoImg = findViewById(R.id.logo_img);
         //Glide.with(this).load(R.mipmap.logo_start).into(logoImg);
         //fmLayout = findViewById(R.id.delay_layout);
-        verifyStoragePermissions(this);
+//        verifyStoragePermissions(this);
 
         //检查APP是否需要更新
         if (installAppPresenter == null) {
-            installAppPresenter = new InstallAppPresenter(this);
+            installAppPresenter = new InstallAppPresenter(this, new InstallAppPresenter.PermissionInterface() {
+                @Override
+                public boolean allowPermission() {
+                    ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+                    int permission = ActivityCompat.checkSelfPermission(mContext,
+                            "android.permission.WRITE_EXTERNAL_STORAGE");
+                    return permission != PackageManager.PERMISSION_GRANTED;
+
+                }
+
+                @Override
+                public boolean showDialogPermission(String serviceName) {
+                    /* @setIcon 设置对话框图标
+                     * @setTitle 设置对话框标题
+                     * @setMessage 设置对话框消息提示
+                     * setXXX方法返回Dialog对象，因此可以链式设置属性
+                     */
+                    final AlertDialog.Builder normalDialog =
+                            new AlertDialog.Builder(mContext);
+                    normalDialog.setIcon(R.drawable.logo);
+                    normalDialog.setTitle("蓝晶灵想要使用"+serviceName);
+                    normalDialog.setMessage("请在设置-蓝晶灵中开启"+serviceName);
+                    normalDialog.setPositiveButton("去设置",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Intent intent = new Intent();
+                                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                    Uri uri1 = Uri.fromParts("package", mContext.getPackageName(), null);
+                                    intent.setData(uri1);
+                                    ((Activity)mContext).startActivityForResult(intent,REQUEST_DIALOG_CODE);
+                                }
+                            });
+                    normalDialog.setNegativeButton("知道了",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    isPermiss = false;
+                                }
+                            });
+                    // 显示
+                    normalDialog.show();
+                    return isPermiss;
+                }
+            });
 
         }
         installAppPresenter.checkAppInstall();
@@ -285,6 +338,20 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             }
         }
 
+        //TODO 待测试
+        if(requestCode == REQUEST_EXTERNAL_STORAGE){
+            if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+               sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,true);
+
+            }else{
+                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,false);
+                Toast.makeText(this, "你拒绝了权限申请，无法进行软件一键升级！", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+
+
+
     }
 
     @Override
@@ -322,6 +389,17 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             String url = bundle.getString("openAppointPage");
             if(mWebView!= null){
                 mWebView.loadUrl("javascript:openPage('" + url + "')");
+            }
+        }
+
+        if(requestCode == REQUEST_DIALOG_CODE){
+            ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+            int permission = ActivityCompat.checkSelfPermission(mContext,
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+            if(permission != PackageManager.PERMISSION_GRANTED){
+                isPermiss = false;
+            }else{
+                isPermiss = true;
             }
         }
 
@@ -364,20 +442,20 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             mWebView.loadUrl("javascript:localCity('" + value + "')");
     }
 
-    //然后通过一个函数来申请
-    private void verifyStoragePermissions(Activity activity) {
-        try {
-            //检测是否有写的权限
-            int permission = ActivityCompat.checkSelfPermission(activity,
-                    "android.permission.WRITE_EXTERNAL_STORAGE");
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                // 没有写的权限，去申请写的权限，会弹出对话框
-                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    //然后通过一个函数来申请
+//    private void verifyStoragePermissions(Activity activity) {
+//        try {
+//            //检测是否有写的权限
+//            int permission = ActivityCompat.checkSelfPermission(activity,
+//                    "android.permission.WRITE_EXTERNAL_STORAGE");
+//            if (permission != PackageManager.PERMISSION_GRANTED) {
+//                // 没有写的权限，去申请写的权限，会弹出对话框
+//                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     class JavaScriptInterface {

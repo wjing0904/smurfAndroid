@@ -1,6 +1,7 @@
 package com.smurf.app.presenter;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,15 +17,19 @@ import android.view.KeyEvent;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
 import com.smurf.app.base.StaticURL;
+import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
 import com.smurf.app.upgrade.UpgradeUtils;
 import com.smurf.app.base.utils.ThreadUtils;
+import com.smurf.app.utils.PermissionsUtils;
+import com.smurf.app.utils.SharedPreferencesHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,6 +61,15 @@ public class InstallAppPresenter {
     private int versioncode;
     private UpgradeDialog upgradeDialog;
 
+    private SharedPreferencesHelper sharedPreferencesHelper;
+    private PermissionInterface permissionInterface;
+
+    public interface PermissionInterface{
+        boolean allowPermission();
+        boolean showDialogPermission(String serviceName);
+    }
+
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -80,14 +94,18 @@ public class InstallAppPresenter {
     private String mSavePath;
 
 
-    public InstallAppPresenter(Context context) {
+    public InstallAppPresenter(Context context,PermissionInterface permissionInterface) {
         this.mContext = context;
+        sharedPreferencesHelper = new SharedPreferencesHelper(
+                context, "smurf");
+        this.permissionInterface = permissionInterface;
     }
 
     /**
      * 检查APK是否需要更新
      */
     public void checkAppInstall() {
+
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -149,7 +167,39 @@ public class InstallAppPresenter {
                                             @Override
                                             public void upgradeForce(String installUrl) {
                                                 //下载并通知升级
-                                                downloadAPK(installUrl);
+                                                int permission = ActivityCompat.checkSelfPermission(mContext,
+                                                        "android.permission.WRITE_EXTERNAL_STORAGE");
+                                                if (permission != PackageManager.PERMISSION_GRANTED) {
+                                                    // 没有写的权限，去申请写的权限，会弹出对话框
+                                                    boolean isPermiss = (boolean) sharedPreferencesHelper.get(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,false);
+                                                    if(!isPermiss){
+                                                        //申请权限
+                                                        if(permissionInterface!= null){
+                                                            if(permissionInterface.allowPermission()){
+                                                                downloadAPK(installUrl);
+
+                                                            }else{
+                                                                if (upgradeDialog != null)
+                                                                    upgradeDialog.dismiss();
+                                                            }
+                                                        }
+//                                                        ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+                                                    }else{
+//                                                        PermissionsUtils.showNormalDialog((Activity)mContext,"存储权限");
+                                                        if(permissionInterface!= null){
+                                                            if(permissionInterface.showDialogPermission("存储权限")){
+                                                                downloadAPK(installUrl);
+
+                                                            }else{
+                                                                if (upgradeDialog != null)
+                                                                    upgradeDialog.dismiss();
+                                                            }
+                                                        }
+                                                    }
+
+                                                }else {
+                                                    downloadAPK(installUrl);
+                                                }
                                             }
                                         });
                                         upgradeDialog.show();
@@ -180,6 +230,7 @@ public class InstallAppPresenter {
         });
         thread.start();
     }
+
 
     public static String getAppVersionCode(Context context) {
         long appVersionCode = 0;
