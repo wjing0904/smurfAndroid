@@ -374,9 +374,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         super.onActivityResult(requestCode, resultCode, data);
         // 扫描二维码/条码回传
         if(requestCode == REQUEST_CAMERA_PERMISSION){
-            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
-            int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA
-                    );
+//            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+            int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
             if(permission != PackageManager.PERMISSION_GRANTED){
                 if(onDialogPremission!= null){
                     onDialogPremission.isPremission(false);
@@ -395,10 +394,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                     javaScriptPresenter.notifyScanVue(content);
             }
         }
+
+
+
         if(requestCode == REQUEST_SELECT_IMAGES_PERMISSION){
-            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_CODE);
-            int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA
-            );
+//            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
+            int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
             if(permission != PackageManager.PERMISSION_GRANTED){
                 if(onDialogPremission!= null){
                     onDialogPremission.isPremission(false);
@@ -460,7 +461,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         }
 
         if(requestCode == REQUEST_DIALOG_CODE){
-            ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
+//            ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             int permission = ActivityCompat.checkSelfPermission(mContext,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if(permission != PackageManager.PERMISSION_GRANTED){

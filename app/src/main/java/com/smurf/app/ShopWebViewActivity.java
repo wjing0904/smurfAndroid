@@ -1,12 +1,17 @@
 package com.smurf.app;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -20,6 +25,8 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
@@ -29,6 +36,7 @@ import com.smurf.app.base.StaticURL;
 import com.smurf.app.base.utils.BitmapUtils;
 import com.smurf.app.base.utils.ShareUtil;
 import com.smurf.app.presenter.JavaScriptPresenter;
+import com.smurf.app.utils.SharedPreferencesHelper;
 import com.smurf.app.view.IWebViewInterface;
 
 import java.util.HashMap;
@@ -37,6 +45,7 @@ import java.util.Map;
 
 import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_PERMISSION;
 
 
 public class ShopWebViewActivity extends AppCompatActivity implements IWebViewInterface {
@@ -49,11 +58,17 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
 
     private boolean isOpenSelected;
 
+    private SharedPreferencesHelper sharedPreferencesHelper;
+    private onDialogPremission onDialogPremission;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(com.fadada.faceverifysdk.R.layout.activity_fddcloudface);
+
+        sharedPreferencesHelper = new SharedPreferencesHelper(
+                this, "smurf");
 
         webView = (WebView) findViewById(com.fadada.faceverifysdk.R.id.wv_host);
 
@@ -98,17 +113,17 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if(BuildConfig.DEBUG){
-                    if(url.startsWith(StaticURL.DEBUG_PHONE_LOGIN)){
+                if (BuildConfig.DEBUG) {
+                    if (url.startsWith(StaticURL.DEBUG_PHONE_LOGIN)) {
                         Intent i = new Intent();
-                        setResult(4,i);
+                        setResult(4, i);
                         finish();
                     }
 
-                }else{
-                    if(url.startsWith(StaticURL.RELEASE_PHONE_LOGIN)){
+                } else {
+                    if (url.startsWith(StaticURL.RELEASE_PHONE_LOGIN)) {
                         Intent i = new Intent();
-                        setResult(4,i);
+                        setResult(4, i);
                         finish();
                     }
                 }
@@ -151,7 +166,7 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
 
         //区分app和H5调用刷脸的标记
         String ua = webView.getSettings().getUserAgentString();
-        webView.getSettings().setUserAgentString(ua+";  SMURF_APP /");
+        webView.getSettings().setUserAgentString(ua + ";  SMURF_APP /");
         webView.getSettings().setTextZoom(100);
 
         ShopWebViewActivity.JavaScriptInterface javascriptInterface = new ShopWebViewActivity.JavaScriptInterface(this);
@@ -162,20 +177,20 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            switch (requestCode) {
-                case REQUEST_SELECT_IMAGES_CODE:
-                    if (isOpenSelected)
-                        javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
-                    break;
-                default:
-                    break;
+        if (requestCode == REQUEST_SELECT_IMAGES_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 1);
+                if (isOpenSelected)
+                    javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
+
             }
         } else {
-            Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机哦！", Toast.LENGTH_SHORT).show();
-        }
+//            Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机哦！", Toast.LENGTH_SHORT).show();
+            sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 2);
 
+        }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -187,6 +202,21 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
                 javaScriptPresenter.notifyCamer(getImgInputStream(images), images.get(0).getName());
 
         }
+
+        if (requestCode == REQUEST_SELECT_IMAGES_PERMISSION) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
+            int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                if (onDialogPremission != null) {
+                    onDialogPremission.isPremission(false);
+                }
+            } else {
+                if (onDialogPremission != null) {
+                    onDialogPremission.isPremission(true);
+                }
+            }
+        }
+
     }
 
     private String getImgInputStream(List<Image> images) {
@@ -215,7 +245,7 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (event.getKeyCode() == 25||event.getKeyCode()==24) {
+        if (event.getKeyCode() == 25 || event.getKeyCode() == 24) {
             return false;
         }
         if (webView != null) {
@@ -296,12 +326,12 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
         }
 
         @JavascriptInterface
-        public void openAppointPage(String url){
+        public void openAppointPage(String url) {
             Bundle bundle = new Bundle();
             bundle.putString("openAppointPage", url);
             Intent intent = new Intent();
             intent.putExtras(bundle);
-            setResult(5,intent);
+            setResult(5, intent);
             finish();
         }
 
@@ -313,11 +343,69 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
         @JavascriptInterface
         public void imageSelected(int picNum) {
             isOpenSelected = true;
-            if (javaScriptPresenter != null)
-                javaScriptPresenter.openImageSelected(picNum);
+            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                int isPermiss = (int) sharedPreferencesHelper.get(SharedPreferencesHelper.CAMERA_PERMISSION, 0);
+                if (isPermiss == 0) {
+                    ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
+                } else if (isPermiss == 2) {
+                    showDialog("照片，多媒体，存储权限", new onDialogPremission() {
+                        @Override
+                        public void isPremission(boolean isAllow) {
+                            if (isAllow) {
+                                if (javaScriptPresenter != null)
+                                    javaScriptPresenter.openImageSelected(picNum);
+                            }
+                        }
+                    }, REQUEST_SELECT_IMAGES_PERMISSION);
+                }
+            } else {
+                if (javaScriptPresenter != null)
+                    javaScriptPresenter.openImageSelected(picNum);
+            }
+
         }
 
+        private void showDialog(String serviceName, onDialogPremission on, int requestCode) {
+            /* @setIcon 设置对话框图标
+             * @setTitle 设置对话框标题
+             * @setMessage 设置对话框消息提示
+             * setXXX方法返回Dialog对象，因此可以链式设置属性
+             */
+            onDialogPremission = on;
+            final AlertDialog.Builder normalDialog =
+                    new AlertDialog.Builder(mContext);
+            normalDialog.setIcon(R.drawable.logo);
+            normalDialog.setTitle("蓝晶灵想要使用" + serviceName);
+            normalDialog.setMessage("请在设置-蓝晶灵中开启" + serviceName);
+            normalDialog.setPositiveButton("去设置",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                            Uri uri1 = Uri.fromParts("package", mContext.getPackageName(), null);
+                            intent.setData(uri1);
+                            ((Activity) mContext).startActivityForResult(intent, requestCode);
+                        }
+                    });
+            normalDialog.setNegativeButton("知道了",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            if (onDialogPremission != null) {
+                                onDialogPremission.isPremission(false);
+                            }
+                        }
+                    });
+            // 显示
+            normalDialog.show();
+        }
 
+    }
+
+    public interface onDialogPremission {
+        void isPremission(boolean isAllow);
     }
 
 
