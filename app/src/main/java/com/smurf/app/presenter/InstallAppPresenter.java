@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
+import com.smurf.app.WebViewActivity;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.upgrade.CouponBean;
@@ -49,6 +50,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.smurf.app.base.StaticNum.REQUEST_DIALOG_CODE;
+
 public class InstallAppPresenter {
 
 
@@ -66,7 +69,7 @@ public class InstallAppPresenter {
 
     public interface PermissionInterface{
         boolean allowPermission();
-        boolean showDialogPermission(String serviceName);
+        void showDialogPermission(String serviceName, WebViewActivity.onDialogPremission o,int requestCode);
     }
 
 
@@ -171,35 +174,38 @@ public class InstallAppPresenter {
                                                         "android.permission.WRITE_EXTERNAL_STORAGE");
                                                 if (permission != PackageManager.PERMISSION_GRANTED) {
                                                     // 没有写的权限，去申请写的权限，会弹出对话框
-                                                    boolean isPermiss = (boolean) sharedPreferencesHelper.get(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,false);
-                                                    if(!isPermiss){
+                                                    int isPermiss = (int) sharedPreferencesHelper.get(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,0);
+                                                    if(isPermiss == 0){
                                                         //申请权限
                                                         if(permissionInterface!= null){
-                                                            if(permissionInterface.allowPermission()){
-                                                                downloadAPK(installUrl);
-
-                                                            }else{
+                                                            if(!permissionInterface.allowPermission()){
                                                                 if (upgradeDialog != null)
                                                                     upgradeDialog.dismiss();
+                                                            }else{
+                                                                downloadAPK(installUrl);
                                                             }
                                                         }
-//                                                        ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-                                                    }else{
-//                                                        PermissionsUtils.showNormalDialog((Activity)mContext,"存储权限");
+                                                    }else if(isPermiss == 2){
                                                         if(permissionInterface!= null){
-                                                            if(permissionInterface.showDialogPermission("存储权限")){
-                                                                downloadAPK(installUrl);
-
-                                                            }else{
-                                                                if (upgradeDialog != null)
-                                                                    upgradeDialog.dismiss();
-                                                            }
+                                                            permissionInterface.showDialogPermission("存储权限", new WebViewActivity.onDialogPremission() {
+                                                                @Override
+                                                                public void isPremission(boolean isAllow) {
+                                                                    if(isAllow){
+                                                                        downloadAPK(installUrl);
+                                                                    }else{
+                                                                        if (upgradeDialog != null)
+                                                                            upgradeDialog.dismiss();
+                                                                    }
+                                                                }
+                                                            },REQUEST_DIALOG_CODE);
                                                         }
+                                                    }else{
+                                                        downloadAPK(installUrl);
                                                     }
-
-                                                }else {
+                                                }else{
                                                     downloadAPK(installUrl);
                                                 }
+
                                             }
                                         });
                                         upgradeDialog.show();

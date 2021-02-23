@@ -71,10 +71,12 @@ import java.util.List;
 import java.util.Map;
 
 import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_PERMISSION;
 import static com.smurf.app.base.StaticNum.REQUEST_DIALOG_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_EXTERNAL_STORAGE;
 import static com.smurf.app.base.StaticNum.REQUEST_LOCAL_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_PERMISSION;
 
 public class WebViewActivity extends AppCompatActivity implements IWebViewInterface {
     private static final String TAG = "WebViewActivity";
@@ -113,6 +115,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
     private SharedPreferencesHelper sharedPreferencesHelper;
 
     private boolean isPermiss;
+
+    private onDialogPremission onDialogPremission;
 
 
     @Override
@@ -189,49 +193,55 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                     ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
                     int permission = ActivityCompat.checkSelfPermission(mContext,
                             "android.permission.WRITE_EXTERNAL_STORAGE");
-                    return permission != PackageManager.PERMISSION_GRANTED;
+                    return permission == PackageManager.PERMISSION_GRANTED;
 
                 }
 
                 @Override
-                public boolean showDialogPermission(String serviceName) {
-                    /* @setIcon 设置对话框图标
-                     * @setTitle 设置对话框标题
-                     * @setMessage 设置对话框消息提示
-                     * setXXX方法返回Dialog对象，因此可以链式设置属性
-                     */
-                    final AlertDialog.Builder normalDialog =
-                            new AlertDialog.Builder(mContext);
-                    normalDialog.setIcon(R.drawable.logo);
-                    normalDialog.setTitle("蓝晶灵想要使用"+serviceName);
-                    normalDialog.setMessage("请在设置-蓝晶灵中开启"+serviceName);
-                    normalDialog.setPositiveButton("去设置",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Intent intent = new Intent();
-                                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                    Uri uri1 = Uri.fromParts("package", mContext.getPackageName(), null);
-                                    intent.setData(uri1);
-                                    ((Activity)mContext).startActivityForResult(intent,REQUEST_DIALOG_CODE);
-                                }
-                            });
-                    normalDialog.setNegativeButton("知道了",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    isPermiss = false;
-                                }
-                            });
-                    // 显示
-                    normalDialog.show();
-                    return isPermiss;
+                public void showDialogPermission(String serviceName,onDialogPremission on,int requestCode) {
+                    showDialog(serviceName,on,requestCode);
                 }
             });
 
         }
         installAppPresenter.checkAppInstall();
+    }
+
+    private void showDialog(String serviceName,onDialogPremission on,int requestCode){
+        /* @setIcon 设置对话框图标
+         * @setTitle 设置对话框标题
+         * @setMessage 设置对话框消息提示
+         * setXXX方法返回Dialog对象，因此可以链式设置属性
+         */
+        onDialogPremission = on;
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(mContext);
+        normalDialog.setIcon(R.drawable.logo);
+        normalDialog.setTitle("蓝晶灵想要使用"+serviceName);
+        normalDialog.setMessage("请在设置-蓝晶灵中开启"+serviceName);
+        normalDialog.setPositiveButton("去设置",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri1 = Uri.fromParts("package", mContext.getPackageName(), null);
+                        intent.setData(uri1);
+                        ((Activity)mContext).startActivityForResult(intent,requestCode);
+                    }
+                });
+        normalDialog.setNegativeButton("知道了",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if(onDialogPremission!= null){
+                            onDialogPremission.isPremission(false);
+                        }
+                    }
+                });
+        // 显示
+        normalDialog.show();
     }
 
 
@@ -305,22 +315,24 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         boolean haspermission = false;
-
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            switch (requestCode) {
-                case REQUEST_CAMERA_CODE:
-                    if (isOpenZxing)
-                        javaScriptPresenter.openZxing();
-                    break;
-                case REQUEST_SELECT_IMAGES_CODE:
-                    if (isOpenSelected)
-                        javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
-                    break;
-                default:
-                    break;
+        if(requestCode == REQUEST_CAMERA_PERMISSION){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 1);
+                if (isOpenZxing)
+                    javaScriptPresenter.openZxing();
+            }else{
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 2);
             }
-        } else {
-            Toast.makeText(this, "你拒绝了权限申请，可能无法打开相机哦！", Toast.LENGTH_SHORT).show();
+        }
+
+        if(requestCode == REQUEST_SELECT_IMAGES_PERMISSION){
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 1);
+                if (isOpenSelected)
+                    javaScriptPresenter.openImageSelected(javaScriptPresenter.getPicSelectedNum());
+            }else{
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 2);
+            }
         }
 
         if (requestCode == REQUEST_LOCAL_CODE) {
@@ -330,34 +342,52 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 }
             }
             if (haspermission) {
-                Toast.makeText(this, "你拒绝了权限申请，无法进行定位哦！", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "你拒绝了权限申请，无法进行定位哦！", Toast.LENGTH_SHORT).show();
+                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,2);
 
             } else {
+                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,1);
                 if (javaScriptPresenter != null)
                     javaScriptPresenter.getLocal();
             }
         }
 
-        //TODO 待测试
         if(requestCode == REQUEST_EXTERNAL_STORAGE){
             if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-               sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,true);
+               sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,1);
 
             }else{
-                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,false);
-                Toast.makeText(this, "你拒绝了权限申请，无法进行软件一键升级！", Toast.LENGTH_SHORT).show();
+                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,2);
+//                Toast.makeText(this, "你拒绝了权限申请，无法进行软件一键升级！", Toast.LENGTH_SHORT).show();
 
             }
         }
 
+    }
 
-
+    public interface onDialogPremission{
+        void isPremission(boolean isAllow);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // 扫描二维码/条码回传
+        if(requestCode == REQUEST_CAMERA_PERMISSION){
+            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
+            int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA
+                    );
+            if(permission != PackageManager.PERMISSION_GRANTED){
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(false);
+                }
+            }else{
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(true);
+                }
+            }
+        }
+
         if (requestCode == REQUEST_CAMERA_CODE && resultCode == RESULT_OK) {
             if (data != null) {
                 String content = data.getStringExtra(DECODED_CONTENT_KEY);
@@ -365,6 +395,21 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                     javaScriptPresenter.notifyScanVue(content);
             }
         }
+        if(requestCode == REQUEST_SELECT_IMAGES_PERMISSION){
+            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_CODE);
+            int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA
+            );
+            if(permission != PackageManager.PERMISSION_GRANTED){
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(false);
+                }
+            }else{
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(true);
+                }
+            }
+        }
+
         //多图选择
         if (requestCode == REQUEST_SELECT_IMAGES_CODE && resultCode == RESULT_OK) {
             List<Image> images = ImagePicker.getImages(data);
@@ -392,22 +437,43 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             }
         }
 
+        if(requestCode == REQUEST_LOCAL_CODE){
+            String[] permissions = new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.INTERNET};
+            List<String> permissionList = new ArrayList<>();
+            for (int i = 0; i < permissions.length; i++) {
+                if (ActivityCompat.checkSelfPermission(mContext, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                    permissionList.add(permissions[i]);
+                }
+            }
+            if (permissionList.size() <= 0) {
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(true);
+                }
+            }else{
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(false);
+                }
+            }
+        }
+
         if(requestCode == REQUEST_DIALOG_CODE){
             ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
             int permission = ActivityCompat.checkSelfPermission(mContext,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if(permission != PackageManager.PERMISSION_GRANTED){
-                isPermiss = false;
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(false);
+                }
             }else{
-                isPermiss = true;
+                if(onDialogPremission!= null){
+                    onDialogPremission.isPremission(true);
+                }
             }
         }
 
-//        if(requestCode == 9 && resultCode ==9){
-////            if(mWebView!= null){
-////                mWebView.goBack();
-////            }
-//        }
     }
 
     private String getImgInputStream(List<Image> images) {
@@ -442,22 +508,6 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             mWebView.loadUrl("javascript:localCity('" + value + "')");
     }
 
-//    //然后通过一个函数来申请
-//    private void verifyStoragePermissions(Activity activity) {
-//        try {
-//            //检测是否有写的权限
-//            int permission = ActivityCompat.checkSelfPermission(activity,
-//                    "android.permission.WRITE_EXTERNAL_STORAGE");
-//            if (permission != PackageManager.PERMISSION_GRANTED) {
-//                // 没有写的权限，去申请写的权限，会弹出对话框
-//                ActivityCompat.requestPermissions(activity, PERMISSIONS_STORAGE, REQUEST_EXTERNAL_STORAGE);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-
     class JavaScriptInterface {
         private Context mContext;
 
@@ -472,14 +522,25 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         public void goSCan() {
             isOpenZxing = true;
             if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_CODE);
+                int isPermiss = (int) sharedPreferencesHelper.get(SharedPreferencesHelper.CAMERA_PERMISSION,0);
+                if(isPermiss == 0){
+                    ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                }else if(isPermiss == 2){
+                    showDialog("照片，多媒体，存储权限", new onDialogPremission() {
+                        @Override
+                        public void isPremission(boolean isAllow) {
+                            if(isAllow){
+                                if (javaScriptPresenter != null)
+                                    javaScriptPresenter.openZxing();
+                            }
+                        }
+                    },REQUEST_CAMERA_PERMISSION);
+                }
             } else {
                 if (javaScriptPresenter != null)
                     javaScriptPresenter.openZxing();
             }
         }
-
-
 
         /**
          * js调用原生图片选择
@@ -489,8 +550,29 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         @JavascriptInterface
         public void imageSelected(int picNum) {
             isOpenSelected = true;
-            if (javaScriptPresenter != null)
-                javaScriptPresenter.openImageSelected(picNum);
+
+            if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                int isPermiss = (int) sharedPreferencesHelper.get(SharedPreferencesHelper.CAMERA_PERMISSION,0);
+                if(isPermiss == 0){
+                    ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
+                }else if(isPermiss == 2){
+                    showDialog("照片，多媒体，存储权限", new onDialogPremission() {
+                        @Override
+                        public void isPremission(boolean isAllow) {
+                            if(isAllow){
+                                if (javaScriptPresenter != null)
+                                    javaScriptPresenter.openImageSelected(picNum);
+                            }
+                        }
+                    },REQUEST_SELECT_IMAGES_PERMISSION);
+                }
+            } else {
+                if (javaScriptPresenter != null)
+                    javaScriptPresenter.openImageSelected(picNum);
+            }
+
+
+
         }
 
         /**
@@ -522,7 +604,21 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                     javaScriptPresenter.getLocal();
                 }
             } else {
-                ActivityCompat.requestPermissions(((Activity) mContext), permissions, REQUEST_LOCAL_CODE);
+                int isPermiss = (int) sharedPreferencesHelper.get(SharedPreferencesHelper.LOCAL_PERMISSION,0);
+                if(isPermiss == 0){
+                    ActivityCompat.requestPermissions(((Activity) mContext), permissions, REQUEST_LOCAL_CODE);
+                }else if(isPermiss == 2){
+                    showDialog("定位权限", new onDialogPremission() {
+                        @Override
+                        public void isPremission(boolean isAllow) {
+                            if(isAllow){
+                                if (javaScriptPresenter != null) {
+                                    javaScriptPresenter.getLocal();
+                                }
+                            }
+                        }
+                    },REQUEST_LOCAL_CODE);
+                }
             }
         }
 

@@ -7,4 +7,10 @@ public class StaticNum {
     public static final int REQUEST_EXTERNAL_STORAGE = 0x0003;
 
     public static final int REQUEST_DIALOG_CODE = 0x0011;
+
+    public static final int REQUEST_CAMERA_PERMISSION = 0x0015;
+
+    public static final int REQUEST_SELECT_IMAGES_PERMISSION = 0x0016;
+
+
 }
