@@ -369,11 +369,6 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
         }
 
         private void showDialog(String serviceName, OnDialogApplyPermissionListener onDialogPremission, int requestCode) {
-            /* @setIcon 设置对话框图标
-             * @setTitle 设置对话框标题
-             * @setMessage 设置对话框消息提示
-             * setXXX方法返回Dialog对象，因此可以链式设置属性
-             */
             mOnDialogPremission = onDialogPremission;
             final AlertDialog.Builder normalDialog =
                     new AlertDialog.Builder(mContext);

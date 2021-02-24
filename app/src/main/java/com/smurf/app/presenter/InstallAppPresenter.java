@@ -1,7 +1,6 @@
 package com.smurf.app.presenter;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,14 +22,10 @@ import androidx.core.content.FileProvider;
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
 import com.smurf.app.OnDialogApplyPermissionListener;
-import com.smurf.app.WebViewActivity;
 import com.smurf.app.base.StaticURL;
-import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
-import com.smurf.app.upgrade.UpgradeUtils;
 import com.smurf.app.base.utils.ThreadUtils;
-import com.smurf.app.utils.PermissionsUtils;
 import com.smurf.app.utils.SharedPreferencesHelper;
 
 import org.json.JSONException;

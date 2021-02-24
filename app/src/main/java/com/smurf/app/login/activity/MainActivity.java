@@ -31,7 +31,6 @@ import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
-import com.smurf.app.utils.PermissionsUtils;
 import com.smurf.app.utils.SharedPreferencesHelper;
 import com.smurf.app.wxapi.WXLogin;
 
