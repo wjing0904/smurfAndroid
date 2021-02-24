@@ -62,20 +62,6 @@ public class ImageActivity extends Activity {
     }
 
     private void init() {
-//        imageView.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                builder = new AlertDialog.Builder(ImageActivity.this);
-//                builder.setItems(new String[]{getResources().getString(R.string.save_picture)}, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-
-//                    }
-//                });
-//                builder.show();
-//                return true;
-//            }
-//        });
         List<? extends View> bgaBannerViews = bgaBanner.getViews();
         for (int i = 0; i < bgaBannerViews.size(); i++) {
             View view = bgaBannerViews.get(i);

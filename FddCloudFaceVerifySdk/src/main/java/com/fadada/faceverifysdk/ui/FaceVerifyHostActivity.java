@@ -3,8 +3,10 @@ package com.fadada.faceverifysdk.ui;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -15,6 +17,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.webkit.JavascriptInterface;
@@ -98,7 +101,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         //开启JS调用逻辑
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setJavaScriptEnabled(true);
-
         //不通过外部浏览器打开
         webView.setWebChromeClient(new WebChromeClient() {
             // For Android < 3.0
@@ -242,7 +244,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                     openImageChooserActivity();
                 } else {
                     uploadMessageAboveL.onReceiveValue(null);
-                    Toast.makeText(this, "获取权限失败", Toast.LENGTH_LONG).show();
                 }
         }
     }
@@ -292,6 +293,44 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         }
     }
 
+//    private void showDialog(String serviceName,OnDialogApplyPermissionListener onDialogPremission,int requestCode){
+//        /* @setIcon 设置对话框图标
+//         * @setTitle 设置对话框标题
+//         * @setMessage 设置对话框消息提示
+//         * setXXX方法返回Dialog对象，因此可以链式设置属性
+//         */
+//        this.mOnDialogPremission = onDialogPremission;
+//        final AlertDialog.Builder normalDialog =
+//                new AlertDialog.Builder(this);
+//        normalDialog.setIcon(R.drawable.logo);
+//        normalDialog.setTitle("蓝晶灵想要使用"+serviceName);
+//        normalDialog.setMessage("请在设置-蓝晶灵中开启"+serviceName);
+//        normalDialog.setPositiveButton("去设置",
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Intent intent = new Intent();
+//                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//                        Uri uri1 = Uri.fromParts("package", mContext.getPackageName(), null);
+//                        intent.setData(uri1);
+//                        ((Activity)mContext).startActivityForResult(intent,requestCode);
+//                    }
+//                });
+//        normalDialog.setNegativeButton("知道了",
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                        if(mOnDialogPremission!= null){
+//                            mOnDialogPremission.isPremission(false);
+//                        }
+//                    }
+//                });
+//        // 显示
+//        normalDialog.show();
+//    }
+
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void onActivityResultAboveL(Intent intent) {
         Uri[] results = null;
@@ -324,21 +363,6 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
         Intent i = new Intent();
         setResult(3, i);
         finish();
-
-//        String baseUrlQy = null;
-//        String baseUrl = null;
-//        if (BuildConfig.DEBUG) {
-//            baseUrl = DEBUG_BASE;
-//            baseUrlQy = DEBUG_BASE_QY;
-//        } else {
-//            baseUrl = RELEASE_BASE;
-//            baseUrlQy = RELEASE_BASE_QY;
-//        }
-//        if (h5Url.startsWith(baseUrl) && !h5Url.startsWith(baseUrlQy)) {
-//
-//        }else{
-//            finish();
-//        }
     }
 
 }

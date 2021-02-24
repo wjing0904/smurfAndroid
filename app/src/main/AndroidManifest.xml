@@ -38,11 +38,6 @@
             android:screenOrientation="portrait" >
         </activity>
 
-        <activity android:name=".login.activity.NativeVerifyActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="portrait"
-            />
-
         <activity
             android:name=".WebViewActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

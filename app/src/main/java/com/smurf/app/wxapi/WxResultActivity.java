@@ -47,7 +47,6 @@ public class WxResultActivity extends Activity implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.user_sure) {
-            // TODO 微信授权 token 发送给服务端
             WxEvent wxEvent = new WxEvent();
             wxEvent.token = wxUserBean.openId;
             EventBus.getDefault().post(wxEvent);

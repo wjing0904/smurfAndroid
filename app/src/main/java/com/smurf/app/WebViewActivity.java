@@ -337,8 +337,6 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 
             }else{
                 sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,2);
-//                Toast.makeText(this, "你拒绝了权限申请，无法进行软件一键升级！", Toast.LENGTH_SHORT).show();
-
             }
         }
 
