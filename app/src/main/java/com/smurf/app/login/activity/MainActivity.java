@@ -108,7 +108,7 @@ public class MainActivity extends Activity {
                             }
                         }).request();
             } else if (isPermiss == 2) {
-                showDialog("照片、媒体内容和文件读写，电话权限", new OnDialogApplyPermissionListener() {
+                showDialog("文件读写权限", new OnDialogApplyPermissionListener() {
                     @Override
                     public void isPremission(boolean isAllow) {
                         if (isAllow) {
@@ -338,10 +338,14 @@ public class MainActivity extends Activity {
                 if (mOnDialogPremission != null) {
                     mOnDialogPremission.isPremission(true);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOGIN_STORAGE_PERMISSION, 1);
+
             }else{
                 if (mOnDialogPremission != null) {
                     mOnDialogPremission.isPremission(false);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOGIN_STORAGE_PERMISSION, 2);
+
             }
 
 //            if (permission != PackageManager.PERMISSION_GRANTED) {

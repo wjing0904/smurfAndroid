@@ -210,10 +210,13 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
                 if (mOnDialogPremission != null) {
                     mOnDialogPremission.isPremission(false);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 2);
             } else {
                 if (mOnDialogPremission != null) {
                     mOnDialogPremission.isPremission(true);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 1);
+
             }
         }
 

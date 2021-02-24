@@ -322,10 +322,10 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             }
             if (haspermission) {
 //                Toast.makeText(this, "你拒绝了权限申请，无法进行定位哦！", Toast.LENGTH_SHORT).show();
-                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,2);
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOCAL_PERMISSION,2);
 
             } else {
-                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,1);
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOCAL_PERMISSION,1);
                 if (javaScriptPresenter != null)
                     javaScriptPresenter.getLocal();
             }
@@ -355,10 +355,14 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(false);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 2);
+
             }else{
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(true);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 1);
+
             }
         }
 
@@ -379,10 +383,14 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(false);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 2);
+
             }else{
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(true);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 1);
+
             }
         }
 
@@ -428,10 +436,14 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(true);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOCAL_PERMISSION,1);
+
             }else{
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(false);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOCAL_PERMISSION,2);
+
             }
         }
 
@@ -443,10 +455,14 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(false);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,2);
+
             }else{
                 if(mOnDialogPremission!= null){
                     mOnDialogPremission.isPremission(true);
                 }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,1);
+
             }
         }
 
