@@ -44,6 +44,9 @@ import cn.jiguang.verifysdk.api.VerifyListener;
 
 import com.smurf.app.base.event.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.smurf.app.base.StaticNum.REQUEST_LOGIN_STORAGE;
 
 
@@ -320,16 +323,36 @@ public class MainActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_LOGIN_STORAGE) {
 //            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
-            int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission_group.STORAGE);
-            if (permission != PackageManager.PERMISSION_GRANTED) {
-                if (mOnDialogPremission != null) {
-                    mOnDialogPremission.isPremission(false);
+//            int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission_group.STORAGE);
+
+            String[] permissions = new String[]{
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE};
+            List<String> permissionList = new ArrayList<>();
+            for (int i = 0; i < permissions.length; i++) {
+                if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                    permissionList.add(permissions[i]);
                 }
-            } else {
+            }
+            if (permissionList.size() <= 0) {
                 if (mOnDialogPremission != null) {
                     mOnDialogPremission.isPremission(true);
                 }
+            }else{
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(false);
+                }
             }
+
+//            if (permission != PackageManager.PERMISSION_GRANTED) {
+//                if (mOnDialogPremission != null) {
+//                    mOnDialogPremission.isPremission(false);
+//                }
+//            } else {
+//                if (mOnDialogPremission != null) {
+//                    mOnDialogPremission.isPremission(true);
+//                }
+//            }
         }
     }
 
