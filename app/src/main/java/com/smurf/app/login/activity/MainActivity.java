@@ -1,10 +1,16 @@
 package com.smurf.app.login.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -15,13 +21,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+
 import com.smurf.app.BuildConfig;
+import com.smurf.app.OnDialogApplyPermissionListener;
 import com.smurf.app.R;
 import com.smurf.app.WebViewActivity;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
+import com.smurf.app.utils.PermissionsUtils;
+import com.smurf.app.utils.SharedPreferencesHelper;
 import com.smurf.app.wxapi.WXLogin;
 
 import org.greenrobot.eventbus.EventBus;
@@ -33,16 +44,24 @@ import cn.jiguang.verifysdk.api.VerifyListener;
 
 import com.smurf.app.base.event.*;
 
+import static com.smurf.app.base.StaticNum.REQUEST_LOGIN_STORAGE;
+
 
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
 
-    private String mNumStr;
+    private SharedPreferencesHelper sharedPreferencesHelper;
+    private OnDialogApplyPermissionListener mOnDialogPremission;
+    private Context context;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
+        sharedPreferencesHelper = new SharedPreferencesHelper(
+                this, "smurf");
         initPermission();
 //        finish();
 //        initShowLoginPage();
@@ -51,34 +70,113 @@ public class MainActivity extends Activity {
 
     @SuppressLint("WrongConstant")
     private void initPermission() {
-        Log.d("smurf","request storage, phone");
-        PermissionUtils.permission(PermissionConstants.STORAGE,PermissionConstants.PHONE)
-        .callback(new PermissionUtils.SimpleCallback() {
-            @Override
-            public void onGranted() {
-                Log.d("smurf","request storage, phone allow");
+        Log.d("smurf", "request storage, phone");
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission_group.STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            int isPermiss = (int) sharedPreferencesHelper.get(SharedPreferencesHelper.LOGIN_STORAGE_PERMISSION, 0);
+            if (isPermiss == 0) {
+                PermissionUtils.permission(PermissionConstants.STORAGE)
+                        .callback(new PermissionUtils.SimpleCallback() {
+                            @Override
+                            public void onGranted() {
+                                Log.d("smurf", "request storage, phone allow");
+                                initShowLoginPage();
+                                sharedPreferencesHelper.put(SharedPreferencesHelper.LOGIN_STORAGE_PERMISSION, 1);
+
+                            }
+
+                            @Override
+                            public void onDenied() {
+                                Log.d("smurf", "request storage, phone denied");
+//                Toast.makeText(MainActivity.this,"未开启读取手机状态权限",Toast.LENGTH_SHORT).show();
+                                sharedPreferencesHelper.put(SharedPreferencesHelper.LOGIN_STORAGE_PERMISSION, 2);
+//登陆拒绝权限 开启H5 页面登陆
+                                String url = null;
+                                if (BuildConfig.DEBUG) {
+                                    url = StaticURL.DEBUG_PHONE_LOGIN;
+                                } else {
+                                    url = StaticURL.RELEASE_PHONE_LOGIN;
+                                }
+                                Intent intent = new Intent(context, WebViewActivity.class);
+                                intent.putExtra("web_url", url);
+                                startActivity(intent);
+
+                            }
+                        }).request();
+            } else if (isPermiss == 2) {
+                showDialog("照片、媒体内容和文件读写，电话权限", new OnDialogApplyPermissionListener() {
+                    @Override
+                    public void isPremission(boolean isAllow) {
+                        if (isAllow) {
+                            initShowLoginPage();
+                        }else{
+                            String url = null;
+                            if (BuildConfig.DEBUG) {
+                                url = StaticURL.DEBUG_PHONE_LOGIN;
+                            } else {
+                                url = StaticURL.RELEASE_PHONE_LOGIN;
+                            }
+                            Intent intent = new Intent(context, WebViewActivity.class);
+                            intent.putExtra("web_url", url);
+                            startActivity(intent);
+                        }
+                    }
+                }, REQUEST_LOGIN_STORAGE);
+            } else {
                 initShowLoginPage();
             }
+        }
 
-            @Override
-            public void onDenied() {
-                Log.d("smurf","request storage, phone denied");
-
-                Toast.makeText(MainActivity.this,"未开启读取手机状态权限",Toast.LENGTH_SHORT).show();
-
-            }
-        }).request();
     }
 
-    private void initShowLoginPage(){
+
+    private void showDialog(String serviceName, OnDialogApplyPermissionListener onDialogPremission, int requestCode) {
+        /* @setIcon 设置对话框图标
+         * @setTitle 设置对话框标题
+         * @setMessage 设置对话框消息提示
+         * setXXX方法返回Dialog对象，因此可以链式设置属性
+         */
+        this.mOnDialogPremission = onDialogPremission;
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(this);
+        normalDialog.setIcon(R.drawable.logo);
+        normalDialog.setTitle("蓝晶灵想要使用" + serviceName);
+        normalDialog.setMessage("请在设置-蓝晶灵中开启" + serviceName);
+        normalDialog.setPositiveButton("去设置",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri1 = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri1);
+                        startActivityForResult(intent, requestCode);
+                    }
+                });
+        normalDialog.setNegativeButton("知道了",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if (mOnDialogPremission != null) {
+                            mOnDialogPremission.isPremission(false);
+                        }
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
+
+    private void initShowLoginPage() {
         JVerificationInterface.getToken(this, new VerifyListener() {
             @Override
             public void onResult(int i, String s, String s1) {
-                Log.e(TAG, "onResult: .getToken"+i +" "+s+" "+s1);
+                Log.e(TAG, "onResult: .getToken" + i + " " + s + " " + s1);
             }
         });
         JVerificationInterface.clearPreLoginCache();
-        JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(),null);
+        JVerificationInterface.setCustomUIWithConfig(getFullScreenPortraitConfig(), null);
         JVerificationInterface.loginAuth(this, new VerifyListener() {
             @Override
             public void onResult(final int code, final String token, String operator) {
@@ -88,11 +186,11 @@ public class MainActivity extends Activity {
                     @Override
                     public void run() {
                         if (code == Constants.CODE_LOGIN_SUCCESS) {
-                            toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS,token,0);
+                            toSuccessActivity(Constants.ACTION_LOGIN_SUCCESS, token, 0);
                             Log.e(TAG, "onResult: loginSuccess");
-                        } else if(code != Constants.CODE_LOGIN_CANCELD){
+                        } else if (code != Constants.CODE_LOGIN_CANCELD) {
                             Log.e(TAG, "onResult: loginError");
-                            toFailedActivigy(code,token);
+                            toFailedActivigy(code, token);
                         }
                         finish();
                     }
@@ -102,7 +200,7 @@ public class MainActivity extends Activity {
     }
 
 
-    private JVerifyUIConfig getFullScreenPortraitConfig(){
+    private JVerifyUIConfig getFullScreenPortraitConfig() {
         JVerifyUIConfig.Builder uiConfigBuilder = new JVerifyUIConfig.Builder();
         uiConfigBuilder.setSloganTextColor(0xFFD0D0D9);
         uiConfigBuilder.setLogoOffsetY(103);
@@ -119,9 +217,9 @@ public class MainActivity extends Activity {
         uiConfigBuilder.setLogBtnOffsetY(255);
         uiConfigBuilder.setLogBtnWidth(300);
         uiConfigBuilder.setLogBtnHeight(45);
-        uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5,0xFF8998FF);
+        uiConfigBuilder.setAppPrivacyColor(0xFFBBBCC5, 0xFF8998FF);
 //        uiConfigBuilder.setPrivacyTopOffsetY(310);
-        uiConfigBuilder.setPrivacyText("登录即同意《","","","》并使用本机号码登录");
+        uiConfigBuilder.setPrivacyText("登录即同意《", "", "", "》并使用本机号码登录");
         uiConfigBuilder.setPrivacyCheckboxHidden(false);
         uiConfigBuilder.setPrivacyTextCenterGravity(true);
         uiConfigBuilder.setPrivacyTextSize(12);
@@ -129,11 +227,11 @@ public class MainActivity extends Activity {
 
         // 手机登录按钮
         RelativeLayout.LayoutParams layoutParamPhoneLogin = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamPhoneLogin.setMargins(0, dp2Pix(this,360.0f),0,0);
+        layoutParamPhoneLogin.setMargins(0, dp2Pix(this, 360.0f), 0, 0);
         layoutParamPhoneLogin.addRule(RelativeLayout.ALIGN_PARENT_TOP, RelativeLayout.TRUE);
         layoutParamPhoneLogin.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         TextView tvPhoneLogin = new TextView(this);
-        tvPhoneLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP,22);
+        tvPhoneLogin.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
         tvPhoneLogin.setTextColor(android.graphics.Color.RED);
         tvPhoneLogin.setText("手机号登陆");
         tvPhoneLogin.setLayoutParams(layoutParamPhoneLogin);
@@ -168,9 +266,9 @@ public class MainActivity extends Activity {
         btnWechat.setImageResource(R.drawable.o_wechat);
 
         LinearLayout.LayoutParams btnParam = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        btnParam.setMargins(25,0,25,0);
+        btnParam.setMargins(25, 0, 25, 0);
 
-        layoutLoginGroup.addView(btnWechat,btnParam);
+        layoutLoginGroup.addView(btnWechat, btnParam);
         uiConfigBuilder.addCustomView(layoutLoginGroup, false, new JVerifyUIClickCallback() {
             @Override
             public void onClicked(Context context, View view) {
@@ -218,28 +316,38 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode,Intent intent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        if(resultCode!=0||intent==null){
-            return;
+        if (requestCode == REQUEST_LOGIN_STORAGE) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
+            int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission_group.STORAGE);
+            if (permission != PackageManager.PERMISSION_GRANTED) {
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(false);
+                }
+            } else {
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(true);
+                }
+            }
         }
-        mNumStr = intent.getStringExtra(Constants.KEY_NUM);
     }
 
 
-    private void toSuccessActivity(int action, String token,int type) {
+    private void toSuccessActivity(int action, String token, int type) {
         TokenEvent codeEvent = new TokenEvent();
-        Log.e(TAG, "toSuccessActivity: 12343"+token);
+        Log.e(TAG, "toSuccessActivity: 12343" + token);
         codeEvent.setCode(token);
         EventBus.getDefault().post(codeEvent);
         finish();
 
     }
-    private void toFailedActivigy(int code, String errorMsg){
+
+    private void toFailedActivigy(int code, String errorMsg) {
         String msg = errorMsg;
-        if (code == 2003){
+        if (code == 2003) {
             msg = "网络连接不通";
-            Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 
         }
 //        else if (code == 2005){
@@ -266,31 +374,31 @@ public class MainActivity extends Activity {
 //        }
 
         String url = null;
-        if(BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             url = StaticURL.DEBUG_PHONE_LOGIN;
-        }else{
+        } else {
             url = StaticURL.RELEASE_PHONE_LOGIN;
         }
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("web_url",url);
+        intent.putExtra("web_url", url);
         startActivity(intent);
         finish();
     }
 
     private void toFailedActivityThird(int code, String errorMsg) {
         String msg = errorMsg;
-        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void toNativeVerifyActivity() {
         String url = null;
-        if(BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             url = StaticURL.DEBUG_PHONE_LOGIN;
-        }else{
+        } else {
             url = StaticURL.RELEASE_PHONE_LOGIN;
         }
         Intent intent = new Intent(this, WebViewActivity.class);
-        intent.putExtra("web_url",url);
+        intent.putExtra("web_url", url);
         startActivity(intent);
         finish();
     }
@@ -304,53 +412,4 @@ public class MainActivity extends Activity {
         }
     }
 
-//    private AuthListener mAuthListener = new AuthListener() {
-//        @Override
-//        public void onComplete(Platform platform, int action, BaseResponseInfo data) {
-//            Logger.dd(TAG, "onComplete:" + platform + ",action:" + action + ",data:" + data);
-//            String toastMsg = null;
-//            switch (action) {
-//                case Platform.ACTION_AUTHORIZING:
-//                    if (data instanceof AccessTokenInfo) {        //授权信息
-//                        JVerificationInterface.dismissLoginAuthActivity();
-//                        String token = ((AccessTokenInfo) data).getToken();//token
-//                        long expiration = ((AccessTokenInfo) data).getExpiresIn();//token有效时间，时间戳
-//                        String refresh_token = ((AccessTokenInfo) data).getRefeshToken();//refresh_token
-//                        String openid = ((AccessTokenInfo) data).getOpenid();//openid
-//                        //授权原始数据，开发者可自行处理
-//                        String originData = data.getOriginData();
-//                        toastMsg = "授权成功:" + data.toString();
-//                        Logger.dd(TAG, "openid:" + openid + ",token:" + token + ",expiration:" + expiration + ",refresh_token:" + refresh_token);
-//                        Logger.dd(TAG, "originData:" + originData);
-//                        toSuccessActivity(Constants.ACTION_THIRD_AUTHORIZED_SUCCESS, token,1);
-//                        Log.e(TAG, "onResult: loginSuccess");
-//                    }
-//                    break;
-//            }
-//            JShareInterface.removeAuthorize(platform.getName(),null);
-//        }
-//
-//        @Override
-//        public void onError(Platform platform, int action, int errorCode, Throwable error) {
-//            Logger.dd(TAG, "onError:" + platform + ",action:" + action + ",error:" + error);
-//            switch (action) {
-//                case Platform.ACTION_AUTHORIZING:
-//                    JVerificationInterface.dismissLoginAuthActivity();
-//                    Log.e(TAG, "onResult: loginError:"+errorCode);
-//                    toFailedActivityThird(errorCode, "授权失败" + (error != null ? error.getMessage() : "") + "---" + errorCode);
-//                    break;
-//            }
-//        }
-//
-//        @Override
-//        public void onCancel(Platform platform, int action) {
-//            Logger.dd(TAG, "onCancel:" + platform + ",action:" + action);
-//            String toastMsg = null;
-//            switch (action) {
-//                case Platform.ACTION_AUTHORIZING:
-//                    toastMsg = "取消授权";
-//                    break;
-//            }
-//        }
-//    };
 }

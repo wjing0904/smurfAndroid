@@ -7,6 +7,7 @@ public class SharedPreferencesHelper {
     public static final String WRITE_EXTERNAL_STORAGE = "WRITE_EXTERNAL_STORAGE";
     public static final String CAMERA_PERMISSION = "CAMERA_PERMISSION";
     public static final String LOCAL_PERMISSION = "LOCAL_PERMISSION";
+    public static final String LOGIN_STORAGE_PERMISSION = "LOGIN_STORAGE_PERMISSION";
 
 
 

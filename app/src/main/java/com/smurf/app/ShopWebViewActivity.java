@@ -59,7 +59,7 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
     private boolean isOpenSelected;
 
     private SharedPreferencesHelper sharedPreferencesHelper;
-    private onDialogPremission onDialogPremission;
+    private OnDialogApplyPermissionListener mOnDialogPremission;
 
 
     @Override
@@ -207,12 +207,12 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
 //            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
             int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
             if (permission != PackageManager.PERMISSION_GRANTED) {
-                if (onDialogPremission != null) {
-                    onDialogPremission.isPremission(false);
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(false);
                 }
             } else {
-                if (onDialogPremission != null) {
-                    onDialogPremission.isPremission(true);
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(true);
                 }
             }
         }
@@ -348,7 +348,7 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
                 if (isPermiss == 0) {
                     ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
                 } else if (isPermiss == 2) {
-                    showDialog("照片，多媒体，存储权限", new onDialogPremission() {
+                    showDialog("照片，多媒体，存储权限", new OnDialogApplyPermissionListener() {
                         @Override
                         public void isPremission(boolean isAllow) {
                             if (isAllow) {
@@ -365,13 +365,13 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
 
         }
 
-        private void showDialog(String serviceName, onDialogPremission on, int requestCode) {
+        private void showDialog(String serviceName, OnDialogApplyPermissionListener onDialogPremission, int requestCode) {
             /* @setIcon 设置对话框图标
              * @setTitle 设置对话框标题
              * @setMessage 设置对话框消息提示
              * setXXX方法返回Dialog对象，因此可以链式设置属性
              */
-            onDialogPremission = on;
+            mOnDialogPremission = onDialogPremission;
             final AlertDialog.Builder normalDialog =
                     new AlertDialog.Builder(mContext);
             normalDialog.setIcon(R.drawable.logo);
@@ -393,8 +393,8 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
-                            if (onDialogPremission != null) {
-                                onDialogPremission.isPremission(false);
+                            if (mOnDialogPremission != null) {
+                                mOnDialogPremission.isPremission(false);
                             }
                         }
                     });
@@ -403,10 +403,5 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
         }
 
     }
-
-    public interface onDialogPremission {
-        void isPremission(boolean isAllow);
-    }
-
 
 }

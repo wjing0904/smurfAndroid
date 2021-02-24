@@ -22,6 +22,7 @@ import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
+import com.smurf.app.OnDialogApplyPermissionListener;
 import com.smurf.app.WebViewActivity;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.common.PermissionConstants;
@@ -69,7 +70,7 @@ public class InstallAppPresenter {
 
     public interface PermissionInterface{
         boolean allowPermission();
-        void showDialogPermission(String serviceName, WebViewActivity.onDialogPremission o,int requestCode);
+        void showDialogPermission(String serviceName, OnDialogApplyPermissionListener o, int requestCode);
     }
 
 
@@ -187,7 +188,7 @@ public class InstallAppPresenter {
                                                         }
                                                     }else if(isPermiss == 2){
                                                         if(permissionInterface!= null){
-                                                            permissionInterface.showDialogPermission("存储权限", new WebViewActivity.onDialogPremission() {
+                                                            permissionInterface.showDialogPermission("存储权限", new OnDialogApplyPermissionListener() {
                                                                 @Override
                                                                 public void isPremission(boolean isAllow) {
                                                                     if(isAllow){

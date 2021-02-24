@@ -12,5 +12,7 @@ public class StaticNum {
 
     public static final int REQUEST_SELECT_IMAGES_PERMISSION = 0x0016;
 
+    public static final int REQUEST_LOGIN_STORAGE = 0x0017;
+
 
 }

@@ -113,11 +113,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
     private Context mContext;
 
     private SharedPreferencesHelper sharedPreferencesHelper;
-
-    private boolean isPermiss;
-
-    private onDialogPremission onDialogPremission;
-
+    private OnDialogApplyPermissionListener mOnDialogPremission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,23 +154,6 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         mWebView.loadUrl(webUrl);
         mWebView.addJavascriptInterface(javascriptInterface, "JSInterface");
 
-//        String[] permissions = new String[]{
-//                Manifest.permission.ACCESS_FINE_LOCATION,
-//                Manifest.permission.ACCESS_COARSE_LOCATION,
-//                Manifest.permission.INTERNET};
-//        List<String> permissionList = new ArrayList<>();
-//        for (int i = 0; i < permissions.length; i++) {
-//            if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
-//                permissionList.add(permissions[i]);
-//            }
-//        }
-//        if (permissionList.size() <= 0) {
-//            if (javaScriptPresenter != null) {
-//                javaScriptPresenter.getLocal();
-//            }
-//        } else {
-//            ActivityCompat.requestPermissions(((Activity) this), permissions, REQUEST_LOCAL_CODE);
-//        }
         EventBus.getDefault().register(this);
 
     }
@@ -198,7 +177,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 }
 
                 @Override
-                public void showDialogPermission(String serviceName,onDialogPremission on,int requestCode) {
+                public void showDialogPermission(String serviceName,OnDialogApplyPermissionListener on,int requestCode) {
                     showDialog(serviceName,on,requestCode);
                 }
             });
@@ -207,13 +186,13 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
         installAppPresenter.checkAppInstall();
     }
 
-    private void showDialog(String serviceName,onDialogPremission on,int requestCode){
+    private void showDialog(String serviceName,OnDialogApplyPermissionListener onDialogPremission,int requestCode){
         /* @setIcon 设置对话框图标
          * @setTitle 设置对话框标题
          * @setMessage 设置对话框消息提示
          * setXXX方法返回Dialog对象，因此可以链式设置属性
          */
-        onDialogPremission = on;
+        this.mOnDialogPremission = onDialogPremission;
         final AlertDialog.Builder normalDialog =
                 new AlertDialog.Builder(mContext);
         normalDialog.setIcon(R.drawable.logo);
@@ -235,8 +214,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
-                        if(onDialogPremission!= null){
-                            onDialogPremission.isPremission(false);
+                        if(mOnDialogPremission!= null){
+                            mOnDialogPremission.isPremission(false);
                         }
                     }
                 });
@@ -365,10 +344,6 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 
     }
 
-    public interface onDialogPremission{
-        void isPremission(boolean isAllow);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -377,12 +352,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 //            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
             int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
             if(permission != PackageManager.PERMISSION_GRANTED){
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(false);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(false);
                 }
             }else{
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(true);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(true);
                 }
             }
         }
@@ -401,12 +376,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 //            ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
             int permission = ActivityCompat.checkSelfPermission(mContext,Manifest.permission.CAMERA);
             if(permission != PackageManager.PERMISSION_GRANTED){
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(false);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(false);
                 }
             }else{
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(true);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(true);
                 }
             }
         }
@@ -450,12 +425,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 }
             }
             if (permissionList.size() <= 0) {
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(true);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(true);
                 }
             }else{
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(false);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(false);
                 }
             }
         }
@@ -465,12 +440,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             int permission = ActivityCompat.checkSelfPermission(mContext,
                     "android.permission.WRITE_EXTERNAL_STORAGE");
             if(permission != PackageManager.PERMISSION_GRANTED){
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(false);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(false);
                 }
             }else{
-                if(onDialogPremission!= null){
-                    onDialogPremission.isPremission(true);
+                if(mOnDialogPremission!= null){
+                    mOnDialogPremission.isPremission(true);
                 }
             }
         }
@@ -527,7 +502,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(isPermiss == 0){
                     ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                 }else if(isPermiss == 2){
-                    showDialog("照片，多媒体，存储权限", new onDialogPremission() {
+                    showDialog("照片，多媒体，存储权限", new OnDialogApplyPermissionListener() {
                         @Override
                         public void isPremission(boolean isAllow) {
                             if(isAllow){
@@ -557,7 +532,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(isPermiss == 0){
                     ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
                 }else if(isPermiss == 2){
-                    showDialog("照片，多媒体，存储权限", new onDialogPremission() {
+                    showDialog("照片，多媒体，存储权限", new OnDialogApplyPermissionListener() {
                         @Override
                         public void isPremission(boolean isAllow) {
                             if(isAllow){
@@ -609,7 +584,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 if(isPermiss == 0){
                     ActivityCompat.requestPermissions(((Activity) mContext), permissions, REQUEST_LOCAL_CODE);
                 }else if(isPermiss == 2){
-                    showDialog("定位权限", new onDialogPremission() {
+                    showDialog("定位权限", new OnDialogApplyPermissionListener() {
                         @Override
                         public void isPremission(boolean isAllow) {
                             if(isAllow){
