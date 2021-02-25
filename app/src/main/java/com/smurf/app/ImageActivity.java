@@ -127,7 +127,9 @@ public class ImageActivity extends Activity {
                             }
                         }, REQUEST_FDD_CODE);
                     } else {
-                        saveCroppedImage(((BitmapDrawable) bannerItemView.getDrawable()).getBitmap());
+                        sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION, 0);
+                        ActivityCompat.requestPermissions((Activity) mContext,
+                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_FDD_CODE);
                     }
                 } else {
                     saveCroppedImage(((BitmapDrawable) bannerItemView.getDrawable()).getBitmap());

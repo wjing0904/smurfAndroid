@@ -361,8 +361,8 @@ public class ShopWebViewActivity extends AppCompatActivity implements IWebViewIn
                         }
                     }, REQUEST_SELECT_IMAGES_PERMISSION);
                 }else{
-                    if (javaScriptPresenter != null)
-                        javaScriptPresenter.openImageSelected(picNum);
+                    sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 0);
+                    ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
                 }
             } else {
                 if (javaScriptPresenter != null)

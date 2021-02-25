@@ -201,7 +201,9 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                     }
                 });
             }else{
-                show();
+                sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION,0);
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_FDD_CODE);
             }
         } else {
             show();

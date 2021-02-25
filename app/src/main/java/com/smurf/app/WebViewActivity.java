@@ -551,8 +551,9 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                         }
                     }, REQUEST_CAMERA_PERMISSION);
                 } else {
-                    if (javaScriptPresenter != null)
-                        javaScriptPresenter.openZxing();
+                    sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 0);
+                    ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+
                 }
             } else {
                 if (javaScriptPresenter != null)
@@ -584,8 +585,9 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                         }
                     }, REQUEST_SELECT_IMAGES_PERMISSION);
                 } else {
-                    if (javaScriptPresenter != null)
-                        javaScriptPresenter.openImageSelected(picNum);
+                    sharedPreferencesHelper.put(SharedPreferencesHelper.CAMERA_PERMISSION, 0);
+                    ActivityCompat.requestPermissions(((Activity) mContext), new String[]{Manifest.permission.CAMERA}, REQUEST_SELECT_IMAGES_PERMISSION);
+
                 }
             } else {
                 if (javaScriptPresenter != null)
@@ -639,9 +641,9 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                         }
                     }, REQUEST_LOCAL_CODE);
                 } else {
-                    if (javaScriptPresenter != null) {
-                        javaScriptPresenter.getLocal();
-                    }
+                    sharedPreferencesHelper.put(SharedPreferencesHelper.LOCAL_PERMISSION, 0);
+                    ActivityCompat.requestPermissions(((Activity) mContext), permissions, REQUEST_LOCAL_CODE);
+
                 }
             }
         }
@@ -683,7 +685,10 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                                             }
                                         }, REQUEST_FDD_CODE);
                                     } else {
-                                        SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);
+//                                        SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);
+                                        sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION, 0);
+                                        ActivityCompat.requestPermissions((Activity) mContext,
+                                                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_FDD_CODE);
                                     }
                                 } else {
                                     SaveImageUtils.saveImageToGallerys(WebViewActivity.this, resource);

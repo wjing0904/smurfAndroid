@@ -126,7 +126,8 @@ public class MainActivity extends Activity {
                     }
                 }, REQUEST_LOGIN_STORAGE);
             } else {
-                initShowLoginPage();
+                sharedPreferencesHelper.put(SharedPreferencesHelper.LOGIN_STORAGE_PERMISSION, 0);
+                initPermission();
             }
         }
 

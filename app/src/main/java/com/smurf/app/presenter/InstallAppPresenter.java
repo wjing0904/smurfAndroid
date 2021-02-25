@@ -196,7 +196,15 @@ public class InstallAppPresenter {
                                                             },REQUEST_DIALOG_CODE);
                                                         }
                                                     }else{
-                                                        downloadAPK(installUrl);
+                                                        sharedPreferencesHelper.put(SharedPreferencesHelper.WRITE_EXTERNAL_STORAGE,0);
+                                                        if(permissionInterface!= null){
+                                                            if(!permissionInterface.allowPermission()){
+                                                                if (upgradeDialog != null)
+                                                                    upgradeDialog.dismiss();
+                                                            }else{
+                                                                downloadAPK(installUrl);
+                                                            }
+                                                        }
                                                     }
                                                 }else{
                                                     downloadAPK(installUrl);
