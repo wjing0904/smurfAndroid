@@ -15,7 +15,7 @@ public class StaticURL {
     //首页
 
     public static final String DEBUG_APP_URL = "http://39.107.84.57:8097/#/index";
-    public static final String RELEASE_APP_URL = "https://smurf.langongbao.com/#/home";
+    public static final String RELEASE_APP_URL = "https://smurf.langongbao.com/#/index";
 
     //升级地址
     public static final String DEBUG_APK_INSTALL_URL = "http://39.107.84.57:8093/api/sys/vno/detect";
