@@ -1,4 +1,4 @@
-package com.smurf.app.utils;
+package com.smurf.app.base.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +9,7 @@ public class SharedPreferencesHelper {
     public static final String LOCAL_PERMISSION = "LOCAL_PERMISSION";
     public static final String LOGIN_STORAGE_PERMISSION = "LOGIN_STORAGE_PERMISSION";
 
+    public static final String FDD_PERMISSION = "FDD_PERMISSION";
 
 
 

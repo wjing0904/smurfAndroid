@@ -51,20 +51,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.smurf.app.base.StaticNum.REQUEST_FDD_CODE;
+import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_PERMISSION;
 import static com.smurf.app.base.StaticURL.DEBUG_BASE;
 import static com.smurf.app.base.StaticURL.DEBUG_BASE_QY;
 import static com.smurf.app.base.StaticURL.RELEASE_BASE;
 import static com.smurf.app.base.StaticURL.RELEASE_BASE_QY;
 
 import com.smurf.app.base.BuildConfig;
+import com.smurf.app.base.OnDialogApplyPermissionListener;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.base.event.*;
 import com.smurf.app.base.utils.ShareUtil;
+import com.smurf.app.base.utils.SharedPreferencesHelper;
 import com.smurf.app.base.utils.ThreadUtils;
 
 public class FaceVerifyHostActivity extends AppCompatActivity {
-
-    final static int REQUEST_PERMISSION = 1;
 
     private WebView webView;
 
@@ -80,11 +82,16 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     //拍照
     private final static int FILE_CAMERA_RESULT_CODE = 129;
 
+    private SharedPreferencesHelper sharedPreferencesHelper;
+
+    private OnDialogApplyPermissionListener mOnDialogPremission;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fddcloudface);
-
+        sharedPreferencesHelper = new SharedPreferencesHelper(
+                this, "smurf");
         webView = (WebView) findViewById(R.id.wv_host);
 
 
@@ -176,42 +183,93 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     }
 
     private void openImageChooserActivity() {
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+            int isPermiss = (int)sharedPreferencesHelper.get(SharedPreferencesHelper.FDD_PERMISSION,0);
+            if(isPermiss == 0){
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_FDD_CODE);
+            }else if(isPermiss == 2){
+                showDialog("照片，多媒体，存储权限", new OnDialogApplyPermissionListener() {
+                    @Override
+                    public void isPremission(boolean isAllow) {
+                        if (isAllow) {
+                            show();
+                        }
+                    }
+                });
+            }
+
         } else {
-            new MaterialDialog.Builder(this)
-                    .items(R.array.photo)
-                    .positiveText("取消")
-                    .onPositive(new MaterialDialog.SingleButtonCallback() {
-                        @Override
-                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            if (uploadMessageAboveL != null) {
-                                uploadMessageAboveL.onReceiveValue(null);
-                                uploadMessageAboveL = null;
-                            }
-                            if (uploadMessage != null) {
-                                uploadMessage.onReceiveValue(null);
-                                uploadMessage = null;
-                            }
-                            dialog.dismiss();
-                        }
-                    })
-                    .cancelable(false)
-                    .canceledOnTouchOutside(false)
-                    .itemsCallback(new MaterialDialog.ListCallback() {
-                        @Override
-                        public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
-                            if (position == 0) {
-                                takeCamera();
-                            } else if (position == 1) {
-                                takePhoto();
-                            }
-                        }
-                    }).show();
+            show();
         }
+    }
+
+    private void showDialog(String serviceName, OnDialogApplyPermissionListener onDialogPremission) {
+        mOnDialogPremission = onDialogPremission;
+        final AlertDialog.Builder normalDialog =
+                new AlertDialog.Builder(this);
+        normalDialog.setIcon(R.drawable.logo);
+        normalDialog.setTitle("蓝晶灵想要使用" + serviceName);
+        normalDialog.setMessage("请在设置-蓝晶灵中开启" + serviceName);
+        normalDialog.setPositiveButton("去设置",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri1 = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri1);
+                        startActivityForResult(intent, REQUEST_FDD_CODE);
+                    }
+                });
+        normalDialog.setNegativeButton("知道了",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if (mOnDialogPremission != null) {
+                            mOnDialogPremission.isPremission(false);
+                        }
+                    }
+                });
+        // 显示
+        normalDialog.show();
+    }
+
+
+    private void show(){
+        new MaterialDialog.Builder(this)
+                .items(R.array.photo)
+                .positiveText("取消")
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        if (uploadMessageAboveL != null) {
+                            uploadMessageAboveL.onReceiveValue(null);
+                            uploadMessageAboveL = null;
+                        }
+                        if (uploadMessage != null) {
+                            uploadMessage.onReceiveValue(null);
+                            uploadMessage = null;
+                        }
+                        dialog.dismiss();
+                    }
+                })
+                .cancelable(false)
+                .canceledOnTouchOutside(false)
+                .itemsCallback(new MaterialDialog.ListCallback() {
+                    @Override
+                    public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                        if (position == 0) {
+                            takeCamera();
+                        } else if (position == 1) {
+                            takePhoto();
+                        }
+                    }
+                }).show();
     }
 
     //选择图片
@@ -239,11 +297,15 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
-            case REQUEST_PERMISSION:
+            case REQUEST_FDD_CODE:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     openImageChooserActivity();
+                    sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION, 1);
+
                 } else {
                     uploadMessageAboveL.onReceiveValue(null);
+                    sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION, 2);
+
                 }
         }
     }
@@ -291,45 +353,23 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                 uploadMessage = null;
             }
         }
+
+        if(requestCode == REQUEST_FDD_CODE){
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this,
+                    Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(false);
+                }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION, 2);
+            }else{
+                if (mOnDialogPremission != null) {
+                    mOnDialogPremission.isPremission(true);
+                }
+                sharedPreferencesHelper.put(SharedPreferencesHelper.FDD_PERMISSION, 1);
+            }
+        }
     }
-
-//    private void showDialog(String serviceName,OnDialogApplyPermissionListener onDialogPremission,int requestCode){
-//        /* @setIcon 设置对话框图标
-//         * @setTitle 设置对话框标题
-//         * @setMessage 设置对话框消息提示
-//         * setXXX方法返回Dialog对象，因此可以链式设置属性
-//         */
-//        this.mOnDialogPremission = onDialogPremission;
-//        final AlertDialog.Builder normalDialog =
-//                new AlertDialog.Builder(this);
-//        normalDialog.setIcon(R.drawable.logo);
-//        normalDialog.setTitle("蓝晶灵想要使用"+serviceName);
-//        normalDialog.setMessage("请在设置-蓝晶灵中开启"+serviceName);
-//        normalDialog.setPositiveButton("去设置",
-//                new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Intent intent = new Intent();
-//                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-//                        Uri uri1 = Uri.fromParts("package", mContext.getPackageName(), null);
-//                        intent.setData(uri1);
-//                        ((Activity)mContext).startActivityForResult(intent,requestCode);
-//                    }
-//                });
-//        normalDialog.setNegativeButton("知道了",
-//                new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                        if(mOnDialogPremission!= null){
-//                            mOnDialogPremission.isPremission(false);
-//                        }
-//                    }
-//                });
-//        // 显示
-//        normalDialog.show();
-//    }
-
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void onActivityResultAboveL(Intent intent) {

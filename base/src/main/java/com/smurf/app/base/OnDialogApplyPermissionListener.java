@@ -1,4 +1,4 @@
-package com.smurf.app;
+package com.smurf.app.base;
 
 public interface OnDialogApplyPermissionListener {
     void isPremission(boolean isAllow);

@@ -21,12 +21,12 @@ import androidx.core.content.FileProvider;
 
 import com.google.gson.Gson;
 import com.smurf.app.BuildConfig;
-import com.smurf.app.OnDialogApplyPermissionListener;
+import com.smurf.app.base.OnDialogApplyPermissionListener;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.upgrade.CouponBean;
 import com.smurf.app.upgrade.UpgradeDialog;
 import com.smurf.app.base.utils.ThreadUtils;
-import com.smurf.app.utils.SharedPreferencesHelper;
+import com.smurf.app.base.utils.SharedPreferencesHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;

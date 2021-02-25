@@ -14,5 +14,7 @@ public class StaticNum {
 
     public static final int REQUEST_LOGIN_STORAGE = 0x0017;
 
+    public static final int REQUEST_FDD_CODE = 0x0019;
+
 
 }

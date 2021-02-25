@@ -24,14 +24,14 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 
 import com.smurf.app.BuildConfig;
-import com.smurf.app.OnDialogApplyPermissionListener;
+import com.smurf.app.base.OnDialogApplyPermissionListener;
 import com.smurf.app.R;
 import com.smurf.app.WebViewActivity;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.login.common.Constants;
 import com.smurf.app.login.common.PermissionConstants;
 import com.smurf.app.login.utils.PermissionUtils;
-import com.smurf.app.utils.SharedPreferencesHelper;
+import com.smurf.app.base.utils.SharedPreferencesHelper;
 import com.smurf.app.wxapi.WXLogin;
 
 import org.greenrobot.eventbus.EventBus;

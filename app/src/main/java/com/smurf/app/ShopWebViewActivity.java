@@ -32,18 +32,18 @@ import com.esafirm.imagepicker.features.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 import com.fadada.faceverifysdk.constant.FddCloudFaceConstant;
 import com.smurf.app.base.BuildConfig;
+import com.smurf.app.base.OnDialogApplyPermissionListener;
 import com.smurf.app.base.StaticURL;
 import com.smurf.app.base.utils.BitmapUtils;
 import com.smurf.app.base.utils.ShareUtil;
 import com.smurf.app.presenter.JavaScriptPresenter;
-import com.smurf.app.utils.SharedPreferencesHelper;
+import com.smurf.app.base.utils.SharedPreferencesHelper;
 import com.smurf.app.view.IWebViewInterface;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.smurf.app.base.StaticNum.REQUEST_CAMERA_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_CODE;
 import static com.smurf.app.base.StaticNum.REQUEST_SELECT_IMAGES_PERMISSION;
 
