@@ -200,8 +200,9 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
                         }
                     }
                 });
+            }else{
+                show();
             }
-
         } else {
             show();
         }
@@ -370,6 +371,7 @@ public class FaceVerifyHostActivity extends AppCompatActivity {
             }
         }
     }
+
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void onActivityResultAboveL(Intent intent) {

@@ -525,6 +525,9 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                             }
                         }
                     },REQUEST_CAMERA_PERMISSION);
+                }else{
+                    if (javaScriptPresenter != null)
+                        javaScriptPresenter.openZxing();
                 }
             } else {
                 if (javaScriptPresenter != null)
@@ -555,6 +558,9 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                             }
                         }
                     },REQUEST_SELECT_IMAGES_PERMISSION);
+                }else{
+                    if (javaScriptPresenter != null)
+                        javaScriptPresenter.openImageSelected(picNum);
                 }
             } else {
                 if (javaScriptPresenter != null)
@@ -608,6 +614,10 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                             }
                         }
                     },REQUEST_LOCAL_CODE);
+                }else{
+                    if (javaScriptPresenter != null) {
+                        javaScriptPresenter.getLocal();
+                    }
                 }
             }
         }
