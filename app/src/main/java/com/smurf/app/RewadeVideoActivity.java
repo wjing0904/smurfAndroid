@@ -17,7 +17,7 @@ import org.greenrobot.eventbus.EventBus;
 
 
 public class RewadeVideoActivity extends Activity {
-    private static final String ADID = "102903";
+    private static final String ADID = "103455";
 
     private RewardedVideoAd mRewardedVideoAd;
     private AlertDialog alertDialog;
@@ -39,6 +39,9 @@ public class RewadeVideoActivity extends Activity {
              */
             @Override
             public void onRewarded() {
+                VideoEvent videoEvent = new VideoEvent();
+                videoEvent.isRewarded = true;
+                EventBus.getDefault().post(videoEvent);
             }
 
             /**

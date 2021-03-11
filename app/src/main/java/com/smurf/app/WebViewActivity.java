@@ -20,6 +20,8 @@ import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -60,6 +62,7 @@ import com.smurf.app.view.IWebViewInterface;
 import com.smurf.app.webView.X5WebView;
 import com.tencent.smtt.export.external.interfaces.ConsoleMessage;
 import com.tencent.smtt.sdk.WebChromeClient;
+import com.tencent.smtt.sdk.WebView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -99,7 +102,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
             "android.permission.READ_EXTERNAL_STORAGE",
             "android.permission.WRITE_EXTERNAL_STORAGE"};
 
-    private FrameLayout fmLayout;
+    private LinearLayout waitingLayout;
 
     private boolean isOpenZxing;
     private boolean isOpenSelected;
@@ -115,6 +118,7 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
 
     private SharedPreferencesHelper sharedPreferencesHelper;
     private OnDialogApplyPermissionListener mOnDialogPremission;
+    private TextView tvWaiting;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,6 +149,12 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 Log.i("consoleMessage", consoleMessage.message());
                 return super.onConsoleMessage(consoleMessage);
             }
+
+            @Override
+            public void onProgressChanged(WebView webView, int i) {
+                super.onProgressChanged(webView, i);
+//                tvWaiting.setText("蓝晶灵正在努力加载数据 "+ i+"% ,请稍等......");
+            }
         });
 
         mWebView.getSettings();
@@ -162,7 +172,8 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
     private void initView() {
         //logoImg = findViewById(R.id.logo_img);
         //Glide.with(this).load(R.mipmap.logo_start).into(logoImg);
-        //fmLayout = findViewById(R.id.delay_layout);
+        waitingLayout = findViewById(R.id.layout_waiting);
+        tvWaiting = findViewById(R.id.tv_progress);
 //        verifyStoragePermissions(this);
 
         //检查APP是否需要更新
@@ -269,13 +280,19 @@ public class WebViewActivity extends AppCompatActivity implements IWebViewInterf
                 mWebView.loadUrl("javascript:videoStart()");
             }
         }
+
+        if(mWebView!= null){
+            if(event.isRewarded){
+                mWebView.loadUrl("javascript:onRewarded()");
+            }
+        }
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void webViewPageFinished(WebViewEvent webViewEvent) {
-        if (fmLayout != null) {
-            fmLayout.setVisibility(View.GONE);
+        if (waitingLayout != null) {
+            waitingLayout.setVisibility(View.GONE);
         }
     }
 

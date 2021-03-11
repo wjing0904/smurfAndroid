@@ -3,6 +3,7 @@ package com.smurf.app.webView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.AttributeSet;
 

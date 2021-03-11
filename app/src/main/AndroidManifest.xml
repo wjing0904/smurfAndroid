@@ -153,28 +153,38 @@
 
         <!-- gdt Ad -->
 
-        <activity
-            android:name="com.qq.e.ads.ADActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name="com.qq.e.ads.PortraitADActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="com.qq.e.ads.LandscapeADActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
-            android:screenOrientation="landscape" />
+<!--        <activity-->
+<!--            android:name="com.qq.e.ads.ADActivity"-->
+<!--            android:configChanges="keyboard|keyboardHidden|orientation|screenSize" />-->
+<!--        <activity-->
+<!--            android:name="com.qq.e.ads.PortraitADActivity"-->
+<!--            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"-->
+<!--            android:screenOrientation="portrait" />-->
+<!--        <activity-->
+<!--            android:name="com.qq.e.ads.LandscapeADActivity"-->
+<!--            android:configChanges="keyboard|keyboardHidden|orientation|screenSize"-->
+<!--            android:screenOrientation="landscape" />-->
 
-        <service
-            android:name="com.qq.e.comm.DownloadService"
-            android:exported="false" />
+<!--        <service-->
+<!--            android:name="com.qq.e.comm.DownloadService"-->
+<!--            android:exported="false" />-->
 
-        <!--如果targetSdkVersion设置值>=24，则必须添加以下provider，否则会影响app变现效率-->
-        <!--请开发者根据自己PackageName来替换${applicationId}这个字段-->
-        <!--特别注意这个authorities中的fileprovider为全部小写-->
+<!--        &lt;!&ndash;如果targetSdkVersion设置值>=24，则必须添加以下provider，否则会影响app变现效率&ndash;&gt;-->
+<!--        &lt;!&ndash;请开发者根据自己PackageName来替换${applicationId}这个字段&ndash;&gt;-->
+<!--        &lt;!&ndash;特别注意这个authorities中的fileprovider为全部小写&ndash;&gt;-->
+<!--        <provider-->
+<!--            android:name="androidx.core.content.FileProvider"-->
+<!--            android:authorities="com.smurf.app.fileprovider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true">-->
+<!--            <meta-data-->
+<!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
+<!--                android:resource="@xml/gdt_file_path" />-->
+<!--        </provider>-->
+
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.smurf.app.fileprovider"
+            android:name="com.qq.e.comm.GDTFileProvider"
+            android:authorities="${applicationId}.gdt.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -199,13 +209,28 @@
 
         <!-- BaiDu Ad -->
 
+<!--        <activity-->
+<!--            android:name="com.baidu.mobads.AppActivity"-->
+<!--            android:configChanges="screenSize|keyboard|keyboardHidden|orientation"-->
+<!--            android:theme="@android:style/Theme.Translucent.NoTitleBar" />-->
+
+<!--        <provider-->
+<!--            android:name="com.baidu.mobads.openad.FileProvider"-->
+<!--            android:authorities="${applicationId}.bd.provider"-->
+<!--            android:exported="false"-->
+<!--            android:grantUriPermissions="true">-->
+<!--            <meta-data-->
+<!--                android:name="android.support.FILE_PROVIDER_PATHS"-->
+<!--                android:resource="@xml/bd_file_paths" />-->
+<!--        </provider>-->
+
         <activity
             android:name="com.baidu.mobads.AppActivity"
             android:configChanges="screenSize|keyboard|keyboardHidden|orientation"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" />
 
         <provider
-            android:name="com.baidu.mobads.openad.FileProvider"
+            android:name="com.baidu.mobads.openad.BdFileProvider"
             android:authorities="${applicationId}.bd.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -213,6 +238,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/bd_file_paths" />
         </provider>
+
 
         <!-- CSJ Ad -->
         <provider
@@ -224,6 +250,11 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <provider
+            android:name="com.bytedance.sdk.openadsdk.multipro.TTMultiProvider"
+            android:authorities="${applicationId}.TTMultiProvider"
+            android:exported="false" />
 
         <!--        com.smurf.app-->
 
@@ -295,5 +326,6 @@
     <uses-permission android:name="android.permission.READ_LOGS"
         tools:ignore="ProtectedPermissions" />
 
+    <uses-sdk tools:overrideLibrary="com.adhub.ads,com.hubcloud.adhubsdk,com.bun.miitmdid,com.kwad.sdk" />
 
 </manifest>

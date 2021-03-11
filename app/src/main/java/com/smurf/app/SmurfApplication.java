@@ -14,7 +14,7 @@ import cn.jiguang.verifysdk.api.RequestCallback;
 
 public class SmurfApplication  extends Application {
 
-    private static final String APPID = "20018";
+    private static final String APPID = "20236";
 
     private static SmurfApplication SApp;
 
